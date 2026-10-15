@@ -1,23 +1,23 @@
-# Documentation index
+# Kazalo dokumentacije
 
-Rules: [AGENTS.md](../AGENTS.md). Project entry point: [README.md](../README.md).
+Pravila: [AGENTS.md](../AGENTS.md). Uvod u projekt: [README.md](../README.md).
 
-## Workflow
+## Tijek rada
 
-- [Documentation index](INDEX.md): this file.
-- [Change protocol](CHANGE_PROTOCOL.md): tasks, review, propagation checklist and handover.
-- [Pipeline](plan/PIPELINE.md): repository structure, local commands, CI and finish checks.
-- [AI review](plan/AI_REVIEW.md): findings, review, daily audit and shared context.
+- [Kazalo dokumentacije](INDEX.md): ova datoteka.
+- [Protokol promjena](CHANGE_PROTOCOL.md): zadaci, pregled, usklađivanje dokumentacije i predaja rada.
+- [Tijek rada i provjera](plan/PIPELINE.md): struktura repozitorija, lokalne naredbe, CI i završne provjere.
+- [Pregled i nalazi](plan/AI_REVIEW.md): nalazi, pregled promjena, dnevna provjera i zajednički kontekst.
 
-## Project and research
+## Projekt i istraživanje
 
-- [Project](plan/PROJECT.md): scope, deliverables, shared understanding and open decisions.
-- [Tasks](plan/TASKS.md): milestones, dependencies, status and completion evidence.
-- [Methodology](plan/METHODOLOGY.md): mathematical depth, implementation verification and experiments.
-- [Literature](research/LITERATURE.md): supplied papers and the learning sequence.
+- [Projekt](plan/PROJECT.md): opseg, predaja, zajedničko razumijevanje i otvorene odluke.
+- [Zadaci](plan/TASKS.md): etape, ovisnosti, stanje i dokazi dovršenosti.
+- [Metodologija](plan/METHODOLOGY.md): matematička razrada, provjera implementacije i eksperimenti.
+- [Literatura](research/LITERATURE.md): priloženi radovi i predloženi redoslijed učenja.
 
-## Decisions
+## Odluke
 
-- [ADR format](plan/adr/README.md).
-- [ADR-0001](plan/adr/0001-seminar-scope-and-shared-understanding.md): scope and whole-project understanding.
-- [ADR-0002](plan/adr/0002-workflow-and-reproducibility.md): collaborative workflow and reproducible evidence.
+- [Format zapisa odluka](plan/adr/README.md).
+- [ADR-0001](plan/adr/0001-seminar-scope-and-shared-understanding.md): opseg i razumijevanje cijelog projekta.
+- [ADR-0002](plan/adr/0002-workflow-and-reproducibility.md): suradnja, tijek rada i ponovljivost rezultata.

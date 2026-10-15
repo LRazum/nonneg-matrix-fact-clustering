@@ -1,42 +1,42 @@
-# ADR-0001: Study and implement NMF with whole-project understanding for all three members
+# ADR-0001: Proučiti i implementirati NMF uz razumijevanje cijelog projekta za sve troje
 
-**Date:** 2026-10-15 · **Status:** accepted (scope specified by Lovro, 2026-10-15)
+**Datum:** 2026-10-15 · **Status:** prihvaćeno (opseg odredio Lovro, 2026-10-15)
 
-## Context
+## Kontekst
 
-The course is Matrične i tenzorske metode u analizi podataka. Mislav, Sara and Lovro work on a
-seminar together. Six research papers were supplied; Lovro identified Gillis's
-main_NNMF-general.pdf as the main required source and NMF as the central method.
+Kolegij je Matrične i tenzorske metode u analizi podataka. Mislav, Sara i Lovro zajedno rade
+seminar. Priloženo je šest znanstvenih radova; Lovro je odredio Gillisov rad
+main_NNMF-general.pdf kao glavni obvezni izvor, a NMF kao glavnu metodu.
 
-## Decision
+## Odluka
 
-1. Learn the theory with detailed mathematical reasoning, understand a numerical method,
-   implement it in Python and apply it to a new concrete problem and dataset.
-2. A new concrete case in a domain already mentioned by the papers is sufficient; another
-   domain is also possible. A new NMF algorithm is not required.
-3. Deliver a written seminar, presentation, code and experimental results.
-4. Every member learns the mathematics, algorithm, data, implementation and interpretation.
-   Do not divide long-term knowledge ownership by subject. Task allocation is decided later.
-5. Application, dataset, objective/solver, dependencies, document formats and deadline remain
-   open. The workflow setup does not select or implement the scientific method.
+1. Naučiti teoriju uz detaljnu matematičku razradu, razumjeti numeričku metodu, implementirati
+   je u Pythonu i primijeniti na nov konkretan problem i skup podataka.
+2. Dovoljan je nov konkretan slučaj u domeni koju radovi već spominju; moguća je i druga domena.
+   Razvoj novog algoritma za NMF nije obvezan.
+3. Predati pisani seminar, prezentaciju, kod i eksperimentalne rezultate.
+4. Svaki član uči matematiku, algoritam, podatke, implementaciju i interpretaciju. Znanje se
+   dugoročno ne dijeli po područjima između članova. Podjela zadataka dogovara se kasnije.
+5. Primjena, skup podataka, funkcija cilja i algoritam, ovisnosti, formati dokumenata i rok
+   ostaju otvoreni. Postavljanje načina rada ne uključuje izbor ni implementaciju metode.
 
-## Why
+## Obrazloženje
 
-The learning objective is to understand a method deeply enough to implement, explain and
-evaluate it. Mathematical derivations and reproducible evidence support that understanding.
-All three members need to explain the same complete project.
+Cilj učenja je razumjeti metodu dovoljno dobro za njezinu implementaciju, objašnjenje i
+evaluaciju. Matematički izvodi i reproducibilni dokazi podupiru to razumijevanje. Sve troje
+treba moći objasniti cijeli projekt.
 
-## What was rejected
+## Odbačene mogućnosti
 
-- A mathematical treatment limited to the NMF definition: Lovro explicitly requested more depth.
-- Permanent mathematics/code/experiment ownership by different members: Lovro explicitly
-  requires everyone to know the entire project.
-- Treating document clustering or rank-2 hierarchy as already required: NMF is the main
-  method and the application is still open.
-- Selecting implementation details during workflow setup: the team will agree these later.
+- Matematička obrada ograničena na definiciju NMF-a: Lovro je izričito zatražio veću dubinu.
+- Trajna podjela odgovornosti za matematiku, kod i eksperimente po članovima: Lovro izričito
+  traži da svi poznaju cijeli projekt.
+- Pretpostavka da je klasteriranje dokumenata ili hijerarhija ranga 2 već obvezna: NMF je glavna
+  metoda, a primjena je još otvorena.
+- Izbor detalja implementacije tijekom postavljanja načina rada: tim će ih dogovoriti kasnije.
 
-## Consequences
+## Posljedice
 
-The scope is reflected in `AGENTS.md`, `docs/plan/PROJECT.md`, `docs/plan/TASKS.md`,
-`docs/plan/METHODOLOGY.md` and `docs/research/LITERATURE.md`. Future decisions need to preserve
-whole-project learning and connect mathematics, code and experimental interpretation.
+Opseg je prenesen u `AGENTS.md`, `docs/plan/PROJECT.md`, `docs/plan/TASKS.md`,
+`docs/plan/METHODOLOGY.md` i `docs/research/LITERATURE.md`. Buduće odluke moraju zadržati
+zajedničko učenje cijelog projekta i povezati matematiku, kod i interpretaciju eksperimenata.

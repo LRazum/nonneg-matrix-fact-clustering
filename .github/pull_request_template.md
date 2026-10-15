@@ -1,37 +1,39 @@
-## What and why
+## Što se mijenja i zašto
 
-<!-- State the problem and resulting change. Link the task and any relevant ADR/finding. -->
+<!-- Navedite problem i promjenu koja ga rješava. Povežite zadatak i relevantni ADR ili nalaz. -->
 
-## Mathematical and experimental impact
+## Utjecaj na matematiku i eksperimente
 
-<!-- State changes to assumptions, derivation, algorithm, data, settings or reported results.
-     For a workflow-only change, say not applicable. Link sources/runs where relevant. -->
+<!-- Navedite promjene pretpostavki, izvoda, algoritma, podataka, postavki ili prijavljenih
+     rezultata. Ako se mijenja samo način rada, navedite da nije primjenjivo.
+     Povežite izvore i izvođenja gdje je relevantno. -->
 
-## Verified
+## Provedene provjere
 
-<!-- Record the revision or working-tree state, actual commands and counts. Never turn
-     NOT RUN or a prepared workflow definition into a claimed pass. -->
+<!-- Zabilježite reviziju ili stanje radnog stabla, stvarno pokrenute naredbe i broj provjera.
+     NOT RUN ili pripremljena definicija automatizacije ne znače da je provjera prošla. -->
 
-- Revision / working-tree state:
-- Documentation check:
-- Tools unit tests:
-- Numerical / experiment / document build checks, if applicable:
-- Checks not run and why:
+- Revizija / stanje radnog stabla:
+- Provjera dokumentacije:
+- Jedinični testovi alata:
+- Numeričke provjere / provjere eksperimenata / izgradnje dokumenata, ako je primjenjivo:
+- Nepokrenute provjere i razlozi:
 
-## Documentation
+## Dokumentacija
 
-<!-- Which rows of docs/CHANGE_PROTOCOL.md apply, and what was updated? -->
+<!-- Koji se redci iz docs/CHANGE_PROTOCOL.md primjenjuju i što je ažurirano? -->
 
-## Review and shared understanding
+## Pregled i zajedničko razumijevanje
 
-<!-- At least one other human team member reviews before merge. Record an actual walkthrough
-     when it happened, unresolved questions, and what the third member still needs to review.
-     Do not pre-fill anyone's approval or understanding. The one-time user-authorized initial
-     workflow PR exception is documented in ADR-0002; later PRs use the normal rule. -->
+<!-- Prije spajanja promjenu pregledava barem jedan drugi član tima. Zabilježite stvarni
+     zajednički prolaz ako je održan, neriješena pitanja i što treći član još treba pregledati.
+     Nemojte unaprijed upisivati ničije odobrenje ili razumijevanje. Konkretne korisnički
+     odobrene iznimke dokumentirane su u dodacima zapisa ADR-0002;
+     svi ostali PR-ovi slijede uobičajeno pravilo. -->
 
-- Human reviewer:
-- Questions / follow-up:
+- Član tima koji pregledava:
+- Pitanja / naknadni zadaci:
 
-## Dependencies and remaining work
+## Ovisnosti i preostali posao
 
-<!-- State dependent PRs/tasks and material limitations. -->
+<!-- Navedite povezane PR-ove i zadatke o kojima promjena ovisi te važna ograničenja. -->

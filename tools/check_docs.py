@@ -29,12 +29,12 @@ FILE_EXTENSIONS = {
     "tsv", "txt", "yaml", "yml",
 }
 ADR_DIR = "docs/plan/adr"
-ADR_SECTIONS = ("Context", "Decision", "Why", "What was rejected", "Consequences")
+ADR_SECTIONS = ("Kontekst", "Odluka", "Obrazloženje", "Odbačene mogućnosti", "Posljedice")
 LINK_RE = re.compile(r'!?\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^\s)]+)(?:\s+"[^"\n]*")?\s*\)')
 INLINE_RE = re.compile(r"`([^`\n]+)`")
 SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 ADR_NAME_RE = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
-ADDENDUM_RE = re.compile(r"^## Addendum (\d{4}-\d{2}-\d{2}): \S")
+ADDENDUM_RE = re.compile(r"^## Dodatak (\d{4}-\d{2}-\d{2}): \S")
 SECRET_RE = re.compile(r"(^|/)\.env(?:\.[A-Za-z0-9_-]+)?$")
 
 
@@ -221,16 +221,16 @@ def check_adrs(repo: Repo) -> list[Problem]:
         first = next(((i, line) for i, line in enumerate(lines, 1) if line.strip()), (1, ""))
         if not re.match(rf"^# ADR-{number}: \S", first[1]):
             problems.append(Problem(path, first[0], 3, f"first line must be `# ADR-{number}: <decision>`"))
-        header = next(((i, line) for i, line in enumerate(lines[:8], 1) if line.startswith("**Date:**")), (0, ""))
-        match = re.fullmatch(r"\*\*Date:\*\* (\d{4}-\d{2}-\d{2}) · \*\*Status:\*\* (.+)", header[1])
+        header = next(((i, line) for i, line in enumerate(lines[:8], 1) if line.startswith("**Datum:**")), (0, ""))
+        match = re.fullmatch(r"\*\*Datum:\*\* (\d{4}-\d{2}-\d{2}) · \*\*Status:\*\* (.+)", header[1])
         if not match or not valid_date(match.group(1)):
-            problems.append(Problem(path, header[0], 3, "missing or invalid `**Date:** YYYY-MM-DD · **Status:** ...` line"))
+            problems.append(Problem(path, header[0], 3, "missing or invalid `**Datum:** YYYY-MM-DD · **Status:** ...` line"))
         else:
             status = match.group(2)
-            accepted = re.fullmatch(r"accepted \([^,()]+, (\d{4}-\d{2}-\d{2})\)", status)
-            superseded = re.fullmatch(r"superseded by ADR-(\d{4})", status)
-            if status != "proposed" and not (accepted and valid_date(accepted.group(1))) and not superseded:
-                problems.append(Problem(path, header[0], 3, "status must be proposed, accepted (<who>, YYYY-MM-DD), or superseded by ADR-NNNN"))
+            accepted = re.fullmatch(r"prihvaćeno \([^,()]+, (\d{4}-\d{2}-\d{2})\)", status)
+            superseded = re.fullmatch(r"zamijenjeno zapisom ADR-(\d{4})", status)
+            if status != "predloženo" and not (accepted and valid_date(accepted.group(1))) and not superseded:
+                problems.append(Problem(path, header[0], 3, "status must be predloženo, prihvaćeno (<tko>, YYYY-MM-DD), or zamijenjeno zapisom ADR-NNNN"))
             if superseded and superseded.group(1) not in numbers:
                 problems.append(Problem(path, header[0], 3, f"superseded by unknown ADR-{superseded.group(1)}"))
         sections = []
@@ -238,11 +238,11 @@ def check_adrs(repo: Repo) -> list[Problem]:
         for line_number, line in enumerate(lines, 1):
             if not line.startswith("## "):
                 continue
-            if line.startswith("## Addendum"):
+            if line.startswith("## Dodatak"):
                 addendum_started = True
                 addendum = ADDENDUM_RE.match(line)
                 if not addendum or not valid_date(addendum.group(1)):
-                    problems.append(Problem(path, line_number, 3, "addendum heading must be `## Addendum YYYY-MM-DD: <what>`"))
+                    problems.append(Problem(path, line_number, 3, "addendum heading must be `## Dodatak YYYY-MM-DD: <što>`"))
             else:
                 sections.append(line[3:].strip())
                 if addendum_started:

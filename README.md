@@ -1,42 +1,45 @@
-# Nonnegative matrix factorization seminar
+# Seminar: nenegativna matrična faktorizacija
 
-A seminar for **Matrične i tenzorske metode u analizi podataka** by **Mislav, Sara and Lovro**:
-understand NMF in mathematical detail, implement it in Python and apply it to a new concrete
-problem and dataset. Everyone learns the whole project.
+Seminar iz kolegija **Matrične i tenzorske metode u analizi podataka** izrađuju **Mislav, Sara i
+Lovro**. Cilj je detaljno razumjeti matematiku NMF-a, implementirati metodu u Pythonu i
+primijeniti je na nov konkretan problem i skup podataka. Svi članovi trebaju razumjeti cijeli
+projekt.
 
-The main source is Nicolas Gillis, *The Why and How of Nonnegative Matrix Factorization*
-(main_NNMF-general.pdf). [The literature guide](docs/research/LITERATURE.md) maps all six
-supplied papers to the learning goals.
+Glavni izvor je rad Nicolasa Gillisa *The Why and How of Nonnegative Matrix Factorization*
+(main_NNMF-general.pdf). [Pregled literature](docs/research/LITERATURE.md) povezuje svih šest
+priloženih radova s ciljevima učenja.
 
-## Current state
+## Trenutačno stanje
 
-The repository contains the working rules, research plan and workflow checks adapted from
-the team's reference workflow. The application, dataset, NMF objective/solver and scientific
-Python environment are not selected. There is no NMF implementation or experimental result
-yet. The deadline, submission formats and individual task allocation are also open.
+Repozitorij sadrži pravila rada, istraživački plan i automatizirane provjere prilagođene
+referentnom projektu. Primjena, podaci, funkcija cilja, algoritam NMF-a i znanstveno Python
+okruženje još nisu odabrani. Implementacija NMF-a i eksperimentalni rezultati još ne postoje.
+Otvoreni su i rok, formati predaje te pojedinačna zaduženja.
 
-The deliverables are a written seminar, a presentation, code and reproducible results.
-The [project scope](docs/plan/PROJECT.md), [mathematical and experimental plan](docs/plan/METHODOLOGY.md)
-and [task list](docs/plan/TASKS.md) connect those deliverables.
+Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
+projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),
+[matematički i eksperimentalni plan](docs/plan/METHODOLOGY.md) i
+[popis zadataka](docs/plan/TASKS.md) povezuju sve dijelove predaje.
 
-## Start here
+## Odakle krenuti
 
-1. Read [AGENTS.md](AGENTS.md) for the rules shared by people and AI tools.
-2. Use [the documentation index](docs/INDEX.md) to locate the current decisions and research.
-3. Take one small task from [TASKS](docs/plan/TASKS.md), on its own branch, with another human
-   team member reviewing the change. [The change protocol](docs/CHANGE_PROTOCOL.md) explains
-   what documentation each kind of change affects.
-4. Run the local checks before handover:
+1. Pročitaj [AGENTS.md](AGENTS.md), zajednička pravila za ljude i AI alate.
+2. U [kazalu dokumentacije](docs/INDEX.md) pronađi aktualne odluke i istraživačke materijale.
+3. Odaberi malen zadatak s [popisa zadataka](docs/plan/TASKS.md) i radi na zasebnoj grani.
+   Promjenu pregledava drugi član tima. [Protokol promjena](docs/CHANGE_PROTOCOL.md) opisuje
+   koju dokumentaciju treba uskladiti uz pojedinu vrstu promjene.
+4. Prije predaje rada drugom članu pokreni lokalne provjere:
 
 ```bash
 python3 tools/check_before_stop.py
 ```
 
-Only Python 3.11 or later and Git are needed for the workflow tools; no scientific packages
-are needed yet. The checker runs documentation checks and the tools' unit tests, and explicitly
-reports the numerical suite as NOT RUN until the implementation environment is agreed.
+Za alate tijeka rada dovoljni su Python 3.11 ili noviji i Git; znanstveni paketi zasad nisu
+potrebni. Provjera pokreće provjere dokumentacije i jedinične testove alata. Numeričke provjere
+izričito označava s NOT RUN dok ne dogovorimo implementacijsko okruženje.
 
-For the separate commands, CI and host-specific hook setup, see
-[PIPELINE](docs/plan/PIPELINE.md). For findings and the read-only daily-audit preview, see
-[AI_REVIEW](docs/plan/AI_REVIEW.md). No GitHub settings, labels, publications or branch
-protection are created merely by adding these files.
+Zasebne naredbe, CI i postavljanje lokalnih hookova opisani su u
+[tijeku rada i provjera](docs/plan/PIPELINE.md). Postupanje s nalazima i probno pokretanje
+dnevne provjere bez pisanja na GitHub opisani su u
+[uputama za pregled i nalaze](docs/plan/AI_REVIEW.md). Samo dodavanje datoteka ne postavlja
+GitHub postavke, labele ni zaštitu grana i ne objavljuje promjene.

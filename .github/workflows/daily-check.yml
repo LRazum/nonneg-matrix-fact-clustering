@@ -1,4 +1,4 @@
-name: Daily check
+name: Dnevna provjera
 
 on:
   schedule:
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   check:
-    name: Main and pull request audit
+    name: Provjera maina i otvorenih PR-ova
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

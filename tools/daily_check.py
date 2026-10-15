@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-ISSUE_TITLE = "Daily check: main or open pull requests need attention"
+ISSUE_TITLE = "Dnevna provjera: main ili otvoreni PR-ovi zahtijevaju pozornost"
 DEFAULT_REPOSITORY = "LRazum/nonneg-matrix-fact-clustering"
 CI_WORKFLOW = "ci.yml"
 STALE_AFTER_DAYS = 3
@@ -37,6 +37,11 @@ APPROVAL_REQUIRED_FROM = datetime(2026, 10, 15, 21, 19, 49, tzinfo=timezone.utc)
 LOOKBACK_HOURS = 48
 SEVERITY_LABELS = ("severity:high", "severity:medium", "severity:low")
 BASE_LABELS = ("finding", "source:daily-check")
+# Explicit per-PR merge instructions recorded in ADR-0002; these are not human approvals.
+AUTHORIZED_REVIEW_EXCEPTIONS = frozenset({
+    (1, "codex/seminar-workflow"),
+    (2, "codex/croatian-project-docs"),
+})
 
 
 @dataclass(frozen=True)
@@ -59,22 +64,22 @@ def ci_problems(runs: list[dict] | None) -> list[Problem]:
         return [
             Problem(
                 "high",
-                "none",
+                "nema",
                 f".github/workflows/{CI_WORKFLOW}",
-                "The CI workflow was not found on `main`.",
-                f"`gh run list --workflow {CI_WORKFLOW} --branch main` fails.",
-                "Check that the workflow file exists on `main` and is enabled.",
+                "Tijek CI provjera nije pronađen na grani `main`.",
+                f"Naredba `gh run list --workflow {CI_WORKFLOW} --branch main` nije uspjela.",
+                "Provjeri postoji li konfiguracija CI provjera na grani `main` i je li uključena.",
             )
         ]
     if not runs:
         return [
             Problem(
                 "high",
-                "none",
+                "nema",
                 f".github/workflows/{CI_WORKFLOW}",
-                "There is no completed CI run on `main`.",
-                f"`gh run list --workflow {CI_WORKFLOW} --branch main --status completed` is empty.",
-                "Run CI on `main` (push or workflow_dispatch) and look at the result.",
+                "Na grani `main` nema dovršenog izvođenja CI provjera.",
+                f"Naredba `gh run list --workflow {CI_WORKFLOW} --branch main --status completed` nema rezultata.",
+                "Pokreni CI na grani `main` (push ili workflow_dispatch) i pregledaj rezultat.",
             )
         ]
     run = runs[0]
@@ -83,11 +88,11 @@ def ci_problems(runs: list[dict] | None) -> list[Problem]:
     return [
         Problem(
             "high",
-            "none",
+            "nema",
             f".github/workflows/{CI_WORKFLOW}",
-            f"The last CI run on `main` ended with `{run.get('conclusion')}`.",
+            f"Posljednje izvođenje CI provjera na grani `main` završilo je stanjem `{run.get('conclusion')}`.",
             f"{run.get('url', '?')} (commit {str(run.get('headSha', '?'))[:12]})",
-            "Fix `main` in a new branch before other work; see the failing job log.",
+            "Prije nastavka rada ispravi `main` kroz novu granu; pregledaj zapis neuspješnog posla.",
         )
     ]
 
@@ -101,11 +106,11 @@ def pr_problems(prs: list[dict], now: datetime) -> list[Problem]:
                 Problem(
                     "medium",
                     ref,
-                    "n/a",
-                    f"Pull request #{pr['number']} has a merge conflict with its base.",
-                    f"{pr.get('url', '?')} shows mergeable = CONFLICTING.",
-                    "The owner of the branch merges the base into it and resolves the conflict "
-                    "(no rebase, no force push).",
+                    "nije primjenjivo",
+                    f"PR #{pr['number']} ima konflikt pri spajanju s ciljnom granom.",
+                    f"{pr.get('url', '?')} prikazuje mergeable = CONFLICTING.",
+                    "Autor grane spaja ciljnu granu u svoju i rješava konflikt "
+                    "(bez rebasea i prisilnog pusha).",
                 )
             )
         elif pr.get("mergeable") != "MERGEABLE":
@@ -113,11 +118,11 @@ def pr_problems(prs: list[dict], now: datetime) -> list[Problem]:
                 Problem(
                     "medium",
                     ref,
-                    "n/a",
-                    f"Pull request #{pr['number']} has unverified mergeability.",
-                    f"{pr.get('url', '?')} reports mergeable = {pr.get('mergeable', 'missing')}.",
-                    "Retry the GitHub check after mergeability has been computed; verify the "
-                    "base before merging. This result does not establish a merge conflict.",
+                    "nije primjenjivo",
+                    f"Za PR #{pr['number']} mogućnost spajanja nije provjerena.",
+                    f"{pr.get('url', '?')} prijavljuje mergeable = {pr.get('mergeable', 'nedostaje')}.",
+                    "Ponovi GitHub provjeru nakon izračuna mogućnosti spajanja; provjeri ciljnu "
+                    "granu prije spajanja. Ovaj nalaz ne potvrđuje postojanje konflikta.",
                 )
             )
         updated = parse_time(pr["updatedAt"])
@@ -127,10 +132,10 @@ def pr_problems(prs: list[dict], now: datetime) -> list[Problem]:
                 Problem(
                     "medium",
                     ref,
-                    "n/a",
-                    f"Pull request #{pr['number']} has not changed for {age.days} days.",
-                    f"{pr.get('url', '?')} was last updated {updated:%Y-%m-%d %H:%M} UTC.",
-                    "Review it, finish it, or close it with a reason.",
+                    "nije primjenjivo",
+                    f"Broj dana bez promjene na PR-u #{pr['number']}: {age.days}.",
+                    f"{pr.get('url', '?')} posljednji je put ažuriran {updated:%Y-%m-%d %H:%M} UTC.",
+                    "Pregledaj ga, dovrši ili zatvori uz obrazloženje.",
                 )
             )
     return problems
@@ -148,9 +153,8 @@ def unapproved_merge_problems(prs: list[dict], now: datetime) -> list[Problem]:
         merged_at = parse_time(pr["mergedAt"])
         if merged_at < since:
             continue
-        # Lovro explicitly authorized this setup's commit/push/PR/merge on 2026-10-15.
-        # This one-off exception waives review only; it does not assert a human approval.
-        if (pr["number"], pr.get("headRefName")) == (1, "codex/seminar-workflow"):
+        # These exact exceptions waive review only; CI and direct-commit checks still apply.
+        if (pr["number"], pr.get("headRefName")) in AUTHORIZED_REVIEW_EXCEPTIONS:
             continue
         author = (pr.get("author") or {}).get("login")
         if author and human_approvers(pr) - {str(author).lower()}:
@@ -160,12 +164,12 @@ def unapproved_merge_problems(prs: list[dict], now: datetime) -> list[Problem]:
             Problem(
                 "medium",
                 f"#{pr['number']} ({pr.get('headRefName', '?')})",
-                "n/a",
-                f"Pull request #{pr['number']} was merged into `main` without a verifiable approving "
-                "review by another human reviewer.",
-                f"{pr.get('url', '?')} was merged {merged_at:%Y-%m-%d %H:%M} UTC by {merged_by}.",
-                "A different team member reviews the merged change now; anything wrong goes "
-                "into a new PR. Future PRs need approval before merging.",
+                "nije primjenjivo",
+                f"PR #{pr['number']} spojen je u `main` bez provjerljivog odobrenja "
+                "druge osobe koja je pregledala promjenu.",
+                f"{pr.get('url', '?')} spojen je {merged_at:%Y-%m-%d %H:%M} UTC; spojio: {merged_by}.",
+                "Drugi član tima treba pregledati spojenu promjenu; ispravci idu kroz novi PR. "
+                "Budući PR-ovi trebaju odobrenje prije spajanja.",
             )
         )
     return problems
@@ -209,11 +213,11 @@ def direct_push_problems(commits: list[dict], now: datetime) -> list[Problem]:
         problems.append(
             Problem(
                 "medium",
-                "none",
-                "n/a",
-                f"Commit {commit['sha'][:12]} reached `main` without a pull request.",
-                f"{commit.get('url', '?')}, committed {committed_at:%Y-%m-%d %H:%M} UTC.",
-                "A different team member reviews the commit; later changes go through a PR.",
+                "nema",
+                "nije primjenjivo",
+                f"Commit {commit['sha'][:12]} dospio je na `main` bez PR-a.",
+                f"{commit.get('url', '?')}, vrijeme commita: {committed_at:%Y-%m-%d %H:%M} UTC.",
+                "Drugi član tima treba pregledati commit; daljnje promjene idu kroz PR.",
             )
         )
     return problems
@@ -226,9 +230,9 @@ def overall_severity(problems: list[Problem]) -> str:
 
 def render_body(problems: list[Problem], now: datetime) -> str:
     lines = [
-        f"Opened and updated by `tools/daily_check.py` (last run {now:%Y-%m-%d %H:%M} UTC).",
-        "It closes this issue by itself when every check passes.",
-        "Review checks exclude bots and the PR author; team membership still needs human verification.",
+        f"Otvara i ažurira `tools/daily_check.py` (posljednje izvođenje: {now:%Y-%m-%d %H:%M} UTC).",
+        "Nalaz se automatski zatvara kada sve provjere prođu.",
+        "Provjera odobrenja isključuje botove i autora PR-a; članstvo u timu i dalje provjeravaju ljudi.",
         "",
     ]
     for number, p in enumerate(problems, start=1):
@@ -236,11 +240,11 @@ def render_body(problems: list[Problem], now: datetime) -> str:
             f"### {number}. {p.problem}",
             "",
             f"- **PR:** {p.pr}",
-            f"- **File:** {p.file}",
+            f"- **Datoteka:** {p.file}",
             f"- **Problem:** {p.problem}",
-            f"- **How it shows:** {p.how_it_shows}",
-            f"- **Proposal:** {p.proposal}",
-            f"- **Severity:** {p.severity}",
+            f"- **Kako se očituje:** {p.how_it_shows}",
+            f"- **Prijedlog:** {p.proposal}",
+            f"- **Ozbiljnost:** { {'high': 'visoka', 'medium': 'srednja', 'low': 'niska'}[p.severity]}",
             "",
         ]
     return "\n".join(lines)
@@ -315,8 +319,8 @@ def fetch_open_issue() -> dict | None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--dry-run", action="store_true", help="print actions, change nothing")
+    parser = argparse.ArgumentParser(description="Dnevna provjera repozitorija; održava jedan otvoren nalaz.")
+    parser.add_argument("--dry-run", action="store_true", help="prikaži planirane radnje bez promjena na GitHubu")
     args = parser.parse_args(argv)
 
     now = datetime.now(timezone.utc)
@@ -343,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
     if problems:
         body = render_body(problems, now)
         severity = overall_severity(problems)
-        print(f"{len(problems)} problem(s) found:\n\n{body}")
+        print(f"Broj pronađenih problema: {len(problems)}\n\n{body}")
         if issue is None:
             labels = [x for label in (*BASE_LABELS, severity) for x in ("--label", label)]
             act("issue", "create", "--title", ISSUE_TITLE, *labels, body=body)
@@ -354,11 +358,11 @@ def main(argv: list[str] | None = None) -> int:
             labels = [x for label in (*BASE_LABELS, severity) for x in ("--add-label", label)]
             act("issue", "edit", str(issue["number"]), *labels, *stale, body=body)
         return 0
-    print("All checks pass.")
+    print("Sve provjere prolaze.")
     if issue is not None:
         act(
             "issue", "close", str(issue["number"]), "--comment",
-            f"All checks pass ({now:%Y-%m-%d %H:%M} UTC). Closed by `tools/daily_check.py`.",
+            f"Sve provjere prolaze ({now:%Y-%m-%d %H:%M} UTC). Nalaz zatvara `tools/daily_check.py`.",
         )
     return 0
 

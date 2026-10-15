@@ -1,94 +1,100 @@
-# Tasks and milestones
+# Zadaci i ključne točke
 
-Status is evidence-based: a plan is not an implementation, passing tools checks are not
-numerical results, and an AI summary is not a human approval. No individual task assignments
-have been agreed. All tasks are shared; a temporary lead/reviewer can be recorded later.
+Status se temelji na dokazima: plan nije implementacija, uspješne provjere alata nisu numerički
+rezultati, a AI sažetak nije ljudsko odobrenje. Pojedinačna zaduženja nisu dogovorena. Svi su
+zadaci zajednički; privremenog nositelja i osobu za pregled moguće je zabilježiti kasnije.
 
-## Overview
+## Pregled
 
-| Task | Purpose | Depends on | State |
+| Zadatak | Cilj | Ovisi o | Stanje |
 |---|---|---|---|
-| T0 | Establish project context and the adapted repository workflow | User's scope decisions | Implemented; publication authorized in initial PR, host trust remains per machine |
-| T1 | Develop the common mathematical understanding from Gillis and supporting papers | T0 context | Ready to start |
-| T2 | Choose a concrete problem and dataset with a justified NMF representation | T0 context | Open; may proceed alongside T1 |
-| T3 | Agree the objective, algorithm and experiment design | T1, T2 | Open |
-| T4 | Implement and verify the agreed NMF method in Python | T3 | Deferred until the team agrees implementation |
-| T5 | Run reproducible experiments and interpret results | T4, data preparation | Open |
-| T6 | Assemble the written seminar and presentation | T1 onward; final evidence from T5 | Open |
-| T7 | Reproduce the final evidence and rehearse the complete explanation together | T5, T6 | Open |
+| T0 | Utvrditi kontekst projekta i prilagoditi tijek rada u repozitoriju | Korisnikove odluke o opsegu | Provedeno; objava odobrena za početni PR, povjerenje hookovima preostaje provjeriti na svakom računalu |
+| T1 | Razviti zajedničko matematičko razumijevanje na temelju Gillisa i dopunske literature | Kontekst T0 | Spremno za početak |
+| T2 | Odabrati konkretan problem i skup podataka s opravdanim NMF prikazom | Kontekst T0 | Otvoreno; može teći usporedno s T1 |
+| T3 | Dogovoriti funkciju cilja, algoritam i plan eksperimenata | T1, T2 | Otvoreno |
+| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | Odgođeno do dogovora tima o implementaciji |
+| T5 | Provesti eksperimente koji omogućuju reprodukciju rezultata i protumačiti ih | T4, priprema podataka | Otvoreno |
+| T6 | Sastaviti pisani seminar i prezentaciju | Od T1 nadalje; konačni rezultati iz T5 | Otvoreno |
+| T7 | Reproducirati konačne rezultate i zajedno uvježbati cjelovito objašnjenje | T5, T6 | Otvoreno |
 
-The agreed project deadline is unknown. This is a dependency order, not a dated schedule or
-an assignment of different subject areas to different people.
+Rok projekta nije poznat. Ovo je redoslijed ovisnosti, a ne vremenski raspored ili podjela
+pojedinih područja među članovima.
 
-## T0: workflow setup
+## T0: postavljanje tijeka rada
 
-Deliver rules, a literature map, the methodology plan, decision records, a documentation
-propagation checklist, PR template, CI, finish checker and a daily-audit definition. Validate
-locally. Distinguish prepared configuration from trusted/running hooks and remotely enabled
-workflows. Do not commit, push or publish GitHub content without authorization.
+Pripremiti pravila, pregled literature, metodološki plan, zapise odluka, popis za usklađivanje
+dokumentacije, predložak PR-a, CI, završne provjere i definiciju dnevnog audita. Provjeriti
+lokalno. Razlikovati pripremljenu konfiguraciju od pouzdanih i aktivnih hookova te tijekova
+rada omogućenih na udaljenom repozitoriju. Ne raditi commit, push ni objavljivati sadržaj
+na GitHubu bez ovlaštenja.
 
-Local verification on 2026-10-15: documentation check reported 0 warnings and all 43 workflow
-tool tests passed. Both configured hook commands were invoked manually from the repository
-root and a subdirectory: valid JSON, with numerical checks explicitly NOT RUN. Workflow YAML
-and text formatting were checked. This does not establish host trust or an automatic invocation.
+Lokalna provjera 2026-10-15: provjera dokumentacije prijavila je 0 upozorenja i prošla su sva
+43 testa alata za tijek rada. Obje konfigurirane naredbe hookova ručno su pokrenute iz korijena
+repozitorija i podmape: valjan JSON, uz izričitu oznaku NOT RUN za numeričke provjere.
+Provjereni su YAML tijekova rada i oblikovanje teksta. To ne dokazuje povjerenje na računalu
+ni automatsko pokretanje hookova.
 
-The pre-publication GitHub snapshot had a default branch named main containing an initial
-README, no published CI definition and no finding labels. Lovro then explicitly authorized
-commit, push, PR and merge. Initial workflow PR #1 uses the documented bootstrap review
-exception; no other member's approval is claimed. The PR and Actions runs record publication
-and remote validation. Publish/activation prerequisites are in [PIPELINE](PIPELINE.md);
-host-specific hook trust remains to be verified separately.
+Snimka stanja GitHuba prije objave pokazivala je zadanu granu main s početnim README-om,
+bez objavljene CI definicije i bez oznaka finding. Lovro je zatim izričito odobrio commit,
+push, PR i spajanje. Početni PR #1 za tijek rada koristi dokumentiranu iznimku od pregleda
+pri početnom postavljanju; ne tvrdi se da ga je odobrio drugi član. PR i izvršavanja GitHub
+Actions bilježe objavu i udaljenu provjeru. Preduvjeti objave i aktivacije navedeni su u
+[uputama za tijek rada](PIPELINE.md); povjerenje hookovima na pojedinom računalu ostaje zasebno provjeriti.
 
-## T1: mathematical understanding
+## T1: matematičko razumijevanje
 
-Work through the coverage in [METHODOLOGY](METHODOLOGY.md), using source sections from
-[LITERATURE](../research/LITERATURE.md). Produce readable derivations with stated assumptions
-and a small worked example. Distinguish a proved statement from an intuition or empirical
-observation. Walk through the notation, objective and update mechanism together.
+Proći sadržaj iz [metodološkog plana](METHODOLOGY.md), uz odgovarajuće odjeljke izvora iz
+[vodiča kroz literaturu](../research/LITERATURE.md). Izraditi čitljive izvode s navedenim pretpostavkama
+i malim razrađenim primjerom. Razlikovati dokazanu tvrdnju od intuicije ili empirijskog
+opažanja. Zajedno proći oznake, funkciju cilja i mehanizam ažuriranja.
 
-Complete when the notes are reviewed, gaps are recorded, and all three members can explain
-the mathematical argument. Do not mark this complete merely because notes were generated.
+Zadatak je dovršen kada su bilješke pregledane, nejasnoće zabilježene i sva tri člana mogu
+objasniti matematički argument. Ne označiti ga dovršenim samo zato što su bilješke generirane.
 
-## T2: problem and dataset
+## T2: problem i skup podataka
 
-Compare a small number of concrete candidates on the question they answer, nonnegative
-matrix construction, availability/license, manageable size, interpretation and evaluation.
-Explain how the concrete problem/data differs from cases in the supplied papers. The team
-chooses a candidate and records the decision. No dataset has been selected yet.
+Usporediti manji broj konkretnih kandidata prema pitanju na koje odgovaraju, konstrukciji
+nenegativne matrice, dostupnosti i licenci, izvedivoj veličini, interpretaciji i evaluaciji.
+Objasniti po čemu se konkretni problem i podaci razlikuju od primjera u priloženim radovima.
+Tim odabire kandidata i bilježi odluku. Skup podataka još nije odabran.
 
-Complete with an agreed research question, a source/data description, preprocessing plan,
-intended meanings of the factors and a feasible evaluation.
+Zadatak završava dogovorenim istraživačkim pitanjem, opisom izvora i podataka, planom
+predobrade, predviđenim značenjem faktora i izvedivom evaluacijom.
 
-## T3: method and experiment design
+## T3: metoda i plan eksperimenata
 
-Tie the objective and algorithm to the chosen representation and question. Agree rank values,
-initializations/seeds, stopping rules, safeguards, baseline, metrics and the compute budget.
-Write hypotheses/questions before inspecting the final results. Avoid adding solvers only to
-fill a comparison table. Record consequential choices and rejected alternatives in an ADR.
+Povezati funkciju cilja i algoritam s odabranim prikazom i pitanjem. Dogovoriti rangove,
+inicijalizacije i sjemena generatora slučajnih brojeva, kriterije zaustavljanja, zaštite,
+referentnu metodu, metrike i raspoložive računalne resurse. Hipoteze i pitanja zapisati prije
+pregleda konačnih rezultata. Ne dodavati algoritme samo radi popunjavanja usporedne tablice.
+Važne izbore i odbačene mogućnosti zabilježiti u ADR-u.
 
-## T4: Python implementation
+## T4: implementacija u Pythonu
 
-Implementation details are intentionally postponed. When work starts, add the environment
-definition/lock, reusable numerical code and meaningful tests together with the project check
-runner and CI commands. Compare behavior with independent small examples and, when useful,
-a library implementation using matched settings. Explain differences in objectives/scaling.
+Detalji implementacije namjerno su odgođeni. Na početku rada dodati definiciju okruženja
+i zaključane verzije ovisnosti, ponovno upotrebljiv numerički kod i smislene testove, zajedno
+s izvršavanjem projektnih provjera i naredbama za CI. Ponašanje usporediti s neovisnim malim
+primjerima i, kada je korisno, bibliotečnom implementacijom s usklađenim postavkama.
+Objasniti razlike u funkciji cilja i skaliranju.
 
-## T5: experiments and interpretation
+## T5: eksperimenti i interpretacija
 
-Implement repeatable entry points and preserve provenance. Report reconstruction behavior,
-the domain question, stability across the agreed runs and failures/limitations. Trace every
-reported table/figure to its generating run. A favorable example alone is insufficient.
+Implementirati ponovljiva pokretanja i sačuvati podatke o podrijetlu rezultata. Izvijestiti o
+ponašanju rekonstrukcije, pitanju domene, stabilnosti kroz dogovorena pokretanja te
+neuspjesima i ograničenjima. Svaku prikazanu tablicu i sliku povezati s pokretanjem koje ju
+je proizvelo. Sam povoljan primjer nije dovoljan.
 
-## T6: seminar and presentation
+## T6: seminar i prezentacija
 
-Draft sections as understanding develops, then replace placeholders with verified evidence.
-Keep notation, algorithm, settings, figures and conclusions aligned with code. Choose source
-formats and build commands before claiming either artifact is buildable. Include citations
-and distinguish external figures from figures produced by this project.
+Pisati nacrte odjeljaka kako se razvija razumijevanje, zatim privremeni sadržaj zamijeniti
+provjerenim rezultatima. Oznake, algoritam, postavke, slike i zaključke uskladiti s kodom.
+Odabrati izvorne formate i naredbe za izradu prije tvrdnje da je bilo koji od tih materijala
+moguće izgraditi. Seminar i prezentaciju pisati na hrvatskom. Uključiti citate i razlikovati
+preuzete slike od slika nastalih u ovom projektu.
 
-## T7: final reproduction and walkthrough
+## T7: završna reprodukcija rezultata i zajednički prolazak
 
-Use a fresh environment to reproduce the reported evidence. Check the submission against
-the eventual course requirements. Each member practices explaining the full chain from
-problem and mathematics to code, results and limitations. Record real verification, remaining
-gaps and final artifact locations; do not invent approvals or readiness.
+U novom okruženju reproducirati prikazane rezultate. Predaju provjeriti prema naknadno
+utvrđenim zahtjevima kolegija. Svaki član vježba objašnjavanje cijelog puta od problema
+i matematike do koda, rezultata i ograničenja. Zabilježiti stvarnu provjeru, preostale
+nejasnoće i mjesta konačnih materijala; ne izmišljati odobrenja ni spremnost za predaju.
