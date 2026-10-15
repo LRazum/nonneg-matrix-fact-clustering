@@ -1,0 +1,46 @@
+# Credentials and personal tool settings
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local research inputs and bulk experiments; curated evidence stays versionable
+/data/raw/
+/data/processed/
+/data/literature/
+/results/runs/
+*.joblib
+.ipynb_checkpoints/
+
+# Document build products; keep source and curated final deliverables
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
+# Operating system
+.DS_Store
+Thumbs.db

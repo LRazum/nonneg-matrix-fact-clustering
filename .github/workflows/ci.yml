@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  workflow:
+    name: Documentation and workflow tools
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; reference workflow pin
+        with:
+          persist-credentials: false
+      - run: python3 --version
+      - run: python3 tools/check_before_stop.py
+
+  # Add the agreed numerical environment, lockfile installation and project runner in the
+  # same change that introduces pyproject.toml. The finish checker then rejects a missing
+  # tools/check_project.py rather than silently reporting a pass.
