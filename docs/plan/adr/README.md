@@ -1,63 +1,65 @@
-# Decision records
+# Zapisi odluka
 
-An architecture decision record (ADR) captures one material project decision, the evidence and
-why alternatives were rejected. Here that includes scientific methodology as well as repository
-workflow. `docs/INDEX.md` lists the records; `docs/CHANGE_PROTOCOL.md` explains when one is needed.
+Zapis odluke (ADR, engl. *architecture decision record*) bilježi jednu važnu projektnu odluku,
+dokaze i razloge odbacivanja drugih mogućnosti. Ovdje to obuhvaća znanstvenu metodologiju i
+način rada u repozitoriju. `docs/INDEX.md` sadrži popis zapisa, a `docs/CHANGE_PROTOCOL.md`
+objašnjava kada treba napisati novi zapis.
 
-## File name and format
+## Naziv datoteke i format
 
-Use the next free four-digit number, followed by a short lowercase title with hyphens. Numbers
-are never reused. For example:
+Upotrijebite sljedeći slobodan četveroznamenkasti broj, a zatim kratak engleski naslov malim
+slovima, s riječima odvojenima spojnicama. Brojevi se ne koriste ponovno. Primjer:
 
 ```text
 docs/plan/adr/0003-choose-application-and-dataset.md
 ```
 
-Use this structure, in this order:
+Koristite sljedeću strukturu i redoslijed:
 
 ```markdown
-# ADR-NNNN: A title that states the decision
+# ADR-NNNN: Naslov koji izriče odluku
 
-**Date:** YYYY-MM-DD · **Status:** proposed
+**Datum:** YYYY-MM-DD · **Status:** predloženo
 
-## Context
-Facts, requirements, evidence and open questions.
+## Kontekst
+Činjenice, zahtjevi, dokazi i otvorena pitanja.
 
-## Decision
-The concrete choice and its scope. State what remains open.
+## Odluka
+Konkretan izbor i njegov opseg. Navedite što ostaje otvoreno.
 
-## Why
-Reasons and evidence, with source locations where relevant.
+## Obrazloženje
+Razlozi i dokazi, uz mjesto u izvoru gdje je to primjenjivo.
 
-## What was rejected
-Considered alternatives and the actual reason for rejecting each.
+## Odbačene mogućnosti
+Razmotrene mogućnosti i stvarni razlog odbacivanja svake od njih.
 
-## Consequences
-Affected rules, plan, code, tests, experiments and deliverables.
+## Posljedice
+Pravila, plan, kod, testovi, eksperimenti i materijali za predaju na koje odluka utječe.
 ```
 
-Use `###` for subdivisions. The documentation check validates the record structure; people
-review whether the reasoning and evidence are sound.
+Za pododjeljke koristite `###`. Provjera dokumentacije provjerava strukturu zapisa; ljudi
+provjeravaju valjanost obrazloženja i dokaza.
 
-## Status and decision authority
+## Status i ovlasti za donošenje odluke
 
-- `proposed`: prepared for discussion; dependent implementation waits if the choice is required.
-- `accepted (<who>, YYYY-MM-DD)`: name only the people who actually decided and the date.
-- `superseded by ADR-NNNN`: a replacement record explains the new decision and links back.
+- `predloženo`: pripremljeno za raspravu; ako implementacija ovisi o toj odluci, čeka se odluka.
+- `prihvaćeno (<tko>, YYYY-MM-DD)`: navedite samo osobe koje su stvarno odlučile i datum odluke.
+- `zamijenjeno zapisom ADR-NNNN`: novi zapis objašnjava novu odluku i povezuje se sa starim.
 
-An accepted workflow requested by Lovro does not mean Mislav or Sara have approved it.
-Scientific choices still open in `docs/plan/PROJECT.md` stay open until genuinely discussed
-and recorded. Write unknown facts as open questions; never invent dataset access, a solver
-choice, an experiment result or a person's approval to complete the template.
+Prihvaćen način rada koji je zatražio Lovro ne znači da su ga odobrili Mislav ili Sara.
+Znanstvene odluke otvorene u `docs/plan/PROJECT.md` ostaju otvorene dok se stvarno ne rasprave
+i zabilježe. Nepoznate činjenice zapišite kao otvorena pitanja; nemojte izmišljati pristup
+podacima, izbor algoritma, rezultat eksperimenta ili nečije odobrenje da biste popunili predložak.
 
-## Later changes
+## Naknadne promjene
 
-Preserve decision history. Add a compatible clarification at the end:
+Sačuvajte povijest odluka. Dopunu koja je u skladu s postojećom odlukom dodajte na kraj:
 
 ```markdown
-## Addendum YYYY-MM-DD: what changed
+## Dodatak YYYY-MM-DD: što se promijenilo
 ```
 
-For a replacement, create a new ADR, mark the old one superseded and state the replacement in
-its Context. Do not delete the old record or rewrite its rejected alternatives as if the new
-decision had always applied. Update all affected documents in the same change.
+Pri zamjeni odluke napišite novi ADR, označite stari kao zamijenjen i u kontekstu novog zapisa
+navedite koju odluku zamjenjuje. Nemojte brisati stari zapis ni prepisivati njegove odbačene
+mogućnosti kao da je nova odluka vrijedila od početka. U istoj promjeni uskladite sve dokumente
+na koje odluka utječe.

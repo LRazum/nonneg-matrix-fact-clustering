@@ -1,140 +1,148 @@
-# AI review, findings and the daily audit
+# AI pregled, nalazi i dnevna provjera
 
-This process keeps problems and handovers visible to Mislav, Sara and Lovro. Root `AGENTS.md`
-and `docs/CHANGE_PROTOCOL.md` remain the rules; an AI tool is a collaborator, not a human
-reviewer or evidence that the team understands a result.
+Ovaj postupak osigurava da Mislav, Sara i Lovro mogu pratiti probleme i primopredaje.
+Korijenski `AGENTS.md` i `docs/CHANGE_PROTOCOL.md` ostaju mjerodavna pravila; AI alat suradnik
+je, a ne ljudski pregledavatelj niti dokaz da tim razumije neki rezultat.
 
-## Findings as shared memory
+## Nalazi kao zajednička memorija
 
-Record a reproducible problem once and link later discoveries to it. Use a GitHub issue with:
+Reproducibilan problem zabilježite jednom, a kasnija otkrića povežite s njim. Koristite GitHub
+prijavu s oznakama:
 
 - `finding`.
-- One source label: `source:codex`, `source:claude-code`, `source:human-review`, `source:ci` or
-  `source:daily-check`.
-- One severity label: `severity:high` for an invalid central result, a broken `main` or a
-  leaked secret; `severity:medium` for blocked work, misleading documentation or missing
-  provenance; `severity:low` for cleanup.
+- Jedna oznaka izvora: `source:codex`, `source:claude-code`, `source:human-review`, `source:ci`
+  ili `source:daily-check`.
+- Jedna oznaka ozbiljnosti: `severity:high` za nevaljan središnji rezultat, neispravan `main`
+  ili otkrivenu tajnu; `severity:medium` za blokiran rad, zavaravajuću dokumentaciju ili
+  nedostajuće podatke o podrijetlu; `severity:low` za dorade i čišćenje.
 
-The body states the PR or `none`, file and location, concrete problem, reproduction/evidence,
-scientific or practical consequence, and a proposed next step. Include the relevant run ID for
-experimental findings. A suspicion without evidence is an open question, not a proven defect.
+U tekstu navedite PR ili da ga nema, datoteku i mjesto, konkretan problem, postupak
+reprodukcije/dokaze, znanstvenu ili praktičnu posljedicu i predloženi sljedeći korak.
+Za eksperimentalne nalaze uključite pripadajući identifikator izvođenja. Sumnja bez dokaza
+otvoreno je pitanje, a ne dokazana pogreška.
 
-At the start of work inspect `gh issue list --label finding --state open`. A fixing PR uses
-`Closes #<number>` when the issue is actually resolved. Do not silently close a finding because
-the code moved. Label names describe the intended scheme; their existence on GitHub must be
-verified, and local configuration is not proof that they were created.
+Na početku rada provjerite `gh issue list --label finding --state open`. PR koji rješava
+problem koristi `Closes #<number>` kada je problem stvarno riješen. Ne zatvarajte nalaz
+prešutno zato što je kod premješten. Nazivi oznaka opisuju predviđeni sustav; njihovo postojanje
+na GitHubu mora se provjeriti, a lokalna konfiguracija nije dokaz da su stvorene.
 
-AI tools may prepare finding text locally. Publishing an issue, label, comment or review needs
-explicit user authorization for that action in the session, unless it is the audit action
-already authorized by an enabled repository workflow. Do not seek the same authorization again
-within its approved scope.
+AI alati smiju lokalno pripremiti tekst nalaza. Objavljivanje prijave, oznake, komentara ili
+pregleda zahtijeva izričito korisnikovo odobrenje za tu radnju u sesiji, osim ako je riječ o
+radnji dnevne provjere već odobrenoj uključenim tijekom rada repozitorija. Ne tražite isto
+odobrenje ponovno unutar njegova odobrenog opsega.
 
-## Daily GitHub audit
+## Dnevna provjera na GitHubu
 
-`.github/workflows/daily-check.yml` schedules `tools/daily_check.py` at 07:00 UTC and supports
-manual dispatch. At the current Europe/Copenhagen offset this is 09:00; winter local time is
-08:00. GitHub schedules are best effort. The workflow has to reach the default branch and
-Actions must be enabled before scheduled auditing can run.
+`.github/workflows/daily-check.yml` zakazuje `tools/daily_check.py` u 07:00 UTC i podržava
+ručno pokretanje. Uz trenutačni pomak u zoni Europe/Copenhagen to je 09:00; zimi je lokalno
+vrijeme 08:00. GitHub ne jamči točno vrijeme zakazanih pokretanja. Tijek rada mora stići na
+zadanu granu, a Actions mora biti uključen da bi se zakazana provjera mogla izvoditi.
 
-The audit checks:
+Dnevna provjera provjerava:
 
-1. The CI workflow exists and its latest completed run on `main` succeeded.
-2. Open PRs for reported merge conflicts.
-3. Open PRs with no update for more than three days.
-4. PRs merged into `main` during the last 48 hours for an approving human review by someone
-   other than the author, given before merge.
-5. Commits visible on `main` with committer dates during the last 48 hours for an associated
-   merged PR into `main`.
+1. Postoji li CI tijek rada i je li njegovo zadnje dovršeno izvođenje na `main` uspjelo.
+2. Imaju li otvoreni PR-ovi prijavljene konflikte pri spajanju.
+3. Ima li otvorenih PR-ova bez ažuriranja dulje od tri dana.
+4. Imaju li PR-ovi spojeni u `main` u posljednjih 48 sati ljudsko odobrenje koje je prije
+   spajanja dao netko drugi, a ne autor.
+5. Imaju li commitovi vidljivi na `main` s datumom commitiranja (`committer date`) unutar posljednjih 48 sati
+   pridružen PR spojen u `main`.
 
-Historical review/direct-commit enforcement starts at the captured setup baseline,
-2026-10-15 21:19:49 UTC. The pre-workflow repository initialization is not retroactively
-reported as a violation of the new rules. The overlapping window reduces missed reports after a delayed run; it is not a
-complete history audit. Unknown mergeability, API failures or missing required information are
-visible diagnostics, not successful checks.
+Provjera povijesti pregleda i izravnih commitova počinje od zabilježene početne točke
+postavljanja, 2026-10-15 21:19:49 UTC. Inicijalizacija repozitorija prije uvođenja tijeka rada
+ne prijavljuje se retroaktivno kao kršenje novih pravila. Preklapajući vremenski prozor
+smanjuje mogućnost propuštenih prijava nakon odgođenog izvođenja; nije cjelovita provjera
+povijesti. Nepoznato stanje mogućnosti spajanja, API pogreške ili nedostajuće obvezne
+informacije prikazuju se kao dijagnostika, a ne kao uspješne provjere.
 
-This is a bounded audit: it reads up to 200 open PRs, 200 merged PRs and 100 commits. It uses
-committer dates rather than push timestamps, so an old commit newly pushed directly to `main`
-can fall outside the window. These limits are adequate for the intended small seminar team;
-the audit is not a complete history or a substitute for branch protection.
+Opseg provjere ograničen je: čita do 200 otvorenih PR-ova, 200 spojenih PR-ova i 100 commitova.
+Koristi datume commitiranja (`committer date`) umjesto vremenskih oznaka pusha pa stari commit tek izravno poslan
+na `main` može ostati izvan vremenskog prozora. Ta su ograničenja primjerena malom seminarskom
+timu; provjera nije potpuna povijesna provjera niti zamjena za zaštitu grane.
 
-The human rule is stricter: the reviewer must be another member of Mislav, Sara and Lovro.
-Until their GitHub identities are configured and verified, a non-author human approval only
-checks that limited condition; the PR participants still verify team membership. Automated
-reviews and bot approvals never fulfill the human-review rule. The audit cannot verify that
-reviewers understood the mathematics, that all three members learned the material, or that the
-results are scientifically sound.
+Pravilo za ljudski pregled strože je: pregledavatelj mora biti drugi član tima koji čine
+Mislav, Sara i Lovro. Dok njihovi GitHub identiteti nisu konfigurirani i provjereni, ljudsko
+odobrenje osobe koja nije autor provjerava samo taj ograničeni uvjet; sudionici PR-a i dalje
+provjeravaju članstvo u timu. Automatski pregledi i odobrenja botova nikad ne ispunjavaju
+pravilo ljudskog pregleda. Dnevna provjera ne može potvrditi da pregledavatelji razumiju
+matematiku, da su sva tri člana naučila gradivo ni da su rezultati znanstveno utemeljeni.
 
-The sole bootstrap exception is PR #1 from `codex/seminar-workflow`: Lovro explicitly requested
-its commit, push, PR and merge on 2026-10-15. ADR-0002 records the instruction. The audit
-recognizes that exact number/branch pair without claiming a human approval. No other PR,
-CI failure or direct commit is exempted by that exception.
+Lovro je 2026-10-15 izričito odobrio spajanje bez pregleda drugih članova za početni PR #1
+iz `codex/seminar-workflow` i za prijevod u PR-u #2 iz `codex/croatian-project-docs`.
+Dodaci zapisa ADR-0002 bilježe te upute. Dnevna provjera prepoznaje samo ta dva točna para
+broja i grane, bez tvrdnje da je postojalo ljudsko odobrenje. Iznimke ne obuhvaćaju druge
+PR-ove, pad CI-ja ni izravne commitove.
 
-On problems, the audit maintains one issue titled
-"Daily check: main or open pull requests need attention", with `finding`, `source:daily-check`
-and the highest detected severity. It updates an existing open audit issue rather than opening
-a duplicate. A clean audit resolves the existing report. It never fixes code, merges a PR,
-approves work or alters research decisions. The intended labels and workflow permissions must
-exist for publication to succeed; an API failure remains a failure.
+Kada otkrije probleme, dnevna provjera održava jednu prijavu s naslovom
+„Dnevna provjera: main ili otvoreni PR-ovi zahtijevaju pozornost”, oznakama `finding`,
+`source:daily-check` i najvišom otkrivenom ozbiljnošću. Ažurira postojeću otvorenu prijavu
+provjere umjesto otvaranja duplikata. Uredna provjera zatvara postojeći izvještaj. Nikad ne
+ispravlja kod, spaja PR, odobrava rad niti mijenja istraživačke odluke. Predviđene oznake i
+ovlasti tijeka rada moraju postojati da bi objava uspjela; API pogreška ostaje pogreška.
 
-Run `python3 tools/daily_check.py --dry-run` to inspect the proposed action without writes.
-Installing this setup in the working tree is not a claim that a remote audit has already run.
-Use GitHub branch protection as well when available; verify its actual configuration rather
-than assuming a restriction from the other project's GitHub plan applies here.
+Pokrenite `python3 tools/daily_check.py --dry-run` za pregled predložene radnje bez pisanja.
+Prisutnost ove konfiguracije u radnom stablu ne znači da je dnevna provjera na GitHubu već
+izvedena. Koristite i zaštitu grane na GitHubu kada je dostupna; provjerite stvarnu
+konfiguraciju umjesto pretpostavke da ovdje vrijedi ograničenje iz GitHub paketa drugog projekta.
 
-### Labels and first activation
+### Oznake i prvo uključivanje
 
-The label scheme above is configuration to create after publication is authorized, not a claim
-that remote labels already exist. At minimum the daily publisher needs `finding`,
-`source:daily-check`, `severity:high` and `severity:medium`. For example, run these only as part
-of an authorized GitHub setup:
+Navedeni sustav oznaka konfiguracija je koju treba stvoriti nakon odobrenja objavljivanja, a
+ne tvrdnja da oznake na GitHubu već postoje. Za dnevno objavljivanje potrebne su barem oznake
+`finding`, `source:daily-check`, `severity:high` i `severity:medium`. Primjerice, ove naredbe
+pokrenite samo u sklopu odobrenog postavljanja GitHuba:
 
 ```bash
-gh label create finding --color B60205 --description "A verified project or workflow problem"
+gh label create finding --color B60205 --description "Provjeren problem u projektu ili tijeku rada"
 gh label create source:daily-check --color 5319E7
 gh label create severity:high --color D93F0B
 gh label create severity:medium --color FBCA04
 ```
 
-The remaining source labels and `severity:low` can be added when used. Verify existing labels
-before creating them, the available human review protections, a successful CI run and a
-read-only audit preview. Publishing the workflow allows its scheduled audit to maintain the
-single report; it does not authorize unrelated messages or changes.
+Preostale oznake izvora i `severity:low` mogu se dodati kada se počnu koristiti. Prije
+stvaranja provjerite postojeće oznake, dostupne zaštite koje zahtijevaju ljudski pregled,
+uspješno CI izvođenje i probni pregled dnevne provjere bez pisanja. Objavljivanje tijeka rada
+omogućuje njegovoj zakazanoj provjeri održavanje jednog izvještaja; ne odobrava nepovezane
+poruke ili promjene.
 
-## Reviewing a change
+## Pregled promjene
 
-Review a PR against its actual base and identify the commit inspected. Read the callers,
-mathematical explanation and affected experiments, not only the diff. If the base is behind
-`main`, note any integration uncertainty. Protect a person's uncommitted work: use an isolated
-worktree for tests when needed and remove only the worktree you created.
+Pregledajte PR u odnosu na njegovu stvarnu osnovu i navedite pregledani commit. Pročitajte
+pozivatelje, matematičko objašnjenje i pogođene eksperimente, a ne samo razlike. Ako osnova
+zaostaje za `main`, navedite neizvjesnosti vezane uz integraciju. Čuvajte tuđe necommitirane
+promjene: po potrebi koristite izdvojeno radno stablo za testove i uklonite samo ono koje ste
+sami stvorili.
 
-Check evidence appropriate to the change:
+Provjerite dokaze primjerene promjeni:
 
-- Mathematical claims: assumptions, dimensions, derivation, source location and the exact
-  convergence or optimality claim. Decreasing objective values do not establish global
-  optimality or convergence to a particular factorization.
-- Numerical code: invalid inputs, finite values, nonnegativity, shapes and stopping behavior;
-  small cases with known properties. Factor scaling/permutation can make raw factor equality
-  an invalid test. A library comparison is useful evidence, not a proof of the same solution.
-- Experiments: source data, preprocessing, configuration, rank selection, variation over runs,
-  metric interpretation, artifact provenance and the link between claims and evidence.
-- Documentation/workflow: propagation checklist, truthful state, executable commands and
-  the distinction between installed automation and a locally prepared configuration.
+- Matematičke tvrdnje: pretpostavke, dimenzije, izvod, mjesto u izvoru i točnu tvrdnju o
+  konvergenciji ili optimalnosti. Pad vrijednosti funkcije cilja ne dokazuje globalnu
+  optimalnost ni konvergenciju prema određenoj faktorizaciji.
+- Numerički kod: nevaljane ulaze, konačnost vrijednosti, nenegativnost, dimenzije i ponašanje
+  pri zaustavljanju; male primjere s poznatim svojstvima. Skaliranje/permutacije faktora mogu
+  učiniti izravnu jednakost faktora nevaljanim testom. Usporedba s bibliotekom korisna je
+  potkrepa, a ne dokaz istog rješenja.
+- Eksperimenti: izvorne podatke, pretprocesiranje, konfiguraciju, odabir ranga, varijabilnost
+  među izvođenjima, interpretaciju metrika, podrijetlo artefakata i vezu između tvrdnji i dokaza.
+- Dokumentacija/tijek rada: popis povezanih ažuriranja, istinit prikaz stanja, izvršive naredbe
+  i razliku između uključene automatizacije i lokalno pripremljene konfiguracije.
 
-Verify a suspected defect with a calculation, minimal test or source before reporting it as a
-finding. Report actionable findings in severity order, with exact locations and consequences;
-separate optional improvements from defects. State what was checked and what remains unrun.
-When commits change, focus on the new changes and their affected dependencies. Publish a review
-only within explicit authorization. Never claim an AI review fulfills the required human
-approval.
+Sumnju na pogrešku provjerite izračunom, minimalnim testom ili izvorom prije nego što je
+prijavite kao nalaz. Nalaze koji zahtijevaju radnju prijavite prema ozbiljnosti, uz točna
+mjesta i posljedice; odvojite neobvezna poboljšanja od pogrešaka. Navedite što je provjereno i
+što ostaje nepokrenuto. Kad se commitovi promijene, usredotočite se na nove promjene i njihove
+pogođene ovisnosti. Pregled objavite samo uz izričito odobrenje. Nikad ne tvrdite da AI pregled
+ispunjava obvezno ljudsko odobrenje.
 
-## Handover and team learning
+## Primopredaja i timsko učenje
 
-Use the handover fields in `docs/CHANGE_PROTOCOL.md` section 9. Keep accepted decisions in ADRs,
-tasks in `docs/plan/TASKS.md`, source notes in `docs/research/LITERATURE.md` and verified problems
-in findings. There is no separate memory repository in this setup, and no automatic pull/push
-of personal AI notes. A future shared memory service needs a concrete team decision.
+Koristite polja primopredaje iz odjeljka 9 u `docs/CHANGE_PROTOCOL.md`. Prihvaćene odluke
+čuvajte u ADR-ovima, zadatke u `docs/plan/TASKS.md`, bilješke o izvorima u
+`docs/research/LITERATURE.md`, a provjerene probleme u nalazima. Ova konfiguracija nema zaseban
+repozitorij memorije ni automatski pull/push osobnih AI bilježaka. Buduća usluga zajedničke
+memorije zahtijeva konkretnu timsku odluku.
 
-At milestone walkthroughs, rotate who explains the model, derivation, implementation and
-experiment interpretation. Capture unresolved questions as tasks. Mark a member's attendance,
-review or understanding only after actual participation or confirmation; a generated checklist
-is not evidence that Mislav, Sara or Lovro completed it.
+Na zajedničkim prolascima kroz etape izmjenjujte tko objašnjava model, izvod, implementaciju i
+interpretaciju eksperimenata. Neriješena pitanja zabilježite kao zadatke. Sudjelovanje,
+pregled ili razumijevanje člana označite tek nakon stvarnog sudjelovanja ili potvrde;
+generirani popis provjera nije dokaz da su ga Mislav, Sara ili Lovro ispunili.

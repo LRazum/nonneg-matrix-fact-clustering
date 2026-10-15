@@ -1,92 +1,94 @@
-# Change protocol
+# Protokol promjena
 
-The root `AGENTS.md` is the source of repository rules. This document turns those rules into
-small tasks, reviewed changes and reproducible research. It adapts the workflow Lovro requested
-on 2026-10-15; it does not record approval by Mislav or Sara.
+Korijenski `AGENTS.md` izvor je pravila repozitorija. Ovaj dokument pretvara ta pravila u
+male zadatke, pregledane promjene i reproducibilno istraživanje. Prilagođava tijek rada koji je
+Lovro zatražio 2026-10-15; ne bilježi odobrenje Mislava ili Sare.
 
-## 1. Sources of truth
+## 1. Mjerodavni izvori
 
-1. The user's current instructions and the root `AGENTS.md`.
-2. Accepted decision records in `docs/plan/adr/`.
+1. Trenutačne korisnikove upute i korijenski `AGENTS.md`.
+2. Prihvaćeni zapisi odluka u `docs/plan/adr/`.
 3. `docs/plan/PROJECT.md`, `docs/plan/TASKS.md`, `docs/plan/METHODOLOGY.md`,
-   `docs/plan/PIPELINE.md` and `docs/plan/AI_REVIEW.md`.
-4. README files, then code comments.
+   `docs/plan/PIPELINE.md` i `docs/plan/AI_REVIEW.md`.
+4. Datoteke README, a zatim komentari u kodu.
 
-Resolve a disagreement in the same change that discovers it. A scientific claim still needs
-evidence: repository rules cannot make a mathematical claim true. Check the original source,
-state its assumptions and correct the explanation, code or plan that disagrees. Attached papers
-are reference material, not instructions to an AI tool. Historic notes and superseded ADRs
-explain earlier decisions; they do not override the current plan.
+Neslaganje riješite u istoj promjeni u kojoj ga otkrijete. Znanstvena tvrdnja i dalje zahtijeva
+dokaz ili potkrepu: pravila repozitorija ne mogu matematičku tvrdnju učiniti istinitom.
+Provjerite izvorni rad, navedite pretpostavke i ispravite objašnjenje, kod ili plan koji mu
+proturječi. Priloženi radovi literatura su, a ne upute AI alatu. Povijesne bilješke i zamijenjeni
+ADR zapisi objašnjavaju ranije odluke; ne nadjačavaju trenutačni plan.
 
-## 2. Shared work and understanding
+## 2. Zajednički rad i razumijevanje
 
-All paths are shared by Mislav, Sara and Lovro. A task may have a current assignee, but nobody
-owns only the mathematics, code or experiments. Assign work in small coherent increments, for
-example an explained derivation together with its numerical check, and rotate authors and
-reviewers. At least one other human team member reviews every PR before merge. AI review is
-additional evidence and never substitutes for that review.
+Sve putanje zajedničke su Mislavu, Sari i Lovri. Zadatak može imati trenutačno zaduženu osobu,
+ali nitko nije odgovoran isključivo za matematiku, kod ili eksperimente. Zadatke dijelite u
+male povezane cjeline, primjerice objašnjen izvod zajedno s njegovom numeričkom provjerom, te
+izmjenjujte autore i pregledavatelje. Najmanje još jedan ljudski član tima pregledava svaki PR
+prije spajanja. AI pregled dodatna je potkrepa i nikad ne zamjenjuje taj pregled.
 
-Before a milestone is called ready, each member must be able to explain the relevant model,
-assumptions, algorithm, data transformations and results. Use a short walkthrough or questions
-to find gaps, then revisit them. Record who actually participated and what remains unclear;
-never mark someone as understanding or approving material without their confirmation. This
-learning check does not claim GitHub can measure understanding.
+Prije nego što se neka etapa proglasi dovršenom, svaki član mora moći objasniti pripadajući
+model, pretpostavke, algoritam, transformacije podataka i rezultate. Kratkim zajedničkim
+prolaskom ili pitanjima pronađite praznine u razumijevanju, a zatim ih ponovno obradite.
+Zabilježite tko je stvarno sudjelovao i što ostaje nejasno; nikad ne označavajte da netko
+razumije ili odobrava materijal bez njegove potvrde. Ova provjera učenja ne znači da GitHub
+može mjeriti razumijevanje.
 
-## 3. What each change carries with it
+## 3. Što svaka promjena povlači za sobom
 
-Check every applicable row. Extend the table when a new kind of change is introduced.
+Provjerite svaki primjenjivi redak. Proširite tablicu kada se uvede nova vrsta promjene.
 
-| Change | Required follow-through |
+| Promjena | Obvezna povezana ažuriranja |
 |---|---|
-| Project scope, major research question or deliverable | An ADR; `docs/plan/PROJECT.md`; affected tasks in `docs/plan/TASKS.md`; root rules and README if their statements change. |
-| Mathematical statement, derivation or notation | Its source and location in `docs/research/LITERATURE.md`; assumptions, dimensions and notation in `docs/plan/METHODOLOGY.md`; affected implementation, tests, experiments, seminar and slides when they exist. Distinguish a citation, a derivation and an empirical observation. |
-| Solver, objective, constraints, initialization or stopping criterion | Team decision and ADR for a material choice; `docs/plan/METHODOLOGY.md`; numerical checks; experiment configuration and provenance; rerun or mark affected results as superseded. |
-| Dataset or preprocessing | Source, access date, version or checksum, licence and redistribution limits; an ADR for the selection or a material change; `docs/plan/METHODOLOGY.md`; reproducible transformation and affected configurations/results. Preserve the reason for each transformation, including how nonnegativity is obtained. |
-| Experimental design, rank selection, metric or baseline | Scientific rationale in `docs/plan/METHODOLOGY.md`; an ADR for a material choice; configuration, checks and provenance; revised comparisons and limitations in the seminar and slides when they exist. |
-| Experiment code or configuration | Tests appropriate to the risk; a new identifiable run for changed results; its environment, data identity and code revision. Never silently replace a cited run. |
-| Result, table, plot or interpretation | Source run and generating command; uncertainty or variation where measured; the corresponding text in the seminar and slides when they exist. An unrun or failed experiment stays visibly unrun or failed. |
-| Task state or sequence | Its row in `docs/plan/TASKS.md`, dependencies and evidence of completion; the project or methodology state if a milestone or open decision changed. |
-| Repository rule or review procedure | ADR first; root `AGENTS.md`; this protocol; `.github/pull_request_template.md`; the matching checks and their tests. Keep `CLAUDE.md` as the pointer `@AGENTS.md`. |
-| File name, folder or document | All links and inline paths; the tree in `docs/plan/PIPELINE.md`; `docs/INDEX.md`; planned-path entries in `tools/check_docs.py`; affected CI and hook paths. |
-| Check, command, dependency or CI job | Its test where it contains logic; commands in root `AGENTS.md`; `docs/plan/PIPELINE.md`; `tools/check_before_stop.py`; `.github/workflows/ci.yml` where applicable. A future numerical environment needs both `pyproject.toml` and a reviewed lock file. |
-| Daily audit or finding process | `docs/plan/AI_REVIEW.md`; `.github/workflows/daily-check.yml`; `tools/daily_check.py` and its tests; audit permissions and any authorization to publish. |
-| New ADR or change to a decision | ADR format below; `docs/INDEX.md`; each affected rule, plan, command and artifact from this table. Preserve the original decision history. |
+| Opseg projekta, glavno istraživačko pitanje ili ono što se predaje | ADR; `docs/plan/PROJECT.md`; pogođeni zadaci u `docs/plan/TASKS.md`; korijenska pravila i README ako se njihove tvrdnje mijenjaju. |
+| Matematička tvrdnja, izvod ili notacija | Izvor i mjesto u izvoru u `docs/research/LITERATURE.md`; pretpostavke, dimenzije i notacija u `docs/plan/METHODOLOGY.md`; pogođena implementacija, testovi, eksperimenti, seminar i slajdovi kada postoje. Razlikujte citiranu tvrdnju, vlastiti izvod i empirijsko opažanje. |
+| Algoritam rješavanja, funkcija cilja, ograničenja, inicijalizacija ili kriterij zaustavljanja | Timska odluka i ADR za bitan izbor; `docs/plan/METHODOLOGY.md`; numeričke provjere; konfiguracija eksperimenta i podaci o podrijetlu; ponovno pokrenite pogođene eksperimente ili označite njihove rezultate kao zamijenjene. |
+| Skup podataka ili pretprocesiranje | Izvor, datum pristupa, verzija ili kontrolni zbroj, licencija i ograničenja redistribucije; ADR za odabir ili bitnu promjenu; `docs/plan/METHODOLOGY.md`; reproducibilna transformacija i pogođene konfiguracije/rezultati. Sačuvajte razlog svake transformacije, uključujući način postizanja nenegativnosti. |
+| Dizajn eksperimenta, odabir ranga, metrika ili referentna metoda | Znanstveno obrazloženje u `docs/plan/METHODOLOGY.md`; ADR za bitan izbor; konfiguracija, provjere i podaci o podrijetlu; ažurirane usporedbe i ograničenja u seminaru i slajdovima kada postoje. |
+| Kod ili konfiguracija eksperimenta | Testovi primjereni riziku; novo prepoznatljivo izvođenje za promijenjene rezultate; njegovo okruženje, identitet podataka i revizija koda. Nikad ne zamijenite prešutno citirano izvođenje. |
+| Rezultat, tablica, graf ili interpretacija | Izvorno izvođenje i naredba koja ih stvara; nesigurnost ili varijabilnost gdje su mjerene; odgovarajući tekst u seminaru i slajdovima kada postoje. Neizveden ili neuspješan eksperiment ostaje jasno označen kao takav. |
+| Stanje ili redoslijed zadataka | Pripadajući redak u `docs/plan/TASKS.md`, ovisnosti i dokaz dovršenosti; stanje projekta ili metodologije ako se promijenila etapa ili otvorena odluka. |
+| Pravilo repozitorija ili postupak pregleda | Najprije ADR; korijenski `AGENTS.md`; ovaj protokol; `.github/pull_request_template.md`; pripadajuće provjere i njihovi testovi. `CLAUDE.md` ostaje poveznica `@AGENTS.md`. |
+| Naziv datoteke, mapa ili dokument | Sve poveznice i putanje u tekstu; stablo u `docs/plan/PIPELINE.md`; `docs/INDEX.md`; popis planiranih putanja u `tools/check_docs.py`; pogođene putanje u CI-ju i hookovima. |
+| Provjera, naredba, ovisnost ili CI zadatak | Test ako sadrži logiku; naredbe u korijenskom `AGENTS.md`; `docs/plan/PIPELINE.md`; `tools/check_before_stop.py`; `.github/workflows/ci.yml` gdje je primjenjivo. Buduće numeričko okruženje zahtijeva i `pyproject.toml` i pregledanu datoteku zaključanih ovisnosti. |
+| Dnevna provjera ili postupak s nalazima | `docs/plan/AI_REVIEW.md`; `.github/workflows/daily-check.yml`; `tools/daily_check.py` i njegovi testovi; ovlasti provjere i eventualno odobrenje objavljivanja. |
+| Novi ADR ili promjena odluke | Format ADR-a opisan u nastavku; `docs/INDEX.md`; svako pogođeno pravilo, plan, naredba i artefakt iz ove tablice. Sačuvajte izvornu povijest odluke. |
 
-The planned paths above do not mean the numerical implementation, dataset or deliverables
-already exist. Their current state is recorded in `docs/plan/PIPELINE.md`.
+Planirane putanje u tablici ne znače da numerička implementacija, skup podataka ili materijali
+za predaju već postoje. Njihovo je trenutačno stanje zabilježeno u `docs/plan/PIPELINE.md`.
 
-## 4. Procedure for one task
+## 4. Postupak za jedan zadatak
 
-1. Read the current task, repository state and open findings. If GitHub is available, inspect
-   `gh issue list --label finding --state open`. Report missing access instead of treating it
-   as an empty result.
-2. Inspect the working tree before changing branches. Preserve others' work; never discard it
-   to obtain a clean tree. Update the base only when this is safe, then use one branch for one
-   task. Human branches use `mislav/<topic>`, `sara/<topic>` and `lovro/<topic>`; AI-created
-   branches use `codex/<topic>`.
-   Never commit directly to `main`, force-push or rewrite another person's branch.
-3. State the concrete outcome, affected rows of section 3 and how to verify it. For unresolved
-   scientific choices such as dataset, solver or evaluation, prepare a short comparison and
-   proposed decision for the team before dependent implementation. Routine fixes proceed
-   within the authorized scope.
-4. Make the smallest complete change. For new numerical logic or a bug, use a small analytical
-   example, invariant or regression test that could fail for a real mistake. Reversible prose
-   edits do not need invented numerical tests.
-5. Propagate the documentation in the same change. Keep factual statements, experimental
-   observations and decisions separate.
-6. Run the relevant checks, inspect the diff and record exact outcomes. Mark unavailable,
-   skipped and unrun checks explicitly.
-7. Prepare small descriptive commits such as `docs: explain NMF stationarity` or
-   `nmf: validate nonnegative input`. AI commits, pushes, opens PRs and publishes issues,
-   reviews or comments only with explicit authorization covering that action in the current
-   session. Existing authorization remains valid within its stated scope; do not ask again.
-8. Use the PR template. Obtain approval from at least one other human member of the three
-   before merge, except the specific user-authorized initial workflow PR in ADR-0002's
-   addendum. Resolve findings and rerun only the checks affected by subsequent edits.
+1. Pročitajte trenutačni zadatak, stanje repozitorija i otvorene nalaze. Ako je GitHub dostupan,
+   provjerite `gh issue list --label finding --state open`. Prijavite nedostupan pristup
+   umjesto da ga tumačite kao prazan rezultat.
+2. Pregledajte radno stablo prije promjene grane. Sačuvajte tuđi rad; nikad ga ne odbacujte da
+   biste dobili čisto stablo. Ažurirajte osnovu samo kada je to sigurno, a zatim koristite jednu
+   granu za jedan zadatak. Ljudske grane koriste `mislav/<topic>`, `sara/<topic>` i
+   `lovro/<topic>`; grane koje stvara AI koriste `codex/<topic>`.
+   Nikad ne radite commit izravno na `main`, prisilni push niti prepisujte tuđu granu.
+3. Navedite konkretan ishod, pogođene retke odjeljka 3 i način provjere. Za otvorene znanstvene
+   izbore, primjerice skup podataka, algoritam rješavanja ili evaluaciju, pripremite kratku
+   usporedbu i prijedlog odluke za tim prije implementacije koja o njima ovisi. Rutinske
+   ispravke provedite unutar odobrenog opsega.
+4. Napravite najmanju potpunu promjenu. Za novu numeričku logiku ili pogrešku koristite mali
+   analitički primjer, invarijantu ili regresijski test koji bi mogao pasti zbog stvarne
+   pogreške. Reverzibilne izmjene teksta ne zahtijevaju izmišljene numeričke testove.
+5. U istoj promjeni ažurirajte povezanu dokumentaciju. Razlikujte činjenične tvrdnje,
+   eksperimentalna opažanja i odluke.
+6. Pokrenite relevantne provjere, pregledajte razlike i zabilježite točne ishode. Izričito
+   označite nedostupne, preskočene i nepokrenute provjere.
+7. Pripremite male opisne commitove, primjerice `docs: objasni stacionarnost NMF-a` ili
+   `nmf: provjeri nenegativnost ulaza`. AI radi commit, push, otvara PR-ove te objavljuje
+   prijave, preglede ili komentare samo uz izričito odobrenje koje u trenutačnoj sesiji pokriva
+   tu radnju. Postojeće odobrenje vrijedi unutar navedenog opsega; ne tražite ga ponovno.
+8. Koristite predložak PR-a. Prije spajanja pribavite odobrenje najmanje još jednog ljudskog
+   člana tročlanog tima, osim za konkretne PR-ove s izričito zabilježenim korisničkim iznimkama
+   u dodacima zapisa ADR-0002. Riješite nalaze i ponovno pokrenite samo provjere pogođene naknadnim
+   izmjenama.
 
-## 5. Completion checklist
+## 5. Završna provjera
 
-Run from the repository root:
+Pokrenite iz korijena repozitorija:
 
 ```bash
 python3 tools/check_docs.py
@@ -94,53 +96,57 @@ python3 -m unittest discover -s tools -p 'test_*.py'
 python3 tools/check_before_stop.py
 ```
 
-The last command combines the available completion checks. It is also the shared entry point
-for tool hooks. Numerical commands are added with the agreed Python environment, not guessed
-in advance. Check that the diff is within scope, contains no secrets or restricted data and
-has no unsupported claim of implementation, understanding, approval or experimental success.
-Record the command, result and material limitations in the PR or handover. Passing repository
-checks does not prove scientific correctness.
+Zadnja naredba objedinjuje dostupne završne provjere. Ona je i zajednička ulazna točka za
+hookove alata. Numeričke naredbe dodaju se uz dogovoreno Python okruženje i ne nagađaju se
+unaprijed. Provjerite da su razlike unutar opsega, da ne sadrže tajne ili podatke s ograničenim
+pristupom i da ne tvrde bez potkrepe da je implementacija dovršena, da netko razumije ili
+odobrava rad ili da je eksperiment uspio. U PR-u ili primopredaji zabilježite naredbu, rezultat
+i bitna ograničenja. Uspješne provjere repozitorija ne dokazuju znanstvenu ispravnost.
 
-## 6. Decision records
+## 6. Zapisi odluka
 
-Write an ADR for a decision someone could reasonably revisit: scientific scope, application and
-dataset, objective or solver, evaluation design, environment, or a material workflow rule. A
-small correction or rename usually needs no ADR. Use `docs/plan/adr/README.md`.
+Napišite ADR za odluku koju bi netko razumno mogao ponovno razmotriti: znanstveni opseg,
+primjenu i skup podataka, funkciju cilja ili algoritam rješavanja, dizajn evaluacije, okruženje
+ili bitno pravilo tijeka rada. Mala ispravka ili preimenovanje obično ne zahtijeva ADR.
+Koristite `docs/plan/adr/README.md`.
 
-Unresolved choices remain `proposed`. Name only people who actually decided. Append a dated
-addendum for a compatible adjustment; create a new ADR and mark the old one superseded for a
-replacement. Do not erase the history or turn a literature suggestion into an accepted choice.
+Otvoreni izbori ostaju označeni kao `predloženo`. Navedite samo osobe koje su stvarno donijele
+odluku. Za usklađenu dopunu dodajte datirani dodatak; za zamjenu stvorite novi ADR i stari
+označite kao zamijenjen. Ne brišite povijest i ne pretvarajte prijedlog iz literature u
+prihvaćen izbor.
 
-## 7. Documentation checks
+## 7. Provjere dokumentacije
 
-`tools/check_docs.py` checks repository documentation and decision-record consistency using the
-Python standard library. Its tests define the automated coverage. Run it after the changes in
-section 3; a passing result is evidence for those automated checks, not a claim that every
-equation, citation, licence or scientific conclusion was reviewed. Keep the planned-path list
-honest as files are created. Update `docs/INDEX.md` whenever a document is added or moved.
+`tools/check_docs.py` provjerava dokumentaciju repozitorija i dosljednost zapisa odluka pomoću
+standardne biblioteke Pythona. Njegovi testovi određuju opseg automatskih provjera. Pokrenite
+ga nakon promjena iz odjeljka 3; uspješan rezultat potvrđuje te automatske provjere, a ne da je
+pregledana svaka jednadžba, citat, licencija ili znanstveni zaključak. Popis planiranih putanja
+održavajte točnim kako nastaju datoteke. Ažurirajte `docs/INDEX.md` kad god dodate ili premjestite
+dokument.
 
-## 8. Completion hooks
+## 8. Završni hookovi
 
-`tools/check_before_stop.py` is the shared completion gate; its local CLI is the command in
-section 5, and `--hook` selects the Stop JSON protocol.
-`.claude/hooks/check_before_stop.py` is the Claude wrapper, configured through
-`.claude/settings.json`. `.codex/hooks.json` configures Codex to run the same checker;
-configuration presence alone does not prove a Codex hook is trusted or active. Check a real
-host invocation before reporting runtime activation. Do not disable a failing hook to
-declare completion. Fix repository failures; report a missing tool or external prerequisite
-with its name and the check it prevented.
+`tools/check_before_stop.py` zajednička je završna provjera; lokalna CLI naredba navedena je u
+odjeljku 5, a `--hook` odabire protokol Stop JSON.
+`.claude/hooks/check_before_stop.py` omotač je za Claude, konfiguriran kroz
+`.claude/settings.json`. `.codex/hooks.json` konfigurira Codex za pokretanje iste provjere;
+sama prisutnost konfiguracije ne dokazuje da je Codex hook pouzdan ili aktivan. Prije tvrdnje
+o aktivaciji u izvođenju provjerite stvaran poziv iz aplikacije. Ne isključujte hook koji pada
+da biste proglasili završetak. Ispravite pogreške u repozitoriju; nedostupan alat ili vanjski
+preduvjet prijavite uz naziv i provjeru koju je onemogućio.
 
-## 9. Parallel work and handover
+## 9. Paralelni rad i primopredaja
 
-Independent agents may work in separate branches/worktrees or on explicitly disjoint paths in
-one shared working tree. Do not let two agents change the same file or branch independently.
-The coordinator integrates and checks the combined result. A handover contains:
+Neovisni agenti mogu raditi u zasebnim granama/radnim stablima ili na izričito odvojenim
+putanjama u jednom zajedničkom radnom stablu. Ne dopustite da dva agenta neovisno mijenjaju
+istu datoteku ili granu. Koordinator objedinjuje i provjerava zajednički rezultat.
+Primopredaja sadrži:
 
-- Task and branch, HEAD commit and dirty/uncommitted state; PR link if one exists.
-- Decisions already made, open scientific questions and dependencies.
-- Files changed, evidence produced and any result IDs affected.
-- Commands run, their outcomes, unavailable checks and unresolved findings.
-- The next concrete step and the limits of any publishing authorization.
+- Zadatak i granu, HEAD commit i stanje necommitiranih promjena; poveznicu na PR ako postoji.
+- Već donesene odluke, otvorena znanstvena pitanja i ovisnosti.
+- Promijenjene datoteke, nastale dokaze i identifikatore pogođenih rezultata.
+- Pokrenute naredbe, njihove ishode, nedostupne provjere i neriješene nalaze.
+- Sljedeći konkretan korak i granice eventualnog odobrenja objavljivanja.
 
-Keep durable facts in the repository and open findings in the shared finding process. Personal
-AI memory is supplementary, never the only record of a decision or experiment.
+Trajne činjenice čuvajte u repozitoriju, a otvorene probleme u zajedničkom postupku za nalaze.
+Osobna AI memorija dopuna je, nikad jedini zapis odluke ili eksperimenta.

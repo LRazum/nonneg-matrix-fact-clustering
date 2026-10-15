@@ -1,100 +1,124 @@
-# ADR-0002: Small reviewed changes, shared understanding and traceable experiments
+# ADR-0002: Male pregledane promjene, zajedničko razumijevanje i sljedivi eksperimenti
 
-**Date:** 2026-10-15 · **Status:** accepted (Lovro, 2026-10-15)
+**Datum:** 2026-10-15 · **Status:** prihvaćeno (Lovro, 2026-10-15)
 
-## Context
+## Kontekst
 
-Mislav, Sara and Lovro are preparing an NMF seminar for Matrične i tenzorske metode u analizi
-podataka. The deliverables are a written seminar, presentation, Python code and experimental
-results. All three must understand the full project. The application, dataset and implementation
-details remain open and will be agreed later.
+Mislav, Sara i Lovro pripremaju seminar o NMF-u za kolegij Matrične i tenzorske metode u analizi
+podataka. Predaju pisani seminar, prezentaciju, Python kod i eksperimentalne rezultate. Sve
+troje mora razumjeti cijeli projekt. Primjena, skup podataka i detalji implementacije ostaju
+otvoreni te će se dogovoriti kasnije.
 
-Lovro requested adapting the existing PelosiPlus workflow on 2026-10-15. Its useful practices
-are small changes, human review, decision records, documentation propagation, findings and a
-daily audit. Its product architecture and ownership boundaries do not describe this seminar.
-This record documents Lovro's requested setup, not Mislav's or Sara's approval.
+Lovro je 2026-10-15 zatražio prilagodbu postojećeg načina rada iz projekta PelosiPlus. Korisne
+su prakse male promjene, ljudski pregled, zapisi odluka, usklađivanje dokumentacije, nalazi i
+dnevna provjera. Arhitektura tog proizvoda i granice odgovornosti ne opisuju ovaj seminar.
+Ovaj zapis dokumentira postavljanje koje je zatražio Lovro, a ne odobrenje Mislava ili Sare.
 
-## Decision
+## Odluka
 
-1. Use one task per branch and a small PR. Human branches use `mislav/<topic>`, `sara/<topic>`
-   and `lovro/<topic>`; AI-created branches use `codex/<topic>`. Never commit directly to `main`, force-push or
-   rewrite another person's branch.
-2. Every PR to `main` needs approval by at least one other human member of the three. AI
-   review supplements that review. Rotate work and walkthroughs so all three can explain the
-   mathematics, implementation, experiments and conclusions; record only real participation.
-3. Keep root `AGENTS.md` as the single source of repository rules and `CLAUDE.md` as
-   `@AGENTS.md`. Record material decisions in ADRs and update the affected plans, commands
-   and deliverables in the same change.
-4. Keep unresolved scientific choices visibly open. Prepare alternatives and rationale for
-   team discussion before dependent implementation; do routine authorized corrections
-   without adding a new approval step.
-5. AI tools need explicit user authorization in the session before committing, pushing,
-   opening PRs or publishing issues, comments, reviews, submissions or public artifacts.
-   Authorization already given remains valid within its stated scope.
-6. Run documentation/tool checks in CI and through the shared completion script. Verify
-   actual hook installation before claiming tool integration. Add numerical CI and locked
-   dependencies when the implementation is chosen.
-7. Keep identified experiment configurations, data identity, code/environment provenance,
-   stopping information and outputs for every reported run. Corrections create new run IDs;
-   cited results are not silently overwritten. Missing evidence stays visibly missing.
-8. Use shared findings and a daily GitHub audit for CI state, PR conflicts/staleness,
-   approvals and commits reaching `main` without PRs. Audit enforcement starts at the captured
-   setup baseline, 2026-10-15 21:19:49 UTC; pre-workflow initialization is not audited
-   retroactively. Remote activation and identity configuration must be verified separately.
+1. Jedan zadatak obrađuje se na jednoj grani i u malom PR-u. Grane članova tima koriste
+   `mislav/<topic>`, `sara/<topic>` i `lovro/<topic>`; grane koje stvara AI koriste `codex/<topic>`.
+   Ne raditi commit izravno na `main`, prisilni push ni prepisivati tuđu granu.
+2. Svaki PR prema `main` treba odobriti barem jedan drugi član tima. AI pregled dopunjuje taj
+   pregled. Izmjenjujte rad i zajedničke prolaze kroz projekt kako bi sve troje moglo objasniti
+   matematiku, implementaciju, eksperimente i zaključke; bilježite samo stvarno sudjelovanje.
+3. Korijenski `AGENTS.md` ostaje jedini izvor pravila repozitorija, a `CLAUDE.md` sadrži
+   `@AGENTS.md`. Važne odluke zapišite u ADR-ove te u istoj promjeni uskladite planove, naredbe
+   i materijale na koje odluka utječe.
+4. Neriješene znanstvene odluke ostaju jasno otvorene. Prije implementacije koja ovisi o njima
+   pripremite mogućnosti i obrazloženje za timsku raspravu; rutinske odobrene ispravke obavite
+   bez dodavanja novog koraka odobravanja.
+5. AI alati trebaju izričito korisničko ovlaštenje u razgovoru prije commita, pusha, otvaranja
+   PR-ova ili objavljivanja problema, komentara, pregleda, predaja ili javnih materijala.
+   Već dano ovlaštenje vrijedi i dalje unutar svojeg opsega.
+6. Pokrećite provjere dokumentacije i alata u CI-ju te zajedničkom završnom skriptom. Prije
+   tvrdnje da je alat integriran provjerite jesu li lokalne završne provjere (*hooks*) stvarno
+   aktivne. Numeričke provjere u CI-ju i zaključane ovisnosti dodaju se nakon izbora implementacije.
+7. Za svako prijavljeno izvođenje sačuvajte označenu konfiguraciju eksperimenta, identitet
+   podataka, podrijetlo koda i okruženja, podatke o zaustavljanju i izlaze. Ispravak dobiva
+   novu oznaku izvođenja; citirani rezultati ne prepisuju se prešutno. Nedostajući dokazi
+   ostaju jasno označeni kao nedostajući.
+8. Koristite zajedničke nalaze i dnevnu GitHub provjeru stanja CI-ja, sukoba i zastarjelosti
+   PR-ova, odobrenja te commitova koji su stigli na `main` bez PR-a. Provjera pravila počinje
+   od zabilježenog početnog stanja, 2026-10-15 21:19:49 UTC; inicijalizacija prije uvođenja
+   načina rada ne provjerava se retroaktivno. Aktivaciju na GitHubu i postavke identiteta
+   treba zasebno provjeriti.
 
-## Why
+## Obrazloženje
 
-Small changes are easier for another student to understand and check. Human review and rotated
-explanations support the learning goal without dividing knowledge into isolated roles.
-Documentation propagation prevents a correct local change from leaving a misleading project
-description. Decision records distinguish a deliberate scientific choice from an incidental
-implementation detail.
+Manje promjene drugi student lakše razumije i provjerava. Ljudski pregled i izmjenjivanje u
+objašnjavanju podupiru cilj učenja bez dijeljenja znanja u odvojene uloge. Usklađivanje
+dokumentacije sprječava da točna lokalna promjena ostavi netočan opis projekta. Zapisi odluka
+razlikuju svjestan znanstveni izbor od usputnog detalja implementacije.
 
-NMF is nonunique and sensitive to methodological choices. Reproducible configurations and
-provenance make results interpretable after code, data or environment changes. Numerical tests,
-scientific review and traceable experiments provide different evidence; none replaces the
-others. A scheduled audit catches some workflow violations but cannot prove understanding or
-scientific correctness.
+NMF nije jedinstven i osjetljiv je na metodološke izbore. Reproducibilne konfiguracije i
+podrijetlo materijala omogućuju tumačenje rezultata nakon promjena koda, podataka ili okruženja.
+Numerički testovi, znanstveni pregled i sljedivi eksperimenti daju različite dokaze; nijedan ne
+zamjenjuje ostale. Zakazana provjera otkriva neka kršenja načina rada, ali ne može dokazati
+razumijevanje ni znanstvenu točnost.
 
-## What was rejected
+## Odbačene mogućnosti
 
-- **Separate permanent owners for mathematics, code and experiments:** incompatible with
-  the requirement that every member understands the full project.
-- **Copying the earlier project's product stack and restrictions:** this project has no
-  agreed API, database, hosted product or deployment requirement.
-- **Choosing the solver and dataset during workflow setup:** Lovro explicitly left those
-  implementation and application decisions for later discussion.
-- **Treating AI approval or a green CI run as sufficient:** neither supplies another human
-  member's review or establishes the scientific claims.
-- **Keeping result screenshots without reproducible inputs:** a figure alone cannot explain
-  which choices produced it.
-- **A separate AI memory repository now:** durable decisions, tasks, source notes and findings
-  already have shared homes here; extra infrastructure is not needed for this setup.
-- **Assuming remote protections, labels or hooks are active:** local files do not establish
-  the state of GitHub or each member's machine.
+- **Trajna podjela odgovornosti za matematiku, kod i eksperimente:** nespojiva je sa zahtjevom
+  da svaki član razumije cijeli projekt.
+- **Kopiranje tehnologija i ograničenja prethodnog proizvoda:** ovaj projekt nema dogovoren
+  API, bazu podataka, mrežni proizvod ni potrebu za objavljivanjem aplikacije.
+- **Izbor algoritma i podataka pri postavljanju načina rada:** Lovro je te odluke o
+  implementaciji i primjeni izričito ostavio za kasniju raspravu.
+- **AI odobrenje ili uspješan CI kao dovoljan uvjet:** nijedno ne zamjenjuje pregled drugog
+  člana tima niti potvrđuje znanstvene tvrdnje.
+- **Snimke rezultata bez reproducibilnih ulaza:** sama slika ne objašnjava koji su je izbori
+  proizveli.
+- **Zaseban repozitorij AI memorije sada:** trajne odluke, zadaci, bilješke o izvorima i nalazi
+  ovdje već imaju zajednička mjesta; za ovo postavljanje ne treba dodatna infrastruktura.
+- **Pretpostavka da su zaštite na GitHubu, oznake ili lokalne završne provjere aktivne:**
+  lokalne datoteke ne utvrđuju stanje GitHuba ni računala pojedinog člana.
 
-## Consequences
+## Posljedice
 
-- `docs/CHANGE_PROTOCOL.md` defines the task procedure, propagation checklist and handover.
-- `docs/plan/PIPELINE.md` distinguishes current checks from planned numerical work and states
-  the minimum provenance for results.
-- `docs/plan/AI_REVIEW.md` defines findings, review and the audit's limits.
-- `.github/pull_request_template.md`, `.github/workflows/ci.yml` and
-  `.github/workflows/daily-check.yml` implement the local workflow setup.
-- `tools/check_docs.py`, `tools/check_before_stop.py` and `tools/daily_check.py`, with tests,
-  provide the automated checks. `.claude/settings.json` and `.codex/hooks.json` configure the
-  same completion checker. Hook activation is verified independently of script presence.
-- GitHub identities, branch protection availability, remote audit activation, application,
-  dataset, solver and numerical environment remain explicit follow-up work.
+- `docs/CHANGE_PROTOCOL.md` određuje postupak za zadatak, popis za usklađivanje i primopredaju.
+- `docs/plan/PIPELINE.md` razlikuje trenutačne provjere od planiranog numeričkog rada i navodi
+  minimalne podatke o podrijetlu rezultata.
+- `docs/plan/AI_REVIEW.md` određuje nalaze, pregled i ograničenja dnevne provjere.
+- `.github/pull_request_template.md`, `.github/workflows/ci.yml` i
+  `.github/workflows/daily-check.yml` provode lokalno postavljanje načina rada.
+- `tools/check_docs.py`, `tools/check_before_stop.py` i `tools/daily_check.py`, uz testove,
+  provode automatizirane provjere. `.claude/settings.json` i `.codex/hooks.json` postavljaju
+  istu završnu provjeru. Aktivacija lokalnih završnih provjera provjerava se neovisno o
+  postojanju skripte.
+- GitHub identiteti, dostupnost zaštite grane, aktivacija dnevne provjere na GitHubu, primjena,
+  podaci, algoritam i numeričko okruženje ostaju izričito navedeni naknadni zadaci.
 
-## Addendum 2026-10-15: explicitly authorized initial workflow merge
+## Dodatak 2026-10-15: izričito odobreno spajanje početnog načina rada
 
-After reviewing the prepared setup, Lovro explicitly requested commit, push, PR and merge in
-the current session. This authorizes publishing and merging initial workflow PR #1 from
-`codex/seminar-workflow` without waiting for another member's review. It does not record or
-imply an approval from Mislav or Sara, and it does not change the review rule for later PRs.
+Nakon pregleda pripremljenog postavljanja Lovro je u razgovoru izričito zatražio commit, push,
+PR i spajanje. Time je odobrio objavu i spajanje početnog PR-a #1 za način rada s grane
+`codex/seminar-workflow` bez čekanja pregleda drugog člana. To ne bilježi niti podrazumijeva
+odobrenje Mislava ili Sare i ne mijenja pravilo pregleda za kasnije PR-ove.
 
-The daily audit recognizes only that exact PR number and branch as a review exception. CI
-must still pass; direct commits and other unreviewed merges remain findings. Creating the
-finding labels required by the published daily workflow is part of its activation. No
-unrelated issues, messages or repository access changes are authorized by this instruction.
+Dnevna provjera prepoznaje samo taj broj PR-a i tu granu kao iznimku od pregleda. CI i dalje
+mora proći; izravni commitovi i druga spajanja bez pregleda ostaju nalazi. Stvaranje oznaka
+nalaza potrebnih objavljenoj dnevnoj provjeri dio je njezine aktivacije. Ova uputa ne odobrava
+nepovezane prijave problema, poruke ni promjene pristupa repozitoriju.
+
+## Dodatak 2026-10-15: hrvatski za tekstove namijenjene ljudima
+
+Lovro je nakon početnog postavljanja izričito zatražio prijevod tekstova koje čitaju ljudi na
+hrvatski jer se kolegij izvodi na hrvatskom. Dokumentacija za tim, pisani seminar, prezentacija,
+commit poruke, tekstovi PR-ova i objašnjenja nalaza pišu se na hrvatskom. Kod, identifikatori,
+nazivi datoteka i tehničke upute
+AI alatima mogu ostati na engleskom kada to olakšava rad. Naredbe, oznake na GitHubu i drugi
+tehnički identifikatori zadržavaju se kako bi postojeći alati nastavili raditi.
+
+Ovo mijenja raniju jezičnu konvenciju; ne bira format predaje niti znanstvenu metodu. Prijevod
+čuva povijest odluka i gore navedenu iznimku za početni PR #1.
+
+## Dodatak 2026-10-15: odobreno spajanje hrvatskog prijevoda bez pregleda tima
+
+Nakon dovršenog prijevoda Lovro je izričito zatražio i njegovo spajanje bez pregleda Mislava
+ili Sare. Uputa obuhvaća commit, push, otvaranje PR-a i spajanje prijevoda u `main`.
+Iznimka vrijedi samo za PR #2 s grane `codex/croatian-project-docs`; ne bilježi tuđe odobrenje
+i ne mijenja pravilo pregleda budućih PR-ova. CI i ostale provjere moraju proći.
+
+Pravila, protokol, PR predložak i dnevna provjera bilježe tu konkretnu iznimku. Prethodna
+iznimka za PR #1 ostaje dio povijesti; drugi PR-ovi nisu izuzeti iz provjere odobrenja.

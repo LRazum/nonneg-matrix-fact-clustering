@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   workflow:
-    name: Documentation and workflow tools
+    name: Dokumentacija i alati tijeka rada
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

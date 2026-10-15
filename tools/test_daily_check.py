@@ -57,9 +57,9 @@ class FindingsTests(unittest.TestCase):
             problems = daily.pr_problems([item], NOW)
             self.assertEqual(len(problems), 1)
             self.assertEqual(problems[0].severity, "medium")
-            self.assertIn("unverified mergeability", problems[0].problem)
-            self.assertNotIn("conflict", problems[0].problem)
-            self.assertIn("Retry", problems[0].proposal)
+            self.assertIn("mogućnost spajanja nije provjerena", problems[0].problem)
+            self.assertNotIn("konflikt", problems[0].problem)
+            self.assertIn("Ponovi", problems[0].proposal)
 
     def test_48_hour_window_does_not_precede_workflow_adoption(self) -> None:
         self.assertEqual(daily.window_start(NOW), datetime(2026, 10, 16, 7, tzinfo=timezone.utc))
@@ -81,12 +81,17 @@ class FindingsTests(unittest.TestCase):
         problems = daily.unapproved_merge_problems(prs, NOW)
         self.assertEqual([p.pr.split()[0] for p in problems], ["#2", "#3", "#4"])
 
-    def test_authorized_bootstrap_exception_requires_exact_pr_and_branch(self) -> None:
-        bootstrap = merged(1, [])
-        bootstrap["headRefName"] = "codex/seminar-workflow"
-        self.assertEqual(daily.unapproved_merge_problems([bootstrap], NOW), [])
-        self.assertEqual(daily.human_approvers(bootstrap), set())
-        for number, branch in ((2, "codex/seminar-workflow"), (1, "codex/another-task")):
+    def test_authorized_review_exceptions_require_exact_pr_and_branch(self) -> None:
+        for number, branch in ((1, "codex/seminar-workflow"), (2, "codex/croatian-project-docs")):
+            with self.subTest(number=number, branch=branch):
+                authorized = merged(number, [])
+                authorized["headRefName"] = branch
+                self.assertEqual(daily.unapproved_merge_problems([authorized], NOW), [])
+                self.assertEqual(daily.human_approvers(authorized), set())
+        for number, branch in (
+            (2, "codex/seminar-workflow"), (1, "codex/another-task"),
+            (3, "codex/croatian-project-docs"), (2, "codex/another-task"),
+        ):
             with self.subTest(number=number, branch=branch):
                 other = merged(number, [])
                 other["headRefName"] = branch
@@ -144,7 +149,7 @@ class FindingsTests(unittest.TestCase):
     def test_report_contains_the_evidence_and_highest_severity(self) -> None:
         problems = daily.ci_problems([]) + daily.pr_problems([pr(3, "2026-10-17T10:00:00Z", "CONFLICTING")], NOW)
         body = daily.render_body(problems, NOW)
-        for field in ("**PR:**", "**File:**", "**Problem:**", "**How it shows:**", "**Proposal:**"):
+        for field in ("**PR:**", "**Datoteka:**", "**Problem:**", "**Kako se očituje:**", "**Prijedlog:**"):
             self.assertEqual(body.count(field), 2)
         self.assertEqual(daily.overall_severity(problems), "severity:high")
         self.assertEqual(daily.overall_severity(problems[1:]), "severity:medium")
@@ -233,7 +238,7 @@ class CliTests(unittest.TestCase):
         self.assertEqual(len(bodies), 2)
         for body in bodies:
             self.assertIn("\n### 1.", body)
-            self.assertIn("\n- **Proposal:**", body)
+            self.assertIn("\n- **Prijedlog:**", body)
         self.assertTrue(all(not path.exists() for path in paths))
 
 

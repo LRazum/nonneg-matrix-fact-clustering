@@ -10,20 +10,20 @@ from unittest.mock import patch
 
 import check_docs
 
-ADR = """# ADR-0001: Use one repository
+ADR = """# ADR-0001: Koristiti jedan repozitorij
 
-**Date:** 2026-10-15 · **Status:** accepted (Project team, 2026-10-15)
+**Datum:** 2026-10-15 · **Status:** prihvaćeno (Projektni tim, 2026-10-15)
 
-## Context
-One seminar.
-## Decision
-One repository.
-## Why
-Shared work.
-## What was rejected
-Separate repositories.
-## Consequences
-Review together.
+## Kontekst
+Jedan seminar.
+## Odluka
+Jedan repozitorij.
+## Obrazloženje
+Zajednički rad.
+## Odbačene mogućnosti
+Odvojeni repozitoriji.
+## Posljedice
+Zajednički pregled.
 """
 
 
@@ -85,16 +85,31 @@ class DocsCheckTest(unittest.TestCase):
 
     def test_duplicate_adr_number_and_bad_structure_fail(self) -> None:
         self.write("docs/plan/adr/0001-one-repo.md", ADR)
-        self.write("docs/plan/adr/0001-other.md", ADR.replace("## Why", "## Reason"))
+        self.write("docs/plan/adr/0001-other.md", ADR.replace("## Obrazloženje", "## Razlog"))
         problems = [p for p in self.checks() if p.check == 3]
         self.assertTrue(any("also used" in p.message for p in problems))
         self.assertTrue(any("sections must be" in p.message for p in problems))
 
     def test_adr_status_dates_and_superseded_reference_are_validated(self) -> None:
-        self.write("docs/plan/adr/0001-one-repo.md", ADR.replace("accepted (Project team, 2026-10-15)", "accepted (Project team, 2026-02-30)"))
+        self.write("docs/plan/adr/0001-one-repo.md", ADR.replace("prihvaćeno (Projektni tim, 2026-10-15)", "prihvaćeno (Projektni tim, 2026-02-30)"))
         self.assertTrue(any("status must be" in p.message for p in self.checks()))
-        self.write("docs/plan/adr/0001-one-repo.md", ADR.replace("accepted (Project team, 2026-10-15)", "superseded by ADR-0009"))
+        self.write("docs/plan/adr/0001-one-repo.md", ADR.replace("prihvaćeno (Projektni tim, 2026-10-15)", "zamijenjeno zapisom ADR-0009"))
         self.assertTrue(any("unknown ADR-0009" in p.message for p in self.checks()))
+
+    def test_croatian_adr_statuses_and_dated_addendum(self) -> None:
+        self.write("docs/INDEX.md", "[opseg](plan/adr/0001-one-repo.md)\n[jezik](plan/adr/0002-language.md)\n")
+        for status in ("predloženo", "prihvaćeno (Član tima, 2026-10-15)", "zamijenjeno zapisom ADR-0002"):
+            with self.subTest(status=status):
+                self.write("docs/plan/adr/0001-one-repo.md", ADR.replace(
+                    "prihvaćeno (Projektni tim, 2026-10-15)", status,
+                ) + "\n## Dodatak 2026-10-15: jezično usklađivanje\nČuvamo povijest odluka.\n")
+                self.write("docs/plan/adr/0002-language.md", ADR.replace("# ADR-0001:", "# ADR-0002:"))
+                self.assertEqual(self.checks(), [])
+
+        self.write("docs/plan/adr/0001-one-repo.md", ADR + "\n## Dodatak 2026-02-30: nevaljan datum\n")
+        self.assertTrue(any("addendum heading must be" in p.message for p in self.checks()))
+        self.write("docs/plan/adr/0001-one-repo.md", ADR.replace("## Obrazloženje", "## Obrazlozenje"))
+        self.assertTrue(any("sections must be" in p.message for p in self.checks()))
 
     def test_index_must_list_every_document(self) -> None:
         self.write("docs/plan/PROJECT.md", "Project\n")
