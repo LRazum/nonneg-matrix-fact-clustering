@@ -144,9 +144,8 @@ postojanje datoteke i uspješan ručni poziv ne dokazuju da je aplikacija pokren
   mogu ostati na engleskom. Putanje, naredbe i API vrijednosti ne prevodi.
 - Dosljedno koristi iste matematičke oznake; imenuj numeričke tolerancije i mjerne jedinice.
 - Odaberi najmanju implementaciju koja potpuno podržava dogovorenu metodu i eksperimente.
-  Ne dodaj servise, objavljivanje aplikacije, opće okvire modela ili dodatne algoritme bez potrebe.
-- Važne odluke bilježi u ADR-u. Prijedloge označi predloženima; bez dokaza ne pripisuj odobrenje
-  Mislavu ili Sari.
+  Ne dodaj servise, opće okvire modela ili dodatne algoritme bez potrebe.
+- Važne odluke bilježi u ADR-u.
 
 Počni od [uvoda](README.md), [kazala dokumentacije](docs/INDEX.md),
 [opsega projekta](docs/plan/PROJECT.md), [zadataka](docs/plan/TASKS.md) i
