@@ -65,8 +65,14 @@ Repozitorij zasad sadrži postavljen tijek rada, bez implementacije NMF-a.
 - Sva su područja repozitorija zajednička. Uzmi malen, jasno omeđen zadatak i zabilježi njegove
   ovisnosti u [popisu zadataka](docs/plan/TASKS.md). Svaki član treba moći objasniti cijeli
   postupak; bilježi stvarne zajedničke prolaze, pitanja i nastavke rada.
-- Jedan zadatak, jedna grana. Ljudske grane: `mislav/<topic>`, `sara/<topic>`, `lovro/<topic>`;
-  zadani AI prefiks: `codex/<topic>`. Prefiks označava suradnika, ne isključivo vlasništvo teme.
+- Jedan zadatak, jedna grana: `mislav/<topic>`, `sara/<topic>` ili `lovro/<topic>`. AI alat radi
+  na grani člana koji ga koristi. Prefiks označava autora, ne isključivo vlasništvo teme.
+- **Autorstvo.** AI alati pomoćno su sredstvo, a ne suradnici ni autori. Član koji koristi alat
+  jedini je autor rezultata: commitovi nose njegov git identitet, a alat ne dodaje
+  `Co-Authored-By`, „Generated with” ni drugi vlastiti potpis u commitove, PR-ove, kod ili
+  dokumente. Taj član odgovara za svaki redak i tvrdnju te ih mora moći objasniti. Povijesne
+  grane `codex/...` PR-ova #1 i #2 ostaju zabilježene kakve jesu. Pogledaj dodatak ADR-0002
+  od 2026-10-29.
 - Na početku provjeri otvorene nalaze ako postoji pristup GitHubu. Ako ga nema, to navedi i
   nastavi neovisan lokalni rad; ne tvrdi da je popis pregledan.
 - Male opisne commit poruke: `dio: što je promijenjeno`, primjerice
