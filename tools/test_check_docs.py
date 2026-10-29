@@ -63,7 +63,7 @@ class DocsCheckTest(unittest.TestCase):
         self.assertEqual(len(self.checks(config)), 2)
 
     def test_fenced_examples_external_links_and_branch_names_are_skipped(self) -> None:
-        self.write("README.md", "[site](https://example.com/a) `codex/topic`\n````md\n```\n[missing](missing.md)\n````\n")
+        self.write("README.md", "[site](https://example.com/a) `codex/topic` `lovro/topic`\n````md\n```\n[missing](missing.md)\n````\n")
         self.assertEqual(self.checks(), [])
 
     def test_agents_requires_exact_claude_pointer(self) -> None:

@@ -16,6 +16,8 @@ from pathlib import Path
 from urllib.parse import unquote
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# Inline-code branch names (team members and historical PRs) are not repository paths.
+BRANCH_PREFIXES = ("codex/", "mislav/", "sara/", "lovro/")
 
 # Remove an entry when its path is created; the checker reports stale entries.
 PLANNED = frozenset({
@@ -148,7 +150,7 @@ def extract_mentions(repo: Repo, path: str) -> list[Mention]:
             token = re.sub(r":\d+(?:-\d+)?$", "", match.group(1))
             if not re.fullmatch(r"[A-Za-z0-9_./-]+", token) or set(token) <= {".", "/"}:
                 continue
-            if token.startswith("codex/"):
+            if token.startswith(BRANCH_PREFIXES):
                 continue
             name = token.rsplit("/", 1)[-1]
             hidden_file = len(name) > 1 and name.startswith(".") and name[1].isalpha()

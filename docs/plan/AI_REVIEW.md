@@ -69,8 +69,9 @@ pravilo ljudskog pregleda. Dnevna provjera ne može potvrditi da pregledavatelji
 matematiku, da su sva tri člana naučila gradivo ni da su rezultati znanstveno utemeljeni.
 
 Lovro je 2026-10-15 izričito odobrio spajanje bez pregleda drugih članova za početni PR #1
-iz `codex/seminar-workflow` i za prijevod u PR-u #2 iz `codex/croatian-project-docs`.
-Dodaci zapisa ADR-0002 bilježe te upute. Dnevna provjera prepoznaje samo ta dva točna para
+iz `codex/seminar-workflow` i za prijevod u PR-u #2 iz `codex/croatian-project-docs`, a
+2026-10-29 za pravila o autorstvu u PR-u #4 iz `lovro/ai-authorship`.
+Dodaci zapisa ADR-0002 bilježe te upute. Dnevna provjera prepoznaje samo ta tri točna para
 broja i grane, bez tvrdnje da je postojalo ljudsko odobrenje. Iznimke ne obuhvaćaju druge
 PR-ove, pad CI-ja ni izravne commitove.
 

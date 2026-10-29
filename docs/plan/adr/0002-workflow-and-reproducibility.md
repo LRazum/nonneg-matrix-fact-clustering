@@ -127,7 +127,10 @@ iznimka za PR #1 ostaje dio povijesti; drugi PR-ovi nisu izuzeti iz provjere odo
 
 Lovro je izričito zatražio da se svaki commit, redak koda i dokument pripisuje isključivo članu
 tima koji radi zadatak, a ne AI alatu kojim se pritom služi. Naveo je da se Mislav i Sara s tim
-slažu; njihova se potvrda bilježi odobrenjem PR-a koji uvodi ovaj dodatak.
+slažu. Zatim je izričito zatražio commit, push, otvaranje PR-a i spajanje te promjene u `main`
+bez pregleda drugog člana. Iznimka vrijedi samo za PR #4 s grane `lovro/ai-authorship`; ne
+bilježi odobrenje Mislava ili Sare i ne mijenja pravilo pregleda budućih PR-ova. CI i ostale
+provjere moraju proći.
 
 Od tog datuma:
 
