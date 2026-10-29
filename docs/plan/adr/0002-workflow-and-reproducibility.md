@@ -122,3 +122,28 @@ i ne mijenja pravilo pregleda budućih PR-ova. CI i ostale provjere moraju proć
 
 Pravila, protokol, PR predložak i dnevna provjera bilježe tu konkretnu iznimku. Prethodna
 iznimka za PR #1 ostaje dio povijesti; drugi PR-ovi nisu izuzeti iz provjere odobrenja.
+
+## Dodatak 2026-10-29: autorstvo i AI alati kao pomoćno sredstvo
+
+Lovro je izričito zatražio da se svaki commit, redak koda i dokument pripisuje isključivo članu
+tima koji radi zadatak, a ne AI alatu kojim se pritom služi. Naveo je da se Mislav i Sara s tim
+slažu. Zatim je izričito zatražio commit, push, otvaranje PR-a i spajanje te promjene u `main`
+bez pregleda drugog člana. Iznimka vrijedi samo za PR #4 s grane `lovro/ai-authorship`; ne
+bilježi odobrenje Mislava ili Sare i ne mijenja pravilo pregleda budućih PR-ova. CI i ostale
+provjere moraju proći.
+
+Od tog datuma:
+
+1. AI alati pomoćno su sredstvo, poput uređivača koda ili sustava za simboličko računanje, a ne
+   suradnici ni autori. Član koji koristi alat jedini je autor rezultata i odgovara za svaki
+   redak i tvrdnju; mora ih moći objasniti i bez alata.
+2. Commitovi nose git identitet tog člana. Alati ne dodaju `Co-Authored-By`, „Generated with”
+   ni drugi vlastiti potpis u commitove, PR-ove, kod ili dokumente. `.claude/settings.json`
+   to isključuje za Claude Code.
+3. Nove grane koriste samo `mislav/<topic>`, `sara/<topic>` i `lovro/<topic>`; AI alat radi na
+   grani člana koji ga koristi. Prefiks `codex/<topic>` iz prve točke odluke više se ne koristi
+   za nove grane.
+
+Ne mijenjaju se obvezni ljudski pregled PR-ova, zabrana izmišljanja zapisa o pregledu ili
+razumijevanju ni povijest odluka. Grane `codex/seminar-workflow` i `codex/croatian-project-docs`
+PR-ova #1 i #2 ostaju zabilježene kakve jesu jer se na njih oslanjaju iznimke dnevne provjere.

@@ -24,7 +24,8 @@ Sve putanje zajedničke su Mislavu, Sari i Lovri. Zadatak može imati trenutačn
 ali nitko nije odgovoran isključivo za matematiku, kod ili eksperimente. Zadatke dijelite u
 male povezane cjeline, primjerice objašnjen izvod zajedno s njegovom numeričkom provjerom, te
 izmjenjujte autore i pregledavatelje. Najmanje još jedan ljudski član tima pregledava svaki PR
-prije spajanja. AI pregled dodatna je potkrepa i nikad ne zamjenjuje taj pregled.
+prije spajanja. AI pregled dodatna je potkrepa i nikad ne zamjenjuje taj pregled. AI alati
+pomoćno su sredstvo člana koji ih koristi; on je jedini autor rezultata i odgovara za njega.
 
 Prije nego što se neka etapa proglasi dovršenom, svaki član mora moći objasniti pripadajući
 model, pretpostavke, algoritam, transformacije podataka i rezultate. Kratkim zajedničkim
@@ -63,8 +64,8 @@ za predaju već postoje. Njihovo je trenutačno stanje zabilježeno u `docs/plan
    umjesto da ga tumačite kao prazan rezultat.
 2. Pregledajte radno stablo prije promjene grane. Sačuvajte tuđi rad; nikad ga ne odbacujte da
    biste dobili čisto stablo. Ažurirajte osnovu samo kada je to sigurno, a zatim koristite jednu
-   granu za jedan zadatak. Ljudske grane koriste `mislav/<topic>`, `sara/<topic>` i
-   `lovro/<topic>`; grane koje stvara AI koriste `codex/<topic>`.
+   granu za jedan zadatak. Grane koriste `mislav/<topic>`, `sara/<topic>` i `lovro/<topic>`;
+   AI alat radi na grani člana koji ga koristi.
    Nikad ne radite commit izravno na `main`, prisilni push niti prepisujte tuđu granu.
 3. Navedite konkretan ishod, pogođene retke odjeljka 3 i način provjere. Za otvorene znanstvene
    izbore, primjerice skup podataka, algoritam rješavanja ili evaluaciju, pripremite kratku
@@ -81,6 +82,8 @@ za predaju već postoje. Njihovo je trenutačno stanje zabilježeno u `docs/plan
    `nmf: provjeri nenegativnost ulaza`. AI radi commit, push, otvara PR-ove te objavljuje
    prijave, preglede ili komentare samo uz izričito odobrenje koje u trenutačnoj sesiji pokriva
    tu radnju. Postojeće odobrenje vrijedi unutar navedenog opsega; ne tražite ga ponovno.
+   Commitovi nose git identitet člana koji radi zadatak. AI alati ne dodaju `Co-Authored-By`,
+   „Generated with” ni drugi vlastiti potpis u commitove, PR-ove, kod ili dokumente.
 8. Koristite predložak PR-a. Prije spajanja pribavite odobrenje najmanje još jednog ljudskog
    člana tročlanog tima, osim za konkretne PR-ove s izričito zabilježenim korisničkim iznimkama
    u dodacima zapisa ADR-0002. Riješite nalaze i ponovno pokrenite samo provjere pogođene naknadnim
@@ -129,7 +132,8 @@ dokument.
 `tools/check_before_stop.py` zajednička je završna provjera; lokalna CLI naredba navedena je u
 odjeljku 5, a `--hook` odabire protokol Stop JSON.
 `.claude/hooks/check_before_stop.py` omotač je za Claude, konfiguriran kroz
-`.claude/settings.json`. `.codex/hooks.json` konfigurira Codex za pokretanje iste provjere;
+`.claude/settings.json`; ista datoteka isključuje Claudeove potpise u commitovima i PR-ovima.
+`.codex/hooks.json` konfigurira Codex za pokretanje iste provjere;
 sama prisutnost konfiguracije ne dokazuje da je Codex hook pouzdan ili aktivan. Prije tvrdnje
 o aktivaciji u izvođenju provjerite stvaran poziv iz aplikacije. Ne isključujte hook koji pada
 da biste proglasili završetak. Ispravite pogreške u repozitoriju; nedostupan alat ili vanjski

@@ -82,7 +82,9 @@ class FindingsTests(unittest.TestCase):
         self.assertEqual([p.pr.split()[0] for p in problems], ["#2", "#3", "#4"])
 
     def test_authorized_review_exceptions_require_exact_pr_and_branch(self) -> None:
-        for number, branch in ((1, "codex/seminar-workflow"), (2, "codex/croatian-project-docs")):
+        for number, branch in (
+            (1, "codex/seminar-workflow"), (2, "codex/croatian-project-docs"), (4, "lovro/ai-authorship"),
+        ):
             with self.subTest(number=number, branch=branch):
                 authorized = merged(number, [])
                 authorized["headRefName"] = branch
@@ -91,6 +93,7 @@ class FindingsTests(unittest.TestCase):
         for number, branch in (
             (2, "codex/seminar-workflow"), (1, "codex/another-task"),
             (3, "codex/croatian-project-docs"), (2, "codex/another-task"),
+            (5, "lovro/ai-authorship"), (4, "lovro/another-task"),
         ):
             with self.subTest(number=number, branch=branch):
                 other = merged(number, [])

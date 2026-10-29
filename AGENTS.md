@@ -65,8 +65,14 @@ Repozitorij zasad sadrži postavljen tijek rada, bez implementacije NMF-a.
 - Sva su područja repozitorija zajednička. Uzmi malen, jasno omeđen zadatak i zabilježi njegove
   ovisnosti u [popisu zadataka](docs/plan/TASKS.md). Svaki član treba moći objasniti cijeli
   postupak; bilježi stvarne zajedničke prolaze, pitanja i nastavke rada.
-- Jedan zadatak, jedna grana. Ljudske grane: `mislav/<topic>`, `sara/<topic>`, `lovro/<topic>`;
-  zadani AI prefiks: `codex/<topic>`. Prefiks označava suradnika, ne isključivo vlasništvo teme.
+- Jedan zadatak, jedna grana: `mislav/<topic>`, `sara/<topic>` ili `lovro/<topic>`. AI alat radi
+  na grani člana koji ga koristi. Prefiks označava autora, ne isključivo vlasništvo teme.
+- **Autorstvo.** AI alati pomoćno su sredstvo, a ne suradnici ni autori. Član koji koristi alat
+  jedini je autor rezultata: commitovi nose njegov git identitet, a alat ne dodaje
+  `Co-Authored-By`, „Generated with” ni drugi vlastiti potpis u commitove, PR-ove, kod ili
+  dokumente. Taj član odgovara za svaki redak i tvrdnju te ih mora moći objasniti. Povijesne
+  grane `codex/...` PR-ova #1 i #2 ostaju zabilježene kakve jesu. Pogledaj dodatak ADR-0002
+  od 2026-10-29.
 - Na početku provjeri otvorene nalaze ako postoji pristup GitHubu. Ako ga nema, to navedi i
   nastavi neovisan lokalni rad; ne tvrdi da je popis pregledan.
 - Male opisne commit poruke: `dio: što je promijenjeno`, primjerice
@@ -76,15 +82,15 @@ Repozitorij zasad sadrži postavljen tijek rada, bez implementacije NMF-a.
   Zaštitu grane treba zasebno provjeriti; lokalne je datoteke ne uključuju. Dnevna provjera
   neke prekršaje otkriva naknadno.
   Lovro je 2026-10-15 izričito odobrio spajanje bez pregleda drugog člana za početni PR #1
-  s grane `codex/seminar-workflow` i za prijevod u PR-u #2 s grane `codex/croatian-project-docs`.
-  To su iznimke samo za navedene parove broja i grane, a ne tuđa odobrenja. Ostali PR-ovi
+  s grane `codex/seminar-workflow` i za prijevod u PR-u #2 s grane `codex/croatian-project-docs`,
+  a 2026-10-29 za PR #4 s grane `lovro/ai-authorship`. To su iznimke samo za navedene parove broja i grane, a ne tuđa odobrenja. Ostali PR-ovi
   slijede redovno pravilo. Pogledaj datirane dodatke zapisa ADR-0002.
 - AI alati rade commit/push, otvaraju PR-ove/issuee, objavljuju preglede/komentare ili šalju
   poruke samo uz korisnikovo ovlaštenje za tu radnju. Ovlaštenje ostaje valjano unutar
   dogovorenog opsega; ne traži ga ponovno za već odobrenu radnju. Lokalne promjene koje se mogu
   poništiti i provjere obavljaju se u opsegu zadatka. Poštuj aktualno ovlaštenje: samo početno lokalno
   postavljanje nije ovlastilo objavu, dok su kasnije Lovrove upute odobrile objavu i spajanje
-  PR-ova #1 i #2.
+  PR-ova #1, #2 i #4.
 - Prije traženja odluke tima o otvorenom znanstvenom pitanju pripremi konkretan prijedlog.
   Rutinski ispravci i već dogovoren rad ne trebaju dodatni postupak odobravanja.
 - Paralelni agenti mogu dijeliti ovu radnu kopiju samo uz odvojene datoteke i jasno određenog

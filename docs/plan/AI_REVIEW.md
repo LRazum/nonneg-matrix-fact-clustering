@@ -1,8 +1,9 @@
 # AI pregled, nalazi i dnevna provjera
 
 Ovaj postupak osigurava da Mislav, Sara i Lovro mogu pratiti probleme i primopredaje.
-Korijenski `AGENTS.md` i `docs/CHANGE_PROTOCOL.md` ostaju mjerodavna pravila; AI alat suradnik
-je, a ne ljudski pregledavatelj niti dokaz da tim razumije neki rezultat.
+Korijenski `AGENTS.md` i `docs/CHANGE_PROTOCOL.md` ostaju mjerodavna pravila; AI alat pomoćno
+je sredstvo člana koji ga koristi, a ne suradnik, autor, ljudski pregledavatelj niti dokaz da
+tim razumije neki rezultat.
 
 ## Nalazi kao zajednička memorija
 
@@ -10,8 +11,8 @@ Reproducibilan problem zabilježite jednom, a kasnija otkrića povežite s njim.
 prijavu s oznakama:
 
 - `finding`.
-- Jedna oznaka izvora: `source:codex`, `source:claude-code`, `source:human-review`, `source:ci`
-  ili `source:daily-check`.
+- Jedna oznaka izvora: `source:human-review`, `source:tool` (član ga je pronašao uz pomoć
+  alata), `source:ci` ili `source:daily-check`.
 - Jedna oznaka ozbiljnosti: `severity:high` za nevaljan središnji rezultat, neispravan `main`
   ili otkrivenu tajnu; `severity:medium` za blokiran rad, zavaravajuću dokumentaciju ili
   nedostajuće podatke o podrijetlu; `severity:low` za dorade i čišćenje.
@@ -68,8 +69,9 @@ pravilo ljudskog pregleda. Dnevna provjera ne može potvrditi da pregledavatelji
 matematiku, da su sva tri člana naučila gradivo ni da su rezultati znanstveno utemeljeni.
 
 Lovro je 2026-10-15 izričito odobrio spajanje bez pregleda drugih članova za početni PR #1
-iz `codex/seminar-workflow` i za prijevod u PR-u #2 iz `codex/croatian-project-docs`.
-Dodaci zapisa ADR-0002 bilježe te upute. Dnevna provjera prepoznaje samo ta dva točna para
+iz `codex/seminar-workflow` i za prijevod u PR-u #2 iz `codex/croatian-project-docs`, a
+2026-10-29 za pravila o autorstvu u PR-u #4 iz `lovro/ai-authorship`.
+Dodaci zapisa ADR-0002 bilježe te upute. Dnevna provjera prepoznaje samo ta tri točna para
 broja i grane, bez tvrdnje da je postojalo ljudsko odobrenje. Iznimke ne obuhvaćaju druge
 PR-ove, pad CI-ja ni izravne commitove.
 
