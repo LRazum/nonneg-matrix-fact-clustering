@@ -12,7 +12,9 @@ Lovro je 2026-11-04 lokalno isprobao cijeli lanac za temu 2. Ta proba nije dio r
 a njezini brojevi nisu rezultati projekta.
 
 Lovro je 2026-11-05 u razgovoru naveo da je tim prihvatio temu 2. Ovaj zapis bilježi tu izjavu.
-Sara i Mislav potvrđuju zapis pregledom PR-a u kojem je uveden.
+PR #39, koji ga uvodi, spojen je bez pregleda na GitHubu (ADR-0002, dodatak 2026-11-05).
+Lovro je naveo da Sara i Mislav to dopuštaju. Oni zapis potvrđuju na sastanku Z0 (issue #5)
+ili traže izmjenu novim PR-om.
 
 ## Odluka
 

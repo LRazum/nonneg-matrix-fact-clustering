@@ -3,7 +3,8 @@
 Raspored niti prihvaćen je u [ADR-0004](adr/0004-divide-work-into-end-to-end-threads.md),
 a tema u [ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md). Ova stranica je
 zajednički plan. Detaljni koraci za svaku osobu nalaze se u osobnim planovima. Sadržaj planova
-je prijedlog: Sara i Mislav ga potvrđuju ili mijenjaju pregledom PR-a u kojem je uveden.
+je prijedlog. PR #39 spojen je bez pregleda na GitHubu (ADR-0002, dodatak 2026-11-05), pa Sara i
+Mislav svoje planove potvrđuju ili mijenjaju na sastanku Z0 ili novim PR-om.
 Rok nije poznat, pa faze nemaju datume.
 
 ## Tko je tko
@@ -114,7 +115,8 @@ provjeriti na umjetnim podacima.
 
 Sudjeluju svi. Sastanak traje oko sat vremena.
 
-- [ ] Pregledati i spojiti PR s ovom podjelom; promjene planova unijeti i u issuee.
+- [ ] Sara i Mislav pregledavaju svoje planove (spojeni u PR-u #39 bez pregleda na GitHubu).
+  Potvrđuju ih ili traže izmjene; promjene se unose i u issuee.
 - [ ] Potvrditi zajednička sučelja s ove stranice ili ih izmijeniti.
 - [ ] Dogovoriti Python ovisnosti. Prijedlog: `numpy`, `scipy`, `matplotlib`, `mir_eval` samo za
   provjeru vrednovanja, okvir za testove (`pytest` ili `unittest`) i `uv` za zaključane verzije.

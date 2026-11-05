@@ -147,3 +147,19 @@ Od tog datuma:
 Ne mijenjaju se obvezni ljudski pregled PR-ova, zabrana izmišljanja zapisa o pregledu ili
 razumijevanju ni povijest odluka. Grane `codex/seminar-workflow` i `codex/croatian-project-docs`
 PR-ova #1 i #2 ostaju zabilježene kakve jesu jer se na njih oslanjaju iznimke dnevne provjere.
+
+## Dodatak 2026-11-05: odobreno spajanje podjele rada bez pregleda tima
+
+Lovro je izričito zatražio da se PR #39 s grane `lovro/podjela-rada` odmah spoji bez pregleda,
+jer je riječ o podjeli rada. Naveo je da Sara i Mislav dopuštaju takvo spajanje. PR bilježi:
+
+- temu 2 (ADR-0003);
+- podjelu na niti (ADR-0004);
+- osobne planove i postavke GitHuba.
+
+Iznimka vrijedi samo za taj par broja i grane. Na GitHubu ne postoji Sarino ni Mislavovo
+odobrenje; zapisana je samo Lovrina izjava. Pravilo pregleda za buduće PR-ove se ne mijenja,
+a CI i ostale provjere moraju proći.
+
+Sara i Mislav svoje planove potvrđuju ili mijenjaju na sastanku Z0 (issue #5) ili novim PR-om.
+Dnevna provjera prepoznaje i ovaj par kao iznimku od pregleda.

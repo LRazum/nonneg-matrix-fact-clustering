@@ -11,8 +11,9 @@ matematiku, kod, eksperimente, dio seminara i dio prezentacije. Tim je birao tko
 
 Lovro je 2026-11-05 u razgovoru naveo raspored: **Sara je osoba A, Lovro osoba B, Mislav osoba
 C.** Isti je dan zatražio da se raspored zabilježi i da svatko dobije detaljan plan. Planove je
-napisao Lovro uz pomoć AI alata. Oni su prijedlog sadržaja koji Sara i Mislav potvrđuju ili
-mijenjaju pregledom PR-a u kojem su uvedeni.
+napisao Lovro uz pomoć AI alata i oni su prijedlog sadržaja. PR #39, koji ih uvodi, spojen je
+bez pregleda na GitHubu (ADR-0002, dodatak 2026-11-05). Lovro je naveo da Sara i Mislav to
+dopuštaju. Svoje planove potvrđuju ili mijenjaju na sastanku Z0 (issue #5) ili novim PR-om.
 
 ## Odluka
 
@@ -71,5 +72,4 @@ mijenjaju pregledom PR-a u kojem su uvedeni.
   - issuei za svaki zadatak iz osobnih planova;
   - predlošci issuea i `.github/CODEOWNERS`;
   - zaštita grane `main` koja traži odobrenje drugog člana i uspješan CI.
-- Kad Sara i Mislav pregledaju PR, svaku promjenu osobnih planova treba unijeti i u
-  pripadajuće issuee.
+- Svaku promjenu osobnih planova nakon Z0 treba unijeti i u pripadajuće issuee.

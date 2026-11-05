@@ -101,8 +101,9 @@ odluku. Repozitorij zasad nema implementaciju NMF-a.
   neke prekršaje otkriva naknadno.
   Lovro je 2026-10-15 izričito odobrio spajanje bez pregleda drugog člana za početni PR #1
   s grane `codex/seminar-workflow` i za prijevod u PR-u #2 s grane `codex/croatian-project-docs`,
-  a 2026-10-29 za PR #4 s grane `lovro/ai-authorship`. To su iznimke samo za navedene parove broja i grane, a ne tuđa odobrenja. Ostali PR-ovi
-  slijede redovno pravilo. Pogledaj datirane dodatke zapisa ADR-0002.
+  zatim 2026-10-29 za PR #4 s grane `lovro/ai-authorship`, a 2026-11-05 za podjelu rada u PR-u #39 s
+  grane `lovro/podjela-rada`. To su iznimke samo za navedene parove broja i grane, a ne tuđa
+  odobrenja. Ostali PR-ovi slijede redovno pravilo. Pogledaj datirane dodatke zapisa ADR-0002.
 - AI alati rade commit/push, otvaraju PR-ove/issuee, objavljuju preglede/komentare ili šalju
   poruke samo uz korisnikovo ovlaštenje za tu radnju. Ovlaštenje ostaje valjano unutar
   dogovorenog opsega; ne traži ga ponovno za već odobrenu radnju. Lokalne promjene koje se mogu

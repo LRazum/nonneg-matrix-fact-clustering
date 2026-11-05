@@ -42,6 +42,7 @@ AUTHORIZED_REVIEW_EXCEPTIONS = frozenset({
     (1, "codex/seminar-workflow"),
     (2, "codex/croatian-project-docs"),
     (4, "lovro/ai-authorship"),
+    (39, "lovro/podjela-rada"),
 })
 
 
