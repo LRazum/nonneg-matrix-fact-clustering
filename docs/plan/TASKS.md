@@ -1,8 +1,9 @@
 # Zadaci i ključne točke
 
 Status se temelji na dokazima: plan nije implementacija, uspješne provjere alata nisu numerički
-rezultati, a AI sažetak nije ljudsko odobrenje. Pojedinačna zaduženja nisu dogovorena. Svi su
-zadaci zajednički; privremenog nositelja i osobu za pregled moguće je zabilježiti kasnije.
+rezultati, a AI sažetak nije ljudsko odobrenje. Ovo su etape projekta. Konkretni zadaci po
+osobama su GitHub issuei iz [podjele rada](PODJELA.md), a svaki pripada jednoj od etapa niže.
+Svi su zadaci zajednički: nositelj vodi zadatak, a recenzent iz pregleda u krug ga provjerava.
 
 ## Pregled
 
@@ -10,15 +11,22 @@ zadaci zajednički; privremenog nositelja i osobu za pregled moguće je zabilje�
 |---|---|---|---|
 | T0 | Utvrditi kontekst projekta i prilagoditi tijek rada u repozitoriju | Korisnikove odluke o opsegu | Provedeno; objava odobrena za početni PR, povjerenje hookovima preostaje provjeriti na svakom računalu |
 | T1 | Razviti zajedničko matematičko razumijevanje na temelju Gillisa i dopunske literature | Kontekst T0 | Spremno za početak |
-| T2 | Odabrati konkretan problem i skup podataka s opravdanim NMF prikazom | Kontekst T0 | Otvoreno; može teći usporedno s T1 |
-| T3 | Dogovoriti funkciju cilja, algoritam i plan eksperimenata | T1, T2 | Otvoreno |
-| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | Odgođeno do dogovora tima o implementaciji |
+| T2 | Odabrati konkretan problem i skup podataka s opravdanim NMF prikazom | Kontekst T0 | Odlučeno 2026-11-05: ADR-0003 (GuitarSet, prepisivanje gitare) |
+| T3 | Dogovoriti funkciju cilja, algoritam i plan eksperimenata | T1, T2 | Djelomično: funkcija cilja i algoritam u ADR-0003; plan eksperimenata je zadatak Z2 |
+| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | Spremno nakon okruženja (B1); zadaci po nitima u podjeli rada |
 | T5 | Provesti eksperimente koji omogućuju reprodukciju rezultata i protumačiti ih | T4, priprema podataka | Otvoreno |
 | T6 | Sastaviti pisani seminar i prezentaciju | Od T1 nadalje; konačni rezultati iz T5 | Otvoreno |
 | T7 | Reproducirati konačne rezultate i zajedno uvježbati cjelovito objašnjenje | T5, T6 | Otvoreno |
 
-Rok projekta nije poznat. Ovo je redoslijed ovisnosti, a ne vremenski raspored ili podjela
-pojedinih područja među članovima.
+Rok projekta nije poznat. Ovo je redoslijed ovisnosti, a ne vremenski raspored. Faze i zadaci po
+osobama nalaze se u [podjeli rada](PODJELA.md):
+
+- T1 pokrivaju A3, B4, C1 te neovisne provjere A9, B9 i C9;
+- T3 pokriva Z2;
+- T4 pokrivaju B1, B2, B3, A1, A2, A5, C2, C3 i C4;
+- T5 pokrivaju A4, A6, B5, B6, C5 i C6;
+- T6 pokrivaju A7, B7, C7, A8, B8, C8 i Z5;
+- T7 pokrivaju Z4 i Z6.
 
 ## T0: postavljanje tijeka rada
 
@@ -51,16 +59,21 @@ opažanja. Zajedno proći oznake, funkciju cilja i mehanizam ažuriranja.
 Zadatak je dovršen kada su bilješke pregledane, nejasnoće zabilježene i sva tri člana mogu
 objasniti matematički argument. Ne označiti ga dovršenim samo zato što su bilješke generirane.
 
-Za temu 2 iz prijedloga tema postoji radni nacrt
+Za odabranu temu 2 postoji radni nacrt
 [skripte](../research/skripta-gitara/skripta-gitara.pdf) (2026-11-05). Nitko ga još nije pregledao
-i on ne dokazuje zajedničko razumijevanje; stanje zadatka T1 se ne mijenja.
+i on ne dokazuje zajedničko razumijevanje; stanje zadatka T1 se ne mijenja. Matematiku dijele
+niti: Sara (A3), Lovro (B4) i Mislav (C1). Svaki dio neovisno izvodi recenzent (A9, B9, C9).
 
 ## T2: problem i skup podataka
 
 Usporediti manji broj konkretnih kandidata prema pitanju na koje odgovaraju, konstrukciji
 nenegativne matrice, dostupnosti i licenci, izvedivoj veličini, interpretaciji i evaluaciji.
 Objasniti po čemu se konkretni problem i podaci razlikuju od primjera u priloženim radovima.
-Tim odabire kandidata i bilježi odluku. Skup podataka još nije odabran.
+Tim odabire kandidata i bilježi odluku.
+
+Odlučeno 2026-11-05 u [ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md), na temelju
+[prijedloga tema](prijedlog-tema/prijedlog-tema-nmf.pdf): prepisivanje gitare u note, GuitarSet 1.1.0.
+Preuzimanje, kontrolni zbrojevi i provjera predobrade su zadaci A1 i A4.
 
 Zadatak završava dogovorenim istraživačkim pitanjem, opisom izvora i podataka, planom
 predobrade, predviđenim značenjem faktora i izvedivom evaluacijom.

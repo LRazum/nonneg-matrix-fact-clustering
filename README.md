@@ -12,9 +12,23 @@ priloženih radova s ciljevima učenja.
 ## Trenutačno stanje
 
 Repozitorij sadrži pravila rada, istraživački plan i automatizirane provjere prilagođene
-referentnom projektu. Primjena, podaci, funkcija cilja, algoritam NMF-a i znanstveno Python
-okruženje još nisu odabrani. Implementacija NMF-a i eksperimentalni rezultati još ne postoje.
-Otvoreni su i rok, formati predaje te pojedinačna zaduženja.
+referentnom projektu.
+
+**Tema:** automatsko prepisivanje gitare u note na skupu GuitarSet. Koristimo generaliziranu
+KL divergenciju i multiplikativna pravila Leeja i Seunga
+([ADR-0003](docs/plan/adr/0003-choose-guitar-transcription-with-kl-nmf.md)).
+
+**Rad je podijeljen na tri niti** ([podjela rada](docs/plan/PODJELA.md)):
+
+- Sara: od snimke do matrice i od nota do $F_1$;
+- Lovro: od matrice do faktora;
+- Mislav: od faktora do nota.
+
+Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Zadaci su GitHub issuei
+organizirani u milestoneove Faza 0 do Faza 4.
+
+Implementacija NMF-a i eksperimentalni rezultati još ne postoje. Otvoreni su znanstveno Python
+okruženje, rok i formati predaje.
 
 Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
 projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),
@@ -25,8 +39,8 @@ projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJEC
 
 1. Pročitaj [AGENTS.md](AGENTS.md), zajednička pravila za ljude i AI alate.
 2. U [kazalu dokumentacije](docs/INDEX.md) pronađi aktualne odluke i istraživačke materijale.
-3. Odaberi malen zadatak s [popisa zadataka](docs/plan/TASKS.md) i radi na zasebnoj grani.
-   Promjenu pregledava drugi član tima. [Protokol promjena](docs/CHANGE_PROTOCOL.md) opisuje
+3. Otvori svoj [osobni plan](docs/plan/PODJELA.md) i sljedeći issue iz njega. Radi na zasebnoj
+   grani, a PR neka zatvori issue s `Closes #N`. Promjenu pregledava drugi član tima. [Protokol promjena](docs/CHANGE_PROTOCOL.md) opisuje
    koju dokumentaciju treba uskladiti uz pojedinu vrstu promjene.
 4. Prije predaje rada drugom članu pokreni lokalne provjere:
 

@@ -16,21 +16,30 @@ Ove je zahtjeve Lovro naveo 2026-10-15. Vidjeti
 [ADR-0001](adr/0001-seminar-scope-and-shared-understanding.md). Ne pretpostavljati da su
 ostali članovi odobrili određeni skup podataka, algoritam ili pregled tijeka rada.
 
+## Odabrana tema
+
+Prema [ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md) radimo automatsko
+prepisivanje gitare u note na skupu GuitarSet. Matrica je amplitudni spektrogram, a koristimo
+generaliziranu KL divergenciju i multiplikativna pravila Leeja i Seunga. Vrednujemo unakrsnom
+provjerom s izostavljenim gitaristom i $F_1$ na razini nota. Rad je podijeljen na tri niti prema
+[ADR-0004](adr/0004-divide-work-into-end-to-end-threads.md) i [podjeli rada](PODJELA.md):
+Sara (A), Lovro (B) i Mislav (C).
+
 ## Što se predaje i trenutačno stanje
 
 | Stavka | Obvezni sadržaj | Trenutačno stanje |
 |---|---|---|
 | Pisani seminar | Motivacija, detaljna matematika, algoritam, podaci i metodologija, eksperimenti, interpretacija, ograničenja i literatura | Planiran na hrvatskom; format i opseg otvoreni |
 | Prezentacija | Povezano objašnjenje istog modela, metode, rezultata i zaključaka | Planirana na hrvatskom; format i trajanje otvoreni |
-| Python kod | Dogovorena NMF metoda, smislene provjere i dokumentirano pokretanje koje omogućuje reprodukciju rezultata | Planirano; funkcija cilja, algoritam i ovisnosti otvoreni |
+| Python kod | Dogovorena NMF metoda, smislene provjere i dokumentirano pokretanje koje omogućuje reprodukciju rezultata | Planirano; funkcija cilja i algoritam odabrani (ADR-0003), ovisnosti otvorene |
 | Rezultati | Numerički rezultati i nalazi u domeni s jasnim podrijetlom, slike i tablice te iskreno navedena ograničenja | Planirano; eksperimenti nisu provedeni |
 
 ## Razumijevanje cijelog projekta
 
 Zadatak može imati privremenog nositelja i drugu osobu koja ga pregledava. Time se ne smije
 stvoriti matematički stručnjak koji jedini razumije izvod ili programerski stručnjak koji
-jedini zna pokrenuti projekt. Pojedinačna zaduženja i način izmjene uloga dogovorit će se
-kasnije.
+jedini zna pokrenuti projekt. Zaduženja i pregled u krug opisani su u [podjeli rada](PODJELA.md).
+Niti se mogu zamijeniti dogovorom.
 
 Na ključnim točkama zajednički proći matematiku, algoritam, podatke, kod i interpretaciju.
 Svaki član treba moći objasniti:
@@ -48,13 +57,16 @@ razumijevanje; AI alat to ne može potvrditi umjesto nje.
 
 ## Još otvorene odluke
 
-- Konkretna primjena, istraživačko pitanje, skup podataka te uvjeti pristupa i daljnje distribucije.
-- Funkcija cilja, algoritam, inicijalizacija, numeričke zaštite, kriterij zaustavljanja i odabir ranga.
+Primjena, skup podataka, funkcija cilja, algoritam, referentne metode i glavna mjera odabrani su u
+ADR-0003, a zaduženja u ADR-0004. GitHub korisnička imena su `saragrguric` (Sara), `LRazum`
+(Lovro) i `phantom5470` (Mislav). Otvoreno je još:
+
+- Način učenja predložaka (maskirani NMF ili prosjek spektara), pozadinska komponenta,
+  inicijalizacija, numeričke zaštite i kriterij zaustavljanja.
+- Parametri STFT-a, normalizacija razine snimki, mreža hiperparametara i dodatne mjere.
 - Znanstvene Python ovisnosti, podržana verzija, okruženje i referentna bibliotečna implementacija.
-- Prikladna referentna metoda, metrike domene i opseg eksperimenata.
 - Format seminara i prezentacije, opseg i trajanje, kriteriji ocjenjivanja i rok.
-- Pojedinačna zaduženja; Mislavova i Sarina GitHub korisnička imena i pristup.
-- Dostupnost zaštite grana na GitHubu te povjerenje i aktivacija hookova na pojedinom računalu.
+- Povjerenje i aktivacija hookova na pojedinom računalu.
 
 Za važne izbore pripremiti argumente i prijedlog, zatim dogovor zabilježiti u ADR-u i ažurirati
 povezane dokumente. Postavljanje tijeka rada ne donosi te odluke.

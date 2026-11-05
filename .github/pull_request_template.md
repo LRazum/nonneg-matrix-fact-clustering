@@ -1,6 +1,11 @@
 ## Što se mijenja i zašto
 
-<!-- Navedite problem i promjenu koja ga rješava. Povežite zadatak i relevantni ADR ili nalaz. -->
+<!-- Navedite problem i promjenu koja ga rješava. Povežite relevantni ADR ili nalaz.
+     Zadatak zatvorite redom „Closes #N” (vidi docs/plan/PODJELA.md). -->
+
+Closes #
+
+- Nit (A, B, C ili zajedničko):
 
 ## Utjecaj na matematiku i eksperimente
 

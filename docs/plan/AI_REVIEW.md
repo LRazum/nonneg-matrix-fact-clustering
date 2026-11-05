@@ -101,7 +101,8 @@ gh label create severity:high --color D93F0B
 gh label create severity:medium --color FBCA04
 ```
 
-Preostale oznake izvora i `severity:low` mogu se dodati kada se počnu koristiti. Prije
+Preostale oznake izvora i `severity:low` stvorene su 2026-11-05 zajedno s predloškom issuea
+„Nalaz” u `.github/ISSUE_TEMPLATE/nalaz.yml`. Prije
 stvaranja provjerite postojeće oznake, dostupne zaštite koje zahtijevaju ljudski pregled,
 uspješno CI izvođenje i probni pregled dnevne provjere bez pisanja. Objavljivanje tijeka rada
 omogućuje njegovoj zakazanoj provjeri održavanje jednog izvještaja; ne odobrava nepovezane

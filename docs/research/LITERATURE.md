@@ -37,10 +37,12 @@ ili raspon stranica.
 Ovo je predloženi redoslijed čitanja, a ne zapis da ga je neki član završio. Stvarne bilješke,
 izvode, pitanja i zajedničke prolaske pratiti kroz [popis zadataka](../plan/TASKS.md).
 
-## Izvori za temu 2 iz prijedloga (gitara)
+## Izvori za odabranu temu 2 (gitara)
 
-[Prijedlog tema](../plan/prijedlog-tema/prijedlog-tema-nmf.pdf) još nije odluka tima. Ako se
-odabere tema 2 (generalizirana KL divergencija i multiplikativna ažuriranja), potrebni su:
+Tim je odabrao temu 2 iz [prijedloga tema](../plan/prijedlog-tema/prijedlog-tema-nmf.pdf)
+([ADR-0003](../plan/adr/0003-choose-guitar-transcription-with-kl-nmf.md)): generaliziranu KL
+divergenciju i multiplikativna ažuriranja. Potrebni su sljedeći izvori. Koji dio čita koja nit
+navedeno je u [podjeli rada](../plan/PODJELA.md).
 
 | Izvor | Mjesto | Zašto |
 |---|---|---|

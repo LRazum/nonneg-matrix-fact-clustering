@@ -19,13 +19,28 @@ je od njih pojedinačno obvezan, a koji ponuđen. Pogledaj
 
 Predajemo pisani seminar, prezentaciju, Python kod i eksperimentalne rezultate. Svi članovi
 moraju razumjeti cijeli projekt: matematiku, algoritam, podatke, kod i rezultate. Ne dodjeljuj
-pojedinim članovima trajno isključivo poznavanje matematike, koda ili eksperimenata. Podjelu
-zadataka dogovorit ćemo kasnije. Pogledaj
+pojedinim članovima trajno isključivo poznavanje matematike, koda ili eksperimenata. Pogledaj
 [ADR-0001](docs/plan/adr/0001-seminar-scope-and-shared-understanding.md).
 
-Primjena, podaci, funkcija cilja/algoritam, Python ovisnosti, formati predaje, rok i pojedinačna
-zaduženja **nisu odlučeni**. Primjer ili prijedlog metode ne pretvaraj u prihvaćenu odluku.
-Repozitorij zasad sadrži postavljen tijek rada, bez implementacije NMF-a.
+**Tema je odabrana** ([ADR-0003](docs/plan/adr/0003-choose-guitar-transcription-with-kl-nmf.md)):
+automatsko prepisivanje gitare u note na skupu GuitarSet. Koristimo generaliziranu KL divergenciju
+i multiplikativna pravila Leeja i Seunga, unakrsnu provjeru s izostavljenim gitaristom i $F_1$ na
+razini nota. Referentne metode su Frobeniusova norma i spektralni vrhovi.
+
+**Rad je podijeljen na tri niti**
+([ADR-0004](docs/plan/adr/0004-divide-work-into-end-to-end-threads.md),
+[podjela rada](docs/plan/PODJELA.md)):
+
+- Sara (A): od snimke do matrice i od nota do $F_1$;
+- Lovro (B): od matrice do faktora;
+- Mislav (C): od faktora do nota.
+
+Svaka nit sadrži matematiku, kod, eksperimente, seminar i slajdove. Pregled ide u krug:
+A pregledava B, B pregledava C, a C pregledava A.
+
+Još **nisu odlučeni**: Python ovisnosti, način učenja predložaka, parametri STFT-a i
+hiperparametri, formati predaje i rok. Primjer ili prijedlog metode ne pretvaraj u prihvaćenu
+odluku. Repozitorij zasad nema implementaciju NMF-a.
 
 ## 2. Znanstvena i numerička pravila
 
@@ -62,11 +77,14 @@ Repozitorij zasad sadrži postavljen tijek rada, bez implementacije NMF-a.
 
 ## 3. Suradnja i Git
 
-- Sva su područja repozitorija zajednička. Uzmi malen, jasno omeđen zadatak i zabilježi njegove
-  ovisnosti u [popisu zadataka](docs/plan/TASKS.md). Svaki član treba moći objasniti cijeli
+- Sva su područja repozitorija zajednička. Zadaci su GitHub issuei iz
+  [podjele rada](docs/plan/PODJELA.md), s oznakom niti i milestoneom faze. Uzmi malen,
+  jasno omeđen zadatak; njegove se ovisnosti pišu u issueu, a etape su u
+  [popisu zadataka](docs/plan/TASKS.md). Svaki član treba moći objasniti cijeli
   postupak; bilježi stvarne zajedničke prolaze, pitanja i nastavke rada.
 - Jedan zadatak, jedna grana: `mislav/<topic>`, `sara/<topic>` ili `lovro/<topic>`. AI alat radi
-  na grani člana koji ga koristi. Prefiks označava autora, ne isključivo vlasništvo teme.
+  na grani člana koji ga koristi. Prefiks označava autora, ne isključivo vlasništvo teme. PR zatvara
+  svoj issue s `Closes #N`, a `.github/CODEOWNERS` automatski traži pregled od recenzenta niti.
 - **Autorstvo.** AI alati pomoćno su sredstvo, a ne suradnici ni autori. Član koji koristi alat
   jedini je autor rezultata: commitovi nose njegov git identitet, a alat ne dodaje
   `Co-Authored-By`, „Generated with” ni drugi vlastiti potpis u commitove, PR-ove, kod ili
