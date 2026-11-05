@@ -29,8 +29,8 @@ Sara (A), Lovro (B) i Mislav (C).
 
 | Stavka | Obvezni sadržaj | Trenutačno stanje |
 |---|---|---|
-| Pisani seminar | Motivacija, detaljna matematika, algoritam, podaci i metodologija, eksperimenti, interpretacija, ograničenja i literatura | Planiran na hrvatskom; format i opseg otvoreni |
-| Prezentacija | Povezano objašnjenje istog modela, metode, rezultata i zaključaka | Planirana na hrvatskom; format i trajanje otvoreni |
+| Pisani seminar | Motivacija, detaljna matematika, algoritam, podaci i metodologija, eksperimenti, interpretacija, ograničenja i literatura | Planiran na hrvatskom, na Overleafu izvan repozitorija (ADR-0005); opseg otvoren |
+| Prezentacija | Povezano objašnjenje istog modela, metode, rezultata i zaključaka | Planirana na hrvatskom, na Overleafu izvan repozitorija (ADR-0005); trajanje otvoreno |
 | Python kod | Dogovorena NMF metoda, smislene provjere i dokumentirano pokretanje koje omogućuje reprodukciju rezultata | Planirano; funkcija cilja i algoritam odabrani (ADR-0003), ovisnosti otvorene |
 | Rezultati | Numerički rezultati i nalazi u domeni s jasnim podrijetlom, slike i tablice te iskreno navedena ograničenja | Planirano; eksperimenti nisu provedeni |
 
@@ -65,7 +65,8 @@ ADR-0003, a zaduženja u ADR-0004. GitHub korisnička imena su `saragrguric` (Sa
   inicijalizacija, numeričke zaštite i kriterij zaustavljanja.
 - Parametri STFT-a, normalizacija razine snimki, mreža hiperparametara i dodatne mjere.
 - Znanstvene Python ovisnosti, podržana verzija, okruženje i referentna bibliotečna implementacija.
-- Format seminara i prezentacije, opseg i trajanje, kriteriji ocjenjivanja i rok.
+- Opseg seminara, trajanje izlaganja, kriteriji ocjenjivanja i rok. Termin dobivamo u tjednu od
+  2026-11-09, a rok zatim određujemo sami.
 - Povjerenje i aktivacija hookova na pojedinom računalu.
 
 Za važne izbore pripremiti argumente i prijedlog, zatim dogovor zabilježiti u ADR-u i ažurirati

@@ -16,6 +16,7 @@ Pravila: [AGENTS.md](../AGENTS.md). Uvod u projekt: [README.md](../README.md).
 - [Metodologija](plan/METHODOLOGY.md): matematička razrada, provjera implementacije i eksperimenti.
 - [Literatura](research/LITERATURE.md): priloženi radovi i predloženi redoslijed učenja.
 - [Podjela rada](plan/PODJELA.md): tri niti, pregled u krug, zajednička sučelja, faze i GitHub issuei.
+  - [Prijedlog za Z0](plan/Z0_PRIJEDLOG.md): Lovrin prijedlog odluka za sastanak Z0 (#5): sučelja, okruženje, format i rok; nije odluka.
   - [Plan A: Sara](plan/podjela/a-sara.md): od snimke do matrice i od nota do $F_1$.
   - [Plan B: Lovro](plan/podjela/b-lovro.md): od matrice do faktora.
   - [Plan C: Mislav](plan/podjela/c-mislav.md): od faktora do nota.
@@ -29,3 +30,4 @@ Pravila: [AGENTS.md](../AGENTS.md). Uvod u projekt: [README.md](../README.md).
 - [ADR-0002](plan/adr/0002-workflow-and-reproducibility.md): suradnja, tijek rada i ponovljivost rezultata.
 - [ADR-0003](plan/adr/0003-choose-guitar-transcription-with-kl-nmf.md): tema 2, prepisivanje gitare pomoću KL-NMF-a.
 - [ADR-0004](plan/adr/0004-divide-work-into-end-to-end-threads.md): tri niti od matematike do rezultata i pregled u krug.
+- [ADR-0005](plan/adr/0005-write-seminar-and-slides-on-overleaf.md): seminar i prezentacija na Overleafu, odvojeno od GitHuba.

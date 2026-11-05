@@ -56,11 +56,10 @@ tests/                               planirano: numeričke provjere i provjere p
 experiments/                         planirano: konfiguracije i reproducibilne ulazne točke
 data/                                planirano: dokumentirana nabava/priprema podataka
 results/                             planirano: označena izvođenja, slike i tablice
-seminar/                             planirano: izvor pisanog seminara
-presentation/                        planirano: izvor prezentacije
 ```
 
-Planirane mape uvode se kada za njih postoji stvaran sadržaj. Naziv mape ne određuje skup
+Planirane mape uvode se kada za njih postoji stvaran sadržaj. Seminar i prezentacija pišu se na
+Overleafu i nisu u repozitoriju ([ADR-0005](adr/0005-write-seminar-and-slides-on-overleaf.md)). Naziv mape ne određuje skup
 podataka, algoritam rješavanja ni format dokumenta. Predložena datoteka zaključanih ovisnosti
 za uv slijedi referentni tijek rada; numeričko okruženje i upravitelj paketa još nisu dogovoreni.
 Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook aktivan.

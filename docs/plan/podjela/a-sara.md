@@ -193,8 +193,8 @@ označi je li citirana, vlastiti izvod ili empirijsko opažanje.
 10. Uskladi oznake s [metodologijom](../METHODOLOGY.md): $A$ je $m\times n$, s frekvencijama u
     retcima i okvirima u stupcima.
 
-**Gotovo kada:** nacrt je u dogovorenom formatu u mapi `seminar/`; Mislav je neovisno prošao
-izvode (C9) i nejasnoće su zapisane u issueu.
+**Gotovo kada:** nacrt je u Overleaf projektu seminara ([ADR-0005](../adr/0005-write-seminar-and-slides-on-overleaf.md)); Mislav je neovisno
+prošao izvode (C9) i nejasnoće su zapisane u issueu.
 
 ## A4: provjera pretprocesiranja podataka (#16)
 
@@ -305,8 +305,8 @@ Pripremi kratko objašnjenje bez slajdova za probnu obranu (Z6).
 
 ## A9: neovisna provjera dokaza niti B (#18)
 
-Ti si recenzentica Lovrine niti. Kad B4 bude u PR-u, bez gledanja u njegov tekst na papiru
-izvedi:
+Ti si recenzentica Lovrine niti. Kad nacrt B4 bude u Overleafu, bez gledanja u njegov tekst
+na papiru izvedi:
 
 1. gradijente $\nabla_H D=W^T(\mathbf 1-A\oslash WH)$ i $\nabla_W D=(\mathbf 1-A\oslash WH)H^T$;
 2. uvjete optimalnosti na nenegativnom ortantu i primjer stacionarne točke koja nije minimum;
@@ -314,8 +314,8 @@ izvedi:
 4. lemu o pomoćnoj funkciji, majorantu preko Jensenove nejednakosti i teorem o nerastu
    (L3, odjeljak 6, teorem 2).
 
-Usporedi svoj izvod s Lovrinim i sa L3. Svaku razliku ili nejasnoću zapiši u issue ili kao
-komentar u PR-u. Na prolazima Z1 i Z3 ti objašnjavaš nit B, a u Z4 reproduciraš Lovrine
+Usporedi svoj izvod s Lovrinim i sa L3. Svaku razliku ili nejasnoću zapiši kao komentar u
+Overleafu, a sažetak u issue. Na prolazima Z1 i Z3 ti objašnjavaš nit B, a u Z4 reproduciraš Lovrine
 eksperimente.
 
 ## Što trebaš znati iz tuđih niti

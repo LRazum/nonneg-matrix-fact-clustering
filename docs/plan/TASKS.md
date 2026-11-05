@@ -18,7 +18,8 @@ Svi su zadaci zajednički: nositelj vodi zadatak, a recenzent iz pregleda u krug
 | T6 | Sastaviti pisani seminar i prezentaciju | Od T1 nadalje; konačni rezultati iz T5 | Otvoreno |
 | T7 | Reproducirati konačne rezultate i zajedno uvježbati cjelovito objašnjenje | T5, T6 | Otvoreno |
 
-Rok projekta nije poznat. Ovo je redoslijed ovisnosti, a ne vremenski raspored. Faze i zadaci po
+Rok projekta nije poznat: termin dobivamo u tjednu od 2026-11-09, a rok zatim određujemo sami.
+Ovo je redoslijed ovisnosti, a ne vremenski raspored. Faze i zadaci po
 osobama nalaze se u [podjeli rada](PODJELA.md):
 
 - T1 pokrivaju A3, B4, C1 te neovisne provjere A9, B9 i C9;
