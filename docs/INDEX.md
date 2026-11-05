@@ -15,6 +15,8 @@ Pravila: [AGENTS.md](../AGENTS.md). Uvod u projekt: [README.md](../README.md).
 - [Zadaci](plan/TASKS.md): etape, ovisnosti, stanje i dokazi dovršenosti.
 - [Metodologija](plan/METHODOLOGY.md): matematička razrada, provjera implementacije i eksperimenti.
 - [Literatura](research/LITERATURE.md): priloženi radovi i predloženi redoslijed učenja.
+- [Prijedlog tema](plan/prijedlog-tema/prijedlog-tema-nmf.pdf) ([izvor](plan/prijedlog-tema/prijedlog-tema-nmf.tex)): četiri moguće teme i način rada po nitima; prijedlog o kojem tim još nije odlučio.
+- [Skripta za temu 2](research/skripta-gitara/skripta-gitara.pdf) ([izvor](research/skripta-gitara/skripta-gitara.tex)): radni nacrt matematike za prepisivanje gitare pomoću NMF-a, intuitivno pa formalno; nije pregledan.
 
 ## Odluke
 

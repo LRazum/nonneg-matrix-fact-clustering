@@ -23,8 +23,10 @@ docs/
     PIPELINE.md                     ova datoteka
     AI_REVIEW.md                    nalazi, dnevna provjera i postupak pregleda
     adr/                            zapisi odluka
+    prijedlog-tema/                 izvještaj s prijedlogom tema i načina rada
   research/
     LITERATURE.md                   bibliografski podaci, uloge izvora i bilješke uz čitanje
+    skripta-gitara/                 radni nacrt skripte za temu 2 iz prijedloga (LaTeX i PDF)
 tools/
   check_docs.py
   test_check_docs.py

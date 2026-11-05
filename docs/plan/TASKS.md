@@ -51,6 +51,10 @@ opažanja. Zajedno proći oznake, funkciju cilja i mehanizam ažuriranja.
 Zadatak je dovršen kada su bilješke pregledane, nejasnoće zabilježene i sva tri člana mogu
 objasniti matematički argument. Ne označiti ga dovršenim samo zato što su bilješke generirane.
 
+Za temu 2 iz prijedloga tema postoji radni nacrt
+[skripte](../research/skripta-gitara/skripta-gitara.pdf) (2026-11-05). Nitko ga još nije pregledao
+i on ne dokazuje zajedničko razumijevanje; stanje zadatka T1 se ne mijenja.
+
 ## T2: problem i skup podataka
 
 Usporediti manji broj konkretnih kandidata prema pitanju na koje odgovaraju, konstrukciji
