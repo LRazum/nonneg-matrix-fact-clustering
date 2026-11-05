@@ -204,8 +204,8 @@ empirijsko opažanje.
 8. **Mali primjer.** Jedna ručno izračunata iteracija na matrici $2\times2$; isti brojevi idu u
    test 5 iz B2.
 
-**Gotovo kada:** nacrt je u mapi `seminar/`; Sara ga je neovisno prošla (A9) i nejasnoće su
-zapisane.
+**Gotovo kada:** nacrt je u Overleaf projektu seminara ([ADR-0005](../adr/0005-write-seminar-and-slides-on-overleaf.md)); Sara ga je neovisno
+prošla (A9) i nejasnoće su zapisane u issueu.
 
 ## B5: algoritam na stvarnim spektrogramima (#19)
 
@@ -264,7 +264,7 @@ Oko 4–6 slajdova:
 
 ## B9: neovisna provjera dokaza niti C (#20)
 
-Ti si recenzent Mislavove niti. Kad C1 bude u PR-u, na papiru neovisno izvedi:
+Ti si recenzent Mislavove niti. Kad nacrt C1 bude u Overleafu, na papiru neovisno izvedi:
 
 1. nejedinstvenost: $(WD)(D^{-1}H)=WH$ i permutacije; normalizacija čuva $WH$;
 2. primjer nekonveksnosti punog problema i dokaz konveksnosti po $H$ uz fiksni $W$. Za KL je
@@ -273,7 +273,8 @@ Ti si recenzent Mislavove niti. Kad C1 bude u PR-u, na papiru neovisno izvedi:
    leme 1 i kritika u L4, odjeljak 3.1; primjer zapinjanja u točki koja nije stacionarna;
 4. propoziciju o maskiranom NMF-u.
 
-Razlike i nejasnoće zapiši u PR ili issue. Na prolazima Z1 i Z3 ti objašnjavaš nit C, a u Z4
+Razlike i nejasnoće zapiši kao komentar u Overleafu, a sažetak u issue. Na prolazima Z1 i Z3
+ti objašnjavaš nit C, a u Z4
 reproduciraš Mislavov glavni eksperiment.
 
 ## Što trebaš znati iz tuđih niti

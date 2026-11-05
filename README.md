@@ -28,7 +28,7 @@ Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Zadaci su GitHub
 organizirani u milestoneove Faza 0 do Faza 4.
 
 Implementacija NMF-a i eksperimentalni rezultati još ne postoje. Otvoreni su znanstveno Python
-okruženje, rok i formati predaje.
+okruženje i rok. Seminar i prezentacija pišu se na Overleafu, odvojeno od GitHuba (ADR-0005).
 
 Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
 projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),

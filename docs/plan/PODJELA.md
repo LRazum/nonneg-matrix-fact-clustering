@@ -5,7 +5,9 @@ a tema u [ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md). Ova st
 zajednički plan. Detaljni koraci za svaku osobu nalaze se u osobnim planovima. Sadržaj planova
 je prijedlog. PR #39 spojen je bez pregleda na GitHubu (ADR-0002, dodatak 2026-11-05), pa Sara i
 Mislav svoje planove potvrđuju ili mijenjaju na sastanku Z0 ili novim PR-om.
-Rok nije poznat, pa faze nemaju datume.
+Rok nije poznat, pa faze nemaju datume. Termin dobivamo u tjednu od 2026-11-09, a rok zatim
+određujemo sami. Seminar i prezentacija pišu se na Overleafu, odvojeno od GitHuba
+([ADR-0005](adr/0005-write-seminar-and-slides-on-overleaf.md)).
 
 ## Tko je tko
 
@@ -34,8 +36,9 @@ cijeli projekt, a ne samo svoju nit.
 
 **A pregledava B, B pregledava C, C pregledava A.** Recenzent niti:
 
-1. pregledava njezine PR-ove: kod, testove, matematiku i usklađenost dokumentacije;
-2. neovisno na papiru izvodi njezine dokaze i zapisuje nejasnoće (zadaci A9, B9 i C9);
+1. pregledava njezine PR-ove: kod, testove i usklađenost dokumentacije;
+2. neovisno na papiru izvodi njezine dokaze, komentira njezine nacrte u Overleafu i nejasnoće
+   zapisuje u issue zadatka (zadaci A9, B9 i C9);
 3. objašnjava tu nit na zajedničkim prolazima, a nositelj ga dopunjuje;
 4. reproducira njezine eksperimente u čistom okruženju (Z4).
 
@@ -121,8 +124,9 @@ Sudjeluju svi. Sastanak traje oko sat vremena.
 - [ ] Dogovoriti Python ovisnosti. Prijedlog: `numpy`, `scipy`, `matplotlib`, `mir_eval` samo za
   provjeru vrednovanja, okvir za testove (`pytest` ili `unittest`) i `uv` za zaključane verzije.
   B1 ih zatim provodi.
-- [ ] Dogovoriti format seminara i prezentacije. Prijedlog je LaTeX, kao skripta, u mapama
-  `seminar/` i `presentation/`. Saznati rok i zahtjeve kolegija.
+- [x] Format seminara i prezentacije: Overleaf, odvojeno od GitHuba (ADR-0005). Na Z0 dogovoriti
+  strukturu projekata, zajedničke oznake i literaturu.
+- [ ] Kad u tjednu od 2026-11-09 dobijemo termin, odrediti rok i dodati datume milestoneima.
 - [ ] Svatko lokalno: klonirati repozitorij, pokrenuti `python3 tools/check_before_stop.py` i
   provjeriti povjerenje hookovima (vidi [tijek rada](PIPELINE.md)).
 - [ ] Svatko pročitati Dio I [skripte](../research/skripta-gitara/skripta-gitara.pdf)
@@ -165,8 +169,9 @@ usporedba brojeva. Razlike i neuspjehe zapisujemo; ne skrivamo ih.
 
 ### Z5: uvod, zaključak i usklađivanje oznaka (#37)
 
-Zajedno pišemo uvod i zaključak seminara. Provjeravamo da seminar, slajdovi i kod koriste iste
-oznake, parametre i brojeve.
+Zajedno pišemo uvod i zaključak seminara. Provjeravamo da seminar i slajdovi u Overleafu i kod u
+repozitoriju koriste iste oznake, parametre i brojeve te da svaka slika i tablica ima
+identifikator pokretanja.
 
 ### Z6: prolaz 3, probna obrana (#38)
 

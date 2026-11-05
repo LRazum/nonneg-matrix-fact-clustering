@@ -39,8 +39,9 @@ Svaka nit sadrži matematiku, kod, eksperimente, seminar i slajdove. Pregled ide
 A pregledava B, B pregledava C, a C pregledava A.
 
 Još **nisu odlučeni**: Python ovisnosti, način učenja predložaka, parametri STFT-a i
-hiperparametri, formati predaje i rok. Primjer ili prijedlog metode ne pretvaraj u prihvaćenu
-odluku. Repozitorij zasad nema implementaciju NMF-a.
+hiperparametri i rok. Seminar i prezentacija pišu se na Overleafu, odvojeno od GitHuba
+(ADR-0005). Primjer ili prijedlog metode ne pretvaraj u prihvaćenu odluku. Repozitorij zasad
+nema implementaciju NMF-a.
 
 ## 2. Znanstvena i numerička pravila
 
@@ -125,9 +126,10 @@ te lokalne završne provjere. Znanstvena implementacija slijedi kasnije. Trenuta
 struktura opisane su u [tijeku rada](docs/plan/PIPELINE.md).
 
 Planirana područja: `src/` za višekratno upotrebljiv Python kod, `tests/` za numeričke provjere,
-`experiments/` za ponovljiva izvođenja, `data/` za lokalne ulaze i njihov opis, `results/` za
-rezultate, `seminar/` za pisani rad i `presentation/` za prezentaciju. Stvaraj ih kada imaju
-koristan sadržaj. Istraživanje u bilježnici mora se povezati s ponovljivim izvođenjem.
+`experiments/` za ponovljiva izvođenja, `data/` za lokalne ulaze i njihov opis i `results/` za
+rezultate, uključujući slike i tablice za seminar. Stvaraj ih kada imaju koristan sadržaj.
+Seminar i prezentacija nisu u repozitoriju, nego na Overleafu (ADR-0005). Istraživanje u
+bilježnici mora se povezati s ponovljivim izvođenjem.
 
 - Pristupne podatke i osobne postavke ne spremaj u Git. Zasad nije potreban API ključ.
 - Sirova preuzimanja, obrađene matrice i opsežni izlazi lokalni su i isključeni iz Gita. Mali

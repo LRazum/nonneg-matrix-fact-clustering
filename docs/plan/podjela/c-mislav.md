@@ -103,8 +103,8 @@ tekst. Uz svaku tvrdnju označi je li citirana, vlastiti izvod ili empirijsko op
      unakrsna provjera; AGENTS.md, pravilo 7). U suprotnom bi rezultat bio optimistično
      pristran.
 
-**Gotovo kada:** nacrt je u mapi `seminar/`; Lovro ga je neovisno prošao (B9) i nejasnoće su
-zapisane.
+**Gotovo kada:** nacrt je u Overleaf projektu seminara ([ADR-0005](../adr/0005-write-seminar-and-slides-on-overleaf.md)); Lovro ga je neovisno
+prošao (B9) i nejasnoće su zapisane u issueu.
 
 ## C2: note iz aktivacija (#14)
 
@@ -246,7 +246,7 @@ Oko 5–7 slajdova:
 
 ## C9: neovisna provjera dokaza niti A (#23)
 
-Ti si recenzent Sarine niti. Kad A3 bude u PR-u, na papiru neovisno izvedi:
+Ti si recenzent Sarine niti. Kad nacrt A3 bude u Overleafu, na papiru neovisno izvedi:
 
 1. propoziciju o zbrajanju modula: kada je spektar zbroja jednak zbroju spektara;
 2. nenegativnost KL divergencije i kada je jednaka nuli;
@@ -254,7 +254,8 @@ Ti si recenzent Sarine niti. Kad A3 bude u PR-u, na papiru neovisno izvedi:
 4. ekvivalenciju minimizacije KL divergencije i Poissonove izglednosti;
 5. zašto $F_1$ traži najveće sparivanje, a ne pohlepno.
 
-Razlike i nejasnoće zapiši u PR ili issue. Na prolazima Z1 i Z3 ti objašnjavaš nit A, a u Z4
+Razlike i nejasnoće zapiši kao komentar u Overleafu, a sažetak u issue. Na prolazima Z1 i Z3
+ti objašnjavaš nit A, a u Z4
 reproduciraš Sarine eksperimente.
 
 ## Što trebaš znati iz tuđih niti
