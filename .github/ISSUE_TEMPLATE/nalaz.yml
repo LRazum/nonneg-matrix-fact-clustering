@@ -1,0 +1,51 @@
+name: Nalaz
+description: Provjeren problem u projektu ili tijeku rada (docs/plan/AI_REVIEW.md).
+title: "Nalaz: "
+labels: ["finding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nalaz je provjeren problem. Sumnja bez dokaza je pitanje, a ne nalaz. Nakon otvaranja
+        dodaj jednu oznaku izvora (`source:human-review`, `source:tool`, `source:ci`) i jednu
+        oznaku ozbiljnosti (`severity:high`, `severity:medium`, `severity:low`).
+  - type: dropdown
+    id: izvor
+    attributes:
+      label: Izvor
+      options:
+        - "Ljudski pregled (source:human-review)"
+        - "Član uz pomoć alata (source:tool)"
+        - "CI (source:ci)"
+    validations:
+      required: true
+  - type: dropdown
+    id: ozbiljnost
+    attributes:
+      label: Ozbiljnost
+      options:
+        - "Visoka: nevaljan središnji rezultat, neispravan main ili otkrivena tajna"
+        - "Srednja: blokiran rad, zavaravajuća dokumentacija ili nedostaje podrijetlo"
+        - "Niska: dorade i čišćenje"
+    validations:
+      required: true
+  - type: input
+    id: mjesto
+    attributes:
+      label: PR, datoteka i mjesto
+      description: Npr. "PR #12, src/gitara/nmf.py:40" ili "nema PR-a".
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem i dokaz
+      description: Konkretan problem, postupak reprodukcije i identifikator pokretanja ako postoji.
+    validations:
+      required: true
+  - type: textarea
+    id: posljedica
+    attributes:
+      label: Posljedica i sljedeći korak
+    validations:
+      required: true

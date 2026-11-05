@@ -1,0 +1,42 @@
+# Rotacija pregleda iz ADR-0004, ne vlasništvo koda.
+# GitHub automatski traži pregled od recenzenta niti: A (Sara) pregledava B,
+# B (Lovro) pregledava C, C (Mislav) pregledava A. Za spajanje vrijedi odobrenje
+# bilo kojeg drugog člana tima. Vidi docs/plan/PODJELA.md.
+# Kasnije pravilo ima prednost pred ranijim.
+
+# Zadano: cijeli tim.
+*                                   @LRazum @saragrguric @phantom5470
+
+# Nit A (Sara): pregledava Mislav.
+/src/gitara/data.py                 @phantom5470
+/src/gitara/spectrogram.py          @phantom5470
+/src/gitara/evaluate.py             @phantom5470
+/src/gitara/peaks.py                @phantom5470
+/tests/test_data.py                 @phantom5470
+/tests/test_spectrogram.py          @phantom5470
+/tests/test_evaluate.py             @phantom5470
+/tests/test_peaks.py                @phantom5470
+/experiments/data_checks.py         @phantom5470
+/experiments/stft_sensitivity.py    @phantom5470
+/data/                              @phantom5470
+/docs/plan/podjela/a-sara.md        @phantom5470
+
+# Nit B (Lovro): pregledava Sara.
+/src/gitara/nmf.py                  @saragrguric
+/src/gitara/provenance.py           @saragrguric
+/tests/test_nmf.py                  @saragrguric
+/tests/test_provenance.py           @saragrguric
+/experiments/convergence.py         @saragrguric
+/pyproject.toml                     @saragrguric
+/uv.lock                            @saragrguric
+/tools/check_project.py             @saragrguric
+/docs/plan/podjela/b-lovro.md       @saragrguric
+
+# Nit C (Mislav): pregledava Lovro.
+/src/gitara/transcribe.py           @LRazum
+/src/gitara/templates.py            @LRazum
+/tests/test_transcribe.py           @LRazum
+/tests/test_templates.py            @LRazum
+/experiments/cv.py                  @LRazum
+/experiments/errors.py              @LRazum
+/docs/plan/podjela/c-mislav.md      @LRazum

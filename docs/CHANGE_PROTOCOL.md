@@ -59,7 +59,8 @@ za predaju već postoje. Njihovo je trenutačno stanje zabilježeno u `docs/plan
 
 ## 4. Postupak za jedan zadatak
 
-1. Pročitajte trenutačni zadatak, stanje repozitorija i otvorene nalaze. Ako je GitHub dostupan,
+1. Pročitajte trenutačni zadatak (GitHub issue iz `docs/plan/PODJELA.md` i osobnog plana),
+   stanje repozitorija i otvorene nalaze. Ako je GitHub dostupan,
    provjerite `gh issue list --label finding --state open`. Prijavite nedostupan pristup
    umjesto da ga tumačite kao prazan rezultat.
 2. Pregledajte radno stablo prije promjene grane. Sačuvajte tuđi rad; nikad ga ne odbacujte da
@@ -84,8 +85,9 @@ za predaju već postoje. Njihovo je trenutačno stanje zabilježeno u `docs/plan
    tu radnju. Postojeće odobrenje vrijedi unutar navedenog opsega; ne tražite ga ponovno.
    Commitovi nose git identitet člana koji radi zadatak. AI alati ne dodaju `Co-Authored-By`,
    „Generated with” ni drugi vlastiti potpis u commitove, PR-ove, kod ili dokumente.
-8. Koristite predložak PR-a. Prije spajanja pribavite odobrenje najmanje još jednog ljudskog
-   člana tročlanog tima, osim za konkretne PR-ove s izričito zabilježenim korisničkim iznimkama
+8. Koristite predložak PR-a i u opisu zatvorite issue s `Closes #N`. `.github/CODEOWNERS`
+   automatski traži pregled od recenzenta niti (pregled u krug iz ADR-0004). Prije spajanja
+   pribavite odobrenje najmanje još jednog ljudskog člana tročlanog tima, osim za konkretne PR-ove s izričito zabilježenim korisničkim iznimkama
    u dodacima zapisa ADR-0002. Riješite nalaze i ponovno pokrenite samo provjere pogođene naknadnim
    izmjenama.
 

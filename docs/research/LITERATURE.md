@@ -37,12 +37,42 @@ ili raspon stranica.
 Ovo je predloženi redoslijed čitanja, a ne zapis da ga je neki član završio. Stvarne bilješke,
 izvode, pitanja i zajedničke prolaske pratiti kroz [popis zadataka](../plan/TASKS.md).
 
+## Izvori za odabranu temu 2 (gitara)
+
+Tim je odabrao temu 2 iz [prijedloga tema](../plan/prijedlog-tema/prijedlog-tema-nmf.pdf)
+([ADR-0003](../plan/adr/0003-choose-guitar-transcription-with-kl-nmf.md)): generaliziranu KL
+divergenciju i multiplikativna ažuriranja. Potrebni su sljedeći izvori. Koji dio čita koja nit
+navedeno je u [podjeli rada](../plan/PODJELA.md).
+
+| Izvor | Mjesto | Zašto |
+|---|---|---|
+| L1 | Odj. 2 (uvod), 3 (uvod), 3.1, 3.1.1, 3.1.2, 3.1.7, 3.1.8 | Analiza glazbe kao primjena, NP-težina, nejedinstvenost, izbor ranga, konveksnost potproblema, uvjeti optimalnosti, nule koje ostaju nule, zaustavljanje i inicijalizacija |
+| L3 | Odj. 3–6, posebno teorem 2 i lema 3 | Definicija divergencije, pravila ažuriranja i dokaz nerasta pomoću pomoćne funkcije |
+| L4 | Odj. 3.1 i 3.4 | Ispravak tvrdnje o konvergenciji iz L3; vidi napomene niže |
+| L2 | Jednadžba (2) | Poissonova izglednost, ekvivalentna minimizaciji generalizirane KL divergencije, i motivacija aditivnih dijelova |
+
+L5 i L6 za tu temu nisu potrebni. Izvan priloženih radova trebaju opis skupa GuitarSet, raniji
+rad o NMF-u za polifonu transkripciju (Smaragdis i Brown, 2003), rad o NMF-u za analizu glazbe
+na koji upućuje L1 (referenca [42]), izvor za kratkotrajnu Fourierovu transformaciju i izvor za
+mjere vrednovanja transkripcije. Njihove bibliografske podatke provjeriti prije citiranja.
+Radni nacrt matematike za tu temu je [skripta za temu 2](skripta-gitara/skripta-gitara.pdf)
+([izvor](skripta-gitara/skripta-gitara.tex)); nitko je još nije pregledao.
+
 ## Napomene koje treba zadržati u seminaru
 
 - NMF minimizira odabranu mjeru odstupanja uz ograničenja nenegativnosti; interpretabilnost
   je motivacija koju treba provjeriti, a ne jamstvo za proizvoljne podatke.
 - Zajednički optimizacijski problem je nekonveksan. Sam monoton niz vrijednosti funkcije
   cilja ne dokazuje konvergenciju prema stacionarnoj točki ili globalnom optimumu.
+- L3 nakon leme 1 (odj. 6) tvrdi konvergenciju prema lokalnom minimumu, a uz teorem 2 da je
+  funkcija cilja nepromijenjena samo u stacionarnoj točki. L4 (odj. 3.1) pokazuje da dokaz daje
+  samo nerast; granična točka s pozitivnim elementima je stacionarna, a za točku na rubu
+  dopustivog skupa to se ne može zaključiti. L4 to izvodi za Frobeniusovu funkciju cilja; prijenos
+  na KL treba izvesti posebno. Nepomična točka multiplikativnih ažuriranja s nultim elementom ne
+  mora biti stacionarna.
+- L4 u odj. 3.4 kaže da je rješenje koje zadovoljava uvjete optimalnosti barem lokalni minimum.
+  To za uvjete prvog reda ne vrijedi: $(W,H)=(0,0)$ je stacionarna točka Frobeniusove funkcije
+  cilja za svaki $A\neq0$, a nije lokalni minimum.
 - Nejednoznačnost zbog skaliranja i permutacija utječe na interpretaciju i usporedbu faktora.
 - NMF težine nisu automatski normirane vjerojatnosti ni čvrste dodjele klasterima.
 - U L6 rang 2 odnosi se na jednu podjelu; hijerarhija može imati više od dva konačna klastera.

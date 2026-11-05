@@ -2,7 +2,9 @@
 
 Ovo je okvir potrebne dubine obrade i donošenja odluka, a ne dovršeno teorijsko poglavlje ili
 prihvaćena specifikacija implementacije. Gillis je glavni izvor; dopunski su radovi navedeni
-u [vodiču kroz literaturu](../research/LITERATURE.md). Funkcija cilja i algoritam još nisu odabrani.
+u [vodiču kroz literaturu](../research/LITERATURE.md). Funkcija cilja i algoritam odabrani su u
+[ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md) (vidi odjeljak 2.1). Detalji
+implementacije i eksperimenata dogovaraju se u zadacima iz [podjele rada](PODJELA.md).
 
 ## 1. Oznake i model
 
@@ -24,8 +26,8 @@ $$
 \min_{W,H\geq0} f(W,H)=\frac12\lVert A-WH\rVert_F^2.
 $$
 
-Ovaj primjer ne određuje konačnu funkciju cilja. Objasniti njezine pretpostavke o pogrešci
-i, ako je relevantno, usporediti je s formulacijom pomoću generalizirane KL divergencije.
+Za odabranu temu ova formulacija je referentna metoda, a odabrana funkcija cilja opisana je u
+odjeljku 2.1. Objasniti pretpostavke obiju formulacija o pogrešci i usporediti ih.
 Za ovaj primjer izvesti gradijente:
 
 $$
@@ -43,6 +45,30 @@ matricu $D$ vrijedi $(WD)(D^{-1}H)=WH$. Zato pojedinačne faktore općenito nije
 provjeravati zahtjevom da im se svi elementi točno podudaraju s drugim pokretanjem.
 Normalizacija mijenja interpretaciju faktora i mora sačuvati rekonstrukciju ako joj je svrha
 samo ukloniti nejednoznačnost skaliranja.
+
+### 2.1 Odabrana formulacija (ADR-0003)
+
+Za temu prepisivanja gitare $A$ je amplitudni spektrogram s $m$ frekvencijskih binova u retcima i
+$n$ vremenskih okvira u stupcima. Stupci od $W$ su predlošci tonova, a retci od $H$ aktivacije.
+Minimiziramo generaliziranu KL divergenciju
+
+$$
+D(A\,\|\,WH)=\sum_{i,j}\Bigl(a_{ij}\log\frac{a_{ij}}{(WH)_{ij}}-a_{ij}+(WH)_{ij}\Bigr),
+\qquad 0\log0=0,
+$$
+
+s gradijentima $\nabla_H D=W^T(\mathbf 1-A\oslash WH)$ i $\nabla_W D=(\mathbf 1-A\oslash WH)H^T$.
+Pritom je $\oslash$ dijeljenje po elementima, a $\mathbf 1$ matrica jedinica dimenzija
+$m\times n$. Multiplikativna pravila Leeja i Seunga (L3, teorem 2) glase
+
+$$
+H\leftarrow H\odot\frac{W^T(A\oslash WH)}{W^T\mathbf 1},\qquad
+W\leftarrow W\odot\frac{(A\oslash WH)H^T}{\mathbf 1H^T},
+$$
+
+uz dijeljenje po elementima. Frobeniusova formulacija gore ostaje referentna metoda. Izvode
+razrađuju zadaci A3, B4 i C1. Numeričke zaštite (ε), normalizacija i zaustavljanje opisuju
+se ovdje kad ih tim odabere. Dodavanje ε mijenja pravilo za koje vrijedi teorem.
 
 ## 3. Izvod odabranog algoritma
 

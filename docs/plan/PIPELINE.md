@@ -22,9 +22,13 @@ docs/
     METHODOLOGY.md                  matematički i eksperimentalni plan
     PIPELINE.md                     ova datoteka
     AI_REVIEW.md                    nalazi, dnevna provjera i postupak pregleda
+    PODJELA.md                      tri niti, pregled u krug, sučelja, faze i issuei
+    podjela/                        osobni planovi: a-sara.md, b-lovro.md, c-mislav.md
     adr/                            zapisi odluka
+    prijedlog-tema/                 izvještaj s prijedlogom tema i načina rada
   research/
     LITERATURE.md                   bibliografski podaci, uloge izvora i bilješke uz čitanje
+    skripta-gitara/                 radni nacrt skripte za odabranu temu 2 (LaTeX i PDF)
 tools/
   check_docs.py
   test_check_docs.py
@@ -34,6 +38,8 @@ tools/
   test_check_before_stop.py
   check_project.py                   planirano: dogovorene numeričke provjere
 .github/
+  CODEOWNERS                         automatski zahtjev za pregled prema rotaciji niti
+  ISSUE_TEMPLATE/                    predlošci „Zadatak” i „Nalaz”
   pull_request_template.md
   workflows/
     ci.yml
@@ -87,10 +93,10 @@ granu repozitorija i dok GitHub Actions ne dopusti izvođenje.
 
 ## Numeričko okruženje: naknadna timska odluka
 
-Python je dogovoren; algoritam rješavanja, verzije ovisnosti, numeričke naredbe i primjena
-ostaju otvoreni. Zadatak implementacije zajedno će dodati specifikaciju okruženja i datoteku
-zaključanih ovisnosti, a zatim dokumentirati jednu podržanu naredbu za postavljanje, naredbu
-za testove i ulaznu točku eksperimenta. Dodajte CI zadatak koji instalira zaključane ovisnosti
+Python je dogovoren, a primjena i algoritam odabrani su u ADR-0003. Verzije ovisnosti i
+numeričke naredbe ostaju otvorene do zadatka B1 iz [podjele rada](PODJELA.md). Taj zadatak
+zajedno dodaje specifikaciju okruženja i datoteku zaključanih ovisnosti, a zatim dokumentira
+jednu podržanu naredbu za postavljanje, naredbu za testove i ulaznu točku eksperimenta. Dodajte CI zadatak koji instalira zaključane ovisnosti
 i pokreće male determinističke provjere. Cjelovita preuzimanja podataka i dugačke serije
 eksperimenata držite izvan zadanog PR zadatka, osim uz izričito obrazloženje.
 
@@ -129,6 +135,21 @@ granu, provjerite jesu li Actions/Issues uključeni, stvorite oznake nalaza opis
 bez pisanja prije oslanjanja na dnevni izvještaj. Postavite dostupnu zaštitu grane za pravilo
 ljudskog pregleda. Ne pretpostavljajte da se ograničenja GitHub paketa referentnog projekta
 odnose i na ovaj repozitorij.
+
+Stanje 2026-11-05, nakon Lovrine izričite upute da se postavi tijek rada na GitHubu:
+
+- **Oznake:** stvorene su oznake niti (`nit:A`, `nit:B`, `nit:C`, `nit:zajedničko`) i oznake
+  područja (`matematika`, `kod`, `podaci`, `eksperimenti`, `seminar`, `prezentacija`,
+  `tijek-rada`, `pregled`, `prolaz`). Dodane su i preostale oznake nalaza: `source:human-review`,
+  `source:tool`, `source:ci` i `severity:low`.
+- **Milestonei i issuei:** stvoreni su milestonei Faza 0 do Faza 4 i issue za svaki zadatak
+  iz [podjele rada](PODJELA.md).
+- **Zaštita grane `main`:** promjene samo kroz PR, uz jedno odobrenje i uspješan CI posao
+  „Dokumentacija i alati tijeka rada”. Administratori je mogu zaobići, pa pravilo pregleda i
+  dalje prati dnevna provjera.
+- **Automatski zahtjev za pregled:** `.github/CODEOWNERS` traži pregled prema rotaciji niti.
+  To je zadani zahtjev, a ne obvezno odobrenje vlasnika koda.
+- **Ploča GitHub Projects** nije stvorena jer token nema dopuštenje `project`.
 
 ## Tijek istraživanja i eksperimenata
 

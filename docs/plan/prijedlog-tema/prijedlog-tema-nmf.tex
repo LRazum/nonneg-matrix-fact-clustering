@@ -1,0 +1,207 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper,margin=2.3cm,top=2.1cm,bottom=2.1cm]{geometry}
+\usepackage{amsmath}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{texgyrepagella}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic]
+\setsansfont{texgyreheros}[Extension=.otf,UprightFont=*-regular,BoldFont=*-bold,ItalicFont=*-italic,BoldItalicFont=*-bolditalic,Scale=0.92]
+\setmathfont{texgyrepagella-math.otf}
+\usepackage[croatian]{babel}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{HTML}{0F5E63}
+\definecolor{muted}{HTML}{55606A}
+
+\titleformat{\section}{\sffamily\large\bfseries\color{accent}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{1.3em}{0.45em}
+\titlespacing*{\subsection}{0pt}{0.9em}{0.25em}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\setlist{nosep,leftmargin=1.3em,topsep=0.2em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.25}
+\emergencystretch=1em
+\widowpenalty=10000
+\clubpenalty=10000
+
+\newcommand{\R}{\mathbb{R}}
+
+\hypersetup{pdftitle={NMF seminar: prijedlog tema i način rada},pdfauthor={Lovro}}
+
+\begin{document}
+
+{\sffamily\LARGE\bfseries\color{accent} NMF seminar: prijedlog tema i način rada\par}
+\vspace{0.3em}
+{\small\color{muted} Matrične i tenzorske metode u analizi podataka \quad·\quad Lovro, za Saru i Mislava \quad·\quad 1.~studenoga 2026.\par}
+\vspace{0.6em}
+
+Moramo detaljno obraditi nenegativnu matričnu faktorizaciju, implementirati je u Pythonu i
+primijeniti na nov konkretan problem. Ovdje su četiri moguće izvedbe. Svaka ima drugi problem i
+drugi algoritam iz literature, pa izbor teme određuje i matematiku koju ćemo braniti.
+\textbf{Predlažem temu~1, a temu~2 kao rezervu.} Ništa još nije odlučeno.
+
+Podaci i licence provjereni su 1.~studenoga 2026., ali nijedna metoda još nije pokrenuta, pa su
+očekivani rezultati zasad samo pretpostavke. Svuda koristimo model
+$A\approx WH$, gdje je $A\in\R_{\geq0}^{m\times n}$, $W\in\R_{\geq0}^{m\times r}$ i
+$H\in\R_{\geq0}^{r\times n}$.
+
+\section{Četiri teme}
+
+\subsection*{Tema 1: Kartiranje močvare Kopački rit iz satelitskih snimaka}
+Pitanje je može li se bez ručno označenih podataka iz snimaka Sentinel-2 odvojiti vodu, močvarnu
+vegetaciju, šumu i polja te izmjeriti kako se površina pod vodom mijenja kroz godinu.
+Stupci matrice $A$ su pikseli, a retci spektralni kanali na nekoliko datuma.
+Spektar piksela smatramo kombinacijom spektara materijala, što je linearni model miješanja iz
+Gillisa (odj.~2.3): stupci $W$ su spektri materijala, a stupci $H$ njihovi udjeli.
+Najčišće piksele tražimo algoritmom SPA (Gillis, odj.~3.2.2) i njima pokrećemo faktorizaciju ranga~2.
+Svaki čvor dijelimo pomoću ANLS-a sa zatvorenom formulom (L6, odj.~3), pa nastaje stablo materijala.
+Završne karte udjela dobivamo nenegativnim najmanjim kvadratima uz fiksirani $W$.
+Rezultat uspoređujemo s k-means i pragom indeksa NDWI, a slaganje mjerimo s kartom ESA WorldCover 2021,
+koja je i sama nesavršena referenca (ukupna točnost 76,7~\%).
+Jedna pločica (34TCR) pokriva cijelo područje i za 2025.\ ima 39 snimaka s manje od 30~\% oblaka na razini pločice.
+Rizici su oblaci, malo proljetnih snimaka i pravilo dijeljenja mNDCG iz L6, koje je smišljeno za
+riječi pa će ga možda trebati zamijeniti.
+
+\subsection*{Tema 2: Automatsko prepisivanje gitare u note}
+Pitanje je može li NMF iz snimke akustične gitare prepoznati koje tonove glazbenik svira i kada.
+Stupci $A$ su vremenski okviri, a retci frekvencijski binovi amplitudnog spektrograma.
+Spektar u nekom trenutku približno je zbroj spektara tonova koji tada zvone, pa su stupci $W$
+predlošci tonova, a retci $H$ njihove aktivacije kroz vrijeme.
+Koristimo generaliziranu KL divergenciju i multiplikativna ažuriranja iz L3, gdje je cijeli dokaz
+nerasta funkcije cilja pomoću pomoćne funkcije (teorem~2, odj.~6).
+L3 tvrdi i konvergenciju prema lokalnom minimumu, ali L4 (odj.~3.1) pokazuje da taj dokaz daje
+samo nerast, pa u seminaru razdvajamo što je dokazano, a što nije.
+Predloške učimo na pet gitarista, a transkripciju provjeravamo na šestom, i to ponavljamo za svakoga.
+Uz fiksirani $W$ problem po $H$ je konveksan, pa je obrada nove snimke brza i lako objašnjiva.
+Skup GuitarSet (CC~BY~4.0) ima 360 snimaka šest gitarista i 62.476 označenih tonova, a dovoljna je
+arhiva od 657~MB.
+Rezultat mjerimo standardnim F1 na razini nota i uspoređujemo ga s Frobeniusovom funkcijom cilja i
+jednostavnim odabirom spektralnih vrhova.
+Rizik je što isti ton zvuči različito na različitim žicama, a akordi se preklapaju, pa rezultat
+može biti skroman.
+Dodatno moramo objasniti kratkotrajnu Fourierovu transformaciju.
+
+\subsection*{Tema 3: Predviđanje šahovskog repertoara}
+Pitanje je može li se iz malog broja partija predvidjeti koja će otvaranja šahist igrati, što
+pomaže u pripremi protiv protivnika.
+Stupci $A$ su igrači, a retci otvaranja odvojeno za bijele i crne figure, što je izravna analogija
+matrice riječi i dokumenata iz L5.
+Zato koristimo težine TF-IDF i HierNMF2 iz L6, pa stablo može otkriti repertoarske stilove igrača.
+Težine novog igrača računamo nenegativnim najmanjim kvadratima uz fiksirani $W$, što bi trebalo
+raditi i uz malo partija.
+Partije dijelimo vremenski: prvi dio mjeseca služi za učenje, a drugi za provjeru predviđanja.
+Uspoređujemo se s popularnošću otvaranja i igračevim vlastitim histogramom, a stablo s ECO
+klasifikacijom otvaranja.
+Baza Lichess je pod licencom CC0, a za srpanj 2014.\ ima 1.048.440 partija, 2.619 naziva otvaranja
+i 5.481 igrača s barem 100 partija.
+Ta datoteka ima oko 200~MB, pa je obrada izvediva na običnom računalu.
+Rizik je što otvaranje ovisi i o protivniku, pa značajke treba pažljivo definirati.
+NMF možda neće pobijediti vlastiti histogram, što bi bio legitiman negativan rezultat.
+
+\subsection*{Tema 4: Razdvajanje bojila na histološkim slikama}
+Preparati tkiva bojani hematoksilinom i eozinom razlikuju se u boji među laboratorijima i
+skenerima, što smeta automatskoj analizi.
+Pitanje je može li NMF ranga~2 razdvojiti ta dva bojila i time ujednačiti boje slika.
+Nakon Beer-Lambertove transformacije u optičku gustoću piksel je približno nenegativna kombinacija
+boja dvaju bojila, pa rang određuje fizika, a ne naš izbor.
+Stupci $A$ su pikseli jedne slike, retci tri RGB kanala, stupci $W$ boje bojila, a retci $H$ njihove
+gustoće.
+Budući da $A$ ima samo tri retka, nejedinstvenost NMF-a možemo nacrtati kao konus u trodimenzionalnom
+prostoru.
+Prema Vahadaneu i suradnicima dodajemo kaznu $\ell_1$ na $H$, a problem rješavamo HALS-om s mekim
+pragom (Gillis, odj.~3.1.5).
+Metodu uspoređujemo s Macenkovom, a korist mjerimo jednostavnim klasifikatorom tkiva provjerenim na
+drugim pacijentima.
+Skup NCT-CRC-HE-100K (CC~BY~4.0) ima 100.000 nenormaliziranih isječaka devet vrsta tkiva i 7.180
+isječaka od 50 drugih pacijenata.
+Puna arhiva ima 11,7~GB, ali dovoljan je uzorak pojedinačnih slika.
+Rizici su potrebno medicinsko predznanje, moguća prethodna normalizacija validacijskih slika i to
+što nazivi datoteka ne otkrivaju s kojeg preparata isječak potječe.
+
+\section{Usporedba}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.05cm}YYY>{\raggedright\arraybackslash}p{2.75cm}@{}}
+\toprule
+\textbf{Tema} & \textbf{Funkcija cilja i algoritam} & \textbf{Veza s literaturom} & \textbf{Vrednovanje} & \textbf{Licenca podataka}\\
+\midrule
+1. Kopački rit & Frobeniusova; SPA, rang-2 ANLS, stablo & L1 (2.3, 3.1.4, 3.2.2), L6 & Slaganje s WorldCoverom, k-means, NDWI & Sentinel otvoren; WorldCover CC BY 4.0\\
+2. Gitara & KL; multiplikativna ažuriranja & L3 (teorem 2), L1 (3.1.2), L4 (3.1) & F1 na notama, provjera na novom gitaristu & CC BY 4.0\\
+3. Šah & Frobeniusova; HierNMF2 na TF-IDF & L5, L6 & Predviđanje na kasnijim partijama & CC0\\
+4. Histologija & Frobeniusova s $\ell_1$; HALS & L1 (3.1.5), Vahadane i sur. & Usporedba s Macenkom, klasifikator tkiva & CC BY 4.0\\
+\bottomrule
+\end{tabularx}
+}
+
+\textbf{Preporuka.} Tema~1 najviše pokriva glavni obvezni izvor: model miješanja, ANLS i SPA s
+dokazom, a stablo dolazi iz L6. Daje i karte koje se dobro prikazuju, ali traži najviše rada s
+pripremom podataka. Tema~2 ima najčišći dokaz i najjasniju mjeru uspjeha, tema~3 najbliža je radovima
+o dokumentima, a tema~4 ima najzorniju geometriju, ali traži medicinski kontekst.
+
+\section{Predložena metodologija rada: niti}
+
+Posao ne dijelimo na teoriju, kod i primjenu. Dijelimo ga na tri isprepletene niti, a svaka ide od
+matematike preko koda i podataka do rezultata te svog dijela seminara i prezentacije. Metoda je ista
+za svaku temu.
+
+{\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.2cm}Y>{\raggedright\arraybackslash}p{4.1cm}@{}}
+\toprule
+\textbf{Nit} & \textbf{Što obuhvaća} & \textbf{Završava}\\
+\midrule
+1. Od podataka do prve faktorizacije & Što znači $A$ i zašto je nenegativna, funkcija cilja, uvjeti optimalnosti, nejedinstvenost, izvod ažuriranja, prvi kod i mali primjer koji se može provjeriti ručno & Prvom faktorizacijom na stvarnim podacima i tumačenjem faktora\\
+2. Od faktorizacije do strukture & Izbor ranga ili stabla, inicijalizacija, zaustavljanje, što je o konvergenciji stvarno dokazano, stabilnost kroz sjemena, usporedba s referentnom metodom & Stabilnom strukturom u podacima i usporedbom\\
+3. Od strukture do odgovora & Pretvaranje faktora u odgovor, vrednovanje, nesigurnost, neuspjesi i ograničenja, ponovljivost pokretanja & Odgovorom na pitanje i završnim slikama\\
+\bottomrule
+\end{tabularx}
+}
+
+Primjer za temu~1: nit~1 završava prvom podjelom scene na vodu i kopno, nit~2 stablom materijala, a
+nit~3 kartama udjela i krivuljom vode kroz godinu.
+
+\textbf{Kako radimo:}
+\begin{itemize}
+\item Svaka nit ima nositelja, a ne vlasnika. Nositelj prati nit, a niti možemo mijenjati usput.
+\item AI alat piše kod i prve nacrte, što je na seminaru dopušteno. Mi sve provjeravamo, pokrećemo i odgovaramo za svaki redak i tvrdnju.
+\item Seminar i prezentacija prate niti, pa svaki dio zajedno ima matematiku, kod i sliku.
+\item Imamo tri zajednička prolaza: nakon prve faktorizacije, nakon strukture i prije obrane. Na svakom nit objašnjava netko tko joj nije nositelj.
+\item Svatko mora moći objasniti cijeli projekt, pa na probnoj obrani dobiva pitanja iz tuđih niti.
+\item Radimo u malim zadacima, svaki na svojoj grani, a PR odobrava drugi član tima. Pitanja i hipoteze zapisujemo prije završnih pokretanja.
+\end{itemize}
+
+\textbf{Redoslijed:} izbor teme, nit~1, nit~2, nit~3, završni seminar i prezentacija, zatim ponovno
+pokretanje svih rezultata i probna obrana. Rok još ne znamo, pa ovo nije vremenski plan.
+
+\textbf{Trebamo odlučiti:} koju temu biramo, tko je u početku nositelj koje niti te koji su rok i format predaje.
+
+\section*{Izvori}
+{\footnotesize\raggedright
+\textbf{Literatura seminara.}
+L1: N.~Gillis, \emph{The Why and How of Nonnegative Matrix Factorization}, arXiv:1401.5226v2.
+L3: D.~D.~Lee, H.~S.~Seung, \emph{Algorithms for Non-negative Matrix Factorization}.
+L4: M.~W.~Berry, M.~Browne, A.~N.~Langville, V.~P.~Pauca, R.~J.~Plemmons, \emph{Algorithms and Applications for Approximate Nonnegative Matrix Factorization}.
+L5: W.~Xu, X.~Liu, Y.~Gong, \emph{Document Clustering Based On Non-negative Matrix Factorization}, SIGIR 2003.
+L6: D.~Kuang, B.~Drake, H.~Park, \emph{Fast Clustering and Topic Modeling Based on Rank-2 Nonnegative Matrix Factorization}, 2015.
+
+\textbf{Dodatno.}
+A.~Vahadane i sur., \emph{Structure-Preserving Color Normalization and Sparse Stain Separation for Histological Images}, IEEE TMI, 2016.
+M.~Macenko i sur., ISBI 2009, doi:10.1109/ISBI.2009.5193250.
+Q.~Xi i sur., \emph{GuitarSet: A Dataset for Guitar Transcription}, ISMIR 2018.
+
+\textbf{Podaci.}
+Sentinel-2 L2A: \url{https://earth-search.aws.element84.com/v1};
+ESA WorldCover: \url{https://zenodo.org/records/7254221};
+GuitarSet: \url{https://zenodo.org/records/3371780};
+Lichess: \url{https://database.lichess.org/};
+NCT-CRC-HE-100K: \url{https://zenodo.org/records/1214456}.
+\par}
+
+\end{document}
