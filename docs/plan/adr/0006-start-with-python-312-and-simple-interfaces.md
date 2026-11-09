@@ -39,3 +39,9 @@ B1 priprema okruženje, a A1, A2, B2, C2 i C3 koriste ugovore iz podjele rada. B
 nulte komponente i prijavljuje nevaljanu rekonstrukciju. C2 testira vremenske rubove i nulte
 aktivacije. Odabir metode učenja predložaka, parametara STFT-a i hiperparametara ostaje u
 pripadajućim zadacima.
+
+## Dodatak 2026-11-09: početno okruženje B1
+
+Za postavljanje Python projekta i zaključavanje ovisnosti koristimo `uv`. Paket se gradi
+pomoću `uv_build` i na početku nema radnih ovisnosti. `unittest` služi za testove, a
+`compileall` za provjeru sintakse. Naredbe su u [tijeku rada](../PIPELINE.md).

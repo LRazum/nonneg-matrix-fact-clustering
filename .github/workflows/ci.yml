@@ -23,8 +23,20 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 --version
-      - run: python3 tools/check_before_stop.py
+      - run: python3 tools/check_docs.py
+      - run: python3 -m unittest discover -s tools -p 'test_*.py'
 
-  # Add the agreed numerical environment, lockfile installation and project runner in the
-  # same change that introduces pyproject.toml. The finish checker then rejects a missing
-  # tools/check_project.py rather than silently reporting a pass.
+  project:
+    name: Numeričke provjere
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.13.6"
+          enable-cache: false
+      - run: uv sync --locked
+      - run: python3 tools/check_project.py

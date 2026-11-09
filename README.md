@@ -27,9 +27,9 @@ KL divergenciju i multiplikativna pravila Leeja i Seunga
 Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Repozitorijski zadaci su GitHub issuei
 organizirani u milestoneove Faza 0 do Faza 4.
 
-Implementacija NMF-a i eksperimentalni rezultati još ne postoje. B1 postavlja osnovu za
-Python 3.12, a ovisnosti dodajemo uz kod koji ih koristi. Tim vodi seminar i prezentaciju
-izvan repozitorija.
+Paket `gitara` postavljen je za Python 3.12 i ima test uvoza. Implementacija NMF-a i
+eksperimentalni rezultati slijede. Ovisnosti dodajemo uz kod koji ih koristi. Tim vodi seminar i
+prezentaciju izvan repozitorija.
 
 Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
 projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),
@@ -43,15 +43,15 @@ projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJEC
 3. Otvori svoj [osobni plan](docs/plan/PODJELA.md) i sljedeći issue iz njega. Radi na zasebnoj
    grani, a PR neka zatvori issue s `Closes #N`. Promjenu pregledava drugi član tima. [Protokol promjena](docs/CHANGE_PROTOCOL.md) opisuje
    koju dokumentaciju treba uskladiti uz pojedinu vrstu promjene.
-4. Prije predaje rada drugom članu pokreni lokalne provjere:
+4. Instaliraj `uv`, postavi okruženje i pokreni lokalne provjere:
 
 ```bash
+uv sync --locked
 python3 tools/check_before_stop.py
 ```
 
-Za alate tijeka rada dovoljni su Python 3.11 ili noviji i Git; znanstveni paketi zasad nisu
-potrebni. Provjera pokreće provjere dokumentacije i jedinične testove alata. Numeričke provjere
-izričito označava s NOT RUN dok B1 ne postavi projektno okruženje.
+Završna provjera obuhvaća dokumentaciju, testove alata i projektne provjere. U projektu se
+zasad provjeravaju sintaksa i uvoz paketa.
 
 Zasebne naredbe, CI i postavljanje lokalnih hookova opisani su u
 [tijeku rada i provjera](docs/plan/PIPELINE.md). Postupanje s nalazima i probno pokretanje

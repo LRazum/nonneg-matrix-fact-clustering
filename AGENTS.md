@@ -141,20 +141,22 @@ s ponovljivim izvođenjem.
 
 ## 5. Naredbe i dovršavanje rada
 
-Pokreni iz korijena repozitorija; trenutačni alati koriste samo standardnu Python biblioteku:
+Pokreni iz korijena repozitorija. `uv` postavlja projekt u Pythonu 3.12, a alati tijeka rada
+koriste standardnu Python biblioteku:
 
 ```bash
+uv sync --locked
 python3 tools/check_docs.py
 python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 tools/check_project.py
 python3 tools/check_before_stop.py
 python3 tools/daily_check.py --dry-run  # treba pristup čitanju GitHuba; ništa ne objavljuje
 gh issue list --label finding --state open
 ```
 
-Prve tri naredbe rade lokalno bez GitHub pristupnih podataka. Završna provjera numeričke
-provjere označava s **NOT RUN** dok ne postoji Python projekt. Pri uvođenju `pyproject.toml`
-ista promjena mora dodati `tools/check_project.py`, dogovorene naredbe testiranja/statičke
-provjere i CI integraciju. Nedostajući pokretač tada je pogreška umjesto prešutnog preskakanja.
+Lokalne provjere rade bez GitHub pristupnih podataka. `tools/check_project.py` provjerava
+usklađenost okruženja s `uv.lock`, sintaksu i projektne testove. Završna provjera poziva i taj
+pokretač te prijavljuje pogrešku ako okruženje nedostaje ili je zastarjelo.
 
 Prije završetka uskladi primjenjive retke protokola promjena i navedi rezultate provjera,
 broj testova i ograničenja. Ne isključuj neuspješnu provjeru da bi završio rad. Jasno navedi
