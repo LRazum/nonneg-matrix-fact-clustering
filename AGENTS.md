@@ -38,10 +38,10 @@ razini nota. Referentne metode su Frobeniusova norma i spektralni vrhovi.
 Svaka nit sadrži matematiku, kod, eksperimente, seminar i slajdove. Pregled ide u krug:
 A pregledava B, B pregledava C, a C pregledava A.
 
-Još **nisu odlučeni**: Python ovisnosti, način učenja predložaka, parametri STFT-a i
-hiperparametri i rok. Seminar i prezentacija pišu se na Overleafu, odvojeno od GitHuba
-(ADR-0005). Primjer ili prijedlog metode ne pretvaraj u prihvaćenu odluku. Repozitorij zasad
-nema implementaciju NMF-a.
+Za implementaciju koristimo **Python 3.12** i dodajemo ovisnosti kad ih kod zatreba (ADR-0006).
+Način učenja predložaka, parametri STFT-a i hiperparametri još su otvoreni. Tim vodi seminar,
+prezentaciju i raspored izvan repozitorija (ADR-0005). Primjer ili prijedlog metode ne pretvaraj
+u prihvaćenu odluku. Repozitorij zasad nema implementaciju NMF-a.
 
 ## 2. Znanstvena i numerička pravila
 
@@ -78,7 +78,7 @@ nema implementaciju NMF-a.
 
 ## 3. Suradnja i Git
 
-- Sva su područja repozitorija zajednička. Zadaci su GitHub issuei iz
+- Sva su područja repozitorija zajednička. Repozitorijski zadaci su GitHub issuei iz
   [podjele rada](docs/plan/PODJELA.md), s oznakom niti i milestoneom faze. Uzmi malen,
   jasno omeđen zadatak; njegove se ovisnosti pišu u issueu, a etape su u
   [popisu zadataka](docs/plan/TASKS.md). Svaki član treba moći objasniti cijeli
@@ -128,8 +128,8 @@ struktura opisane su u [tijeku rada](docs/plan/PIPELINE.md).
 Planirana područja: `src/` za višekratno upotrebljiv Python kod, `tests/` za numeričke provjere,
 `experiments/` za ponovljiva izvođenja, `data/` za lokalne ulaze i njihov opis i `results/` za
 rezultate, uključujući slike i tablice za seminar. Stvaraj ih kada imaju koristan sadržaj.
-Seminar i prezentacija nisu u repozitoriju, nego na Overleafu (ADR-0005). Istraživanje u
-bilježnici mora se povezati s ponovljivim izvođenjem.
+Tim vodi materijale za predaju izvan repozitorija. Istraživanje u bilježnici mora se povezati
+s ponovljivim izvođenjem.
 
 - Pristupne podatke i osobne postavke ne spremaj u Git. Zasad nije potreban API ključ.
 - Sirova preuzimanja, obrađene matrice i opsežni izlazi lokalni su i isključeni iz Gita. Mali
@@ -137,8 +137,7 @@ bilježnici mora se povezati s ponovljivim izvođenjem.
   Prije uporabe stvarnih podataka zabilježi izvor, licencu i upute za preuzimanje/pripremu.
 - Priložene radove i druge tuđe materijale ne objavljuj bez prava daljnje distribucije. Osobne
   apsolutne putanje nisu prenosive projektne ovisnosti.
-- Ovisnosti i datoteku zaključanih verzija dodaj kada dogovorimo implementaciju; u sklopu
-  postavljanja tijeka rada ne instaliraj znanstveno okruženje i ne gradi aplikaciju.
+- Dodaj ovisnost i ažuriraj zaključane verzije u istoj promjeni koja uvodi kod koji je koristi.
 
 ## 5. Naredbe i dovršavanje rada
 

@@ -56,3 +56,10 @@ ADR-0003 i ADR-0004.
   #18, #20, #23) upućuju na Overleaf umjesto na mape u repozitoriju i PR.
 - Z5 (#37) usklađuje oznake i brojeve između Overleafa i koda ručno.
 - Kad tim odredi rok, milestonei dobivaju datume, a TASKS.md i PODJELA.md bilježe ga.
+
+## Dodatak 2026-11-09: odvojeno vođenje materijala i rasporeda
+
+Prema Lovrinoj primopredaji sa Z0, tim je organizirao pisanje. Strukturu projekata, pisanje i
+preglede materijala vodi izvan repozitorija. Z5 i Z6 zajedničke su aktivnosti tima izvan
+GitHuba. U repozitoriju ostaju konfiguracije pokretanja i identifikatori rezultata koji
+omogućuju provjeru brojki. Termine i rokove tim vodi zasebno.

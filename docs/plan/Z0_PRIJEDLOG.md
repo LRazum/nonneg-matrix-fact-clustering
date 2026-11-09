@@ -1,11 +1,12 @@
 # Prijedlog odluka za sastanak Z0 (#5)
 
-**Pripremio:** Lovro, 2026-11-05 · **Status:** prijedlog za raspravu, a ne odluka.
+**Pripremio:** Lovro, 2026-11-05 · **Status:** povijesni prijedlog prije sastanka.
 
-Ova stranica priprema sastanak Z0 iz [podjele rada](PODJELA.md). Za svako otvoreno pitanje daje
-konkretan prijedlog i obrazloženje, kako AGENTS.md traži prije odluke tima. Odluke sa sastanka
-zapisujemo u issue #5, a važne i u ADR. Nakon toga ova stranica postaje povijesni zapis
-prijedloga.
+Aktualni dogovor i sučelja opisani su u [podjeli rada](PODJELA.md) i
+[ADR-0006](adr/0006-start-with-python-312-and-simple-interfaces.md).
+
+Ova je stranica poslužila za pripremu sastanka Z0. Sadržaj ispod čuva tadašnje prijedloge i
+njihova obrazloženja.
 
 Neki prijedlozi spominju opažanja iz Lovrine lokalne probe od 2026-11-04. Proba nije dio
 repozitorija i njezini brojevi nisu rezultati projekta. Ovdje služe samo kao upozorenje na

@@ -29,9 +29,9 @@ Sara (A), Lovro (B) i Mislav (C).
 
 | Stavka | Obvezni sadržaj | Trenutačno stanje |
 |---|---|---|
-| Pisani seminar | Motivacija, detaljna matematika, algoritam, podaci i metodologija, eksperimenti, interpretacija, ograničenja i literatura | Planiran na hrvatskom, na Overleafu izvan repozitorija (ADR-0005); opseg otvoren |
-| Prezentacija | Povezano objašnjenje istog modela, metode, rezultata i zaključaka | Planirana na hrvatskom, na Overleafu izvan repozitorija (ADR-0005); trajanje otvoreno |
-| Python kod | Dogovorena NMF metoda, smislene provjere i dokumentirano pokretanje koje omogućuje reprodukciju rezultata | Planirano; funkcija cilja i algoritam odabrani (ADR-0003), ovisnosti otvorene |
+| Pisani seminar | Motivacija, detaljna matematika, algoritam, podaci i metodologija, eksperimenti, interpretacija, ograničenja i literatura | Tim ga vodi izvan repozitorija |
+| Prezentacija | Povezano objašnjenje istog modela, metode, rezultata i zaključaka | Tim je vodi izvan repozitorija |
+| Python kod | Dogovorena NMF metoda, smislene provjere i dokumentirano pokretanje koje omogućuje reprodukciju rezultata | Planiran u Pythonu 3.12. Ovisnosti se dodaju uz kod prema ADR-0006 |
 | Rezultati | Numerički rezultati i nalazi u domeni s jasnim podrijetlom, slike i tablice te iskreno navedena ograničenja | Planirano; eksperimenti nisu provedeni |
 
 ## Razumijevanje cijelog projekta
@@ -64,9 +64,7 @@ ADR-0003, a zaduženja u ADR-0004. GitHub korisnička imena su `saragrguric` (Sa
 - Način učenja predložaka (maskirani NMF ili prosjek spektara), pozadinska komponenta,
   inicijalizacija, numeričke zaštite i kriterij zaustavljanja.
 - Parametri STFT-a, normalizacija razine snimki, mreža hiperparametara i dodatne mjere.
-- Znanstvene Python ovisnosti, podržana verzija, okruženje i referentna bibliotečna implementacija.
-- Opseg seminara, trajanje izlaganja, kriteriji ocjenjivanja i rok. Termin dobivamo u tjednu od
-  2026-11-09, a rok zatim određujemo sami.
+- Alat za upravljanje ovisnostima i eventualna referentna bibliotečna implementacija.
 - Povjerenje i aktivacija hookova na pojedinom računalu.
 
 Za važne izbore pripremiti argumente i prijedlog, zatim dogovor zabilježiti u ADR-u i ažurirati

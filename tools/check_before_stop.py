@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Run the shared local checks; --hook uses the Stop-hook JSON protocol.
 
-The numerical stack has not been selected yet. Until pyproject.toml exists, project
-checks are explicitly NOT RUN. Adding that file requires tools/check_project.py,
+Until pyproject.toml exists, project checks are explicitly NOT RUN.
+Adding that file requires tools/check_project.py,
 which must run the agreed checks in the agreed environment and propagate failures.
 """
 from __future__ import annotations
@@ -49,8 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     not_run: list[str] = []
     if not (ROOT / "pyproject.toml").is_file():
         not_run.append(
-            "project checks NOT RUN: no pyproject.toml; the Python stack and numerical checks "
-            "have not been agreed yet"
+            "project checks NOT RUN: no pyproject.toml; the project environment is not set up yet"
         )
     elif not (ROOT / "tools/check_project.py").is_file():
         failures.append(

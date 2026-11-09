@@ -68,7 +68,11 @@ $$
 
 uz dijeljenje po elementima. Frobeniusova formulacija gore ostaje referentna metoda. Izvode
 razrađuju zadaci A3, B4 i C1. Numeričke zaštite (ε), normalizacija i zaustavljanje opisuju
-se ovdje kad ih tim odabere. Dodavanje ε mijenja pravilo za koje vrijedi teorem.
+se ovdje kad ih tim odabere. Dodavanje ε mijenja pravilo za koje vrijedi teorem. Implementacija
+zadržava neaktivne komponente na istim indeksima. U omjerima ažuriranja koristi faktor 1 za
+nulti brojnik i nazivnik. U omjeru $A\oslash WH$ doprinos mjesta s $A=0$ je nula, uključujući
+$A=WH=0$. Pozitivan $A$ uz $WH=0$ daje beskonačnu KL vrijednost i izvođenje se prijavljuje kao
+neuspjelo. B4 razrađuje uvjete dokaza za aktivne komponente.
 
 ## 3. Izvod odabranog algoritma
 
@@ -99,7 +103,7 @@ različiti su rezultati. Težine uz dodatne pretpostavke mogu predstavljati vjer
 
 ## 5. Provjera implementacije
 
-Na početku implementacije odabrati podržano Python okruženje i zaključane verzije ovisnosti.
+Na početku implementacije postaviti Python 3.12. Ovisnosti zaključati uz kod koji ih prvi koristi.
 Numeričku metodu omogućiti pozivati neovisno o bilježnici ili stvarnom skupu podataka.
 Obuhvatiti provjeru ulaza, nenegativnost i konačne izlazne vrijednosti, malu poznatu
 rekonstrukciju, odgovarajuće ponašanje funkcije cilja, zaustavljanje i rubne slučajeve

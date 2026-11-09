@@ -13,14 +13,12 @@ Svi su zadaci zajednički: nositelj vodi zadatak, a recenzent iz pregleda u krug
 | T1 | Razviti zajedničko matematičko razumijevanje na temelju Gillisa i dopunske literature | Kontekst T0 | Spremno za početak |
 | T2 | Odabrati konkretan problem i skup podataka s opravdanim NMF prikazom | Kontekst T0 | Odlučeno 2026-11-05: ADR-0003 (GuitarSet, prepisivanje gitare) |
 | T3 | Dogovoriti funkciju cilja, algoritam i plan eksperimenata | T1, T2 | Djelomično: funkcija cilja i algoritam u ADR-0003; plan eksperimenata je zadatak Z2 |
-| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | Spremno nakon okruženja (B1); zadaci po nitima u podjeli rada |
+| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | Python 3.12 dogovoren na Z0. Slijedi početno okruženje B1 i implementacija po nitima |
 | T5 | Provesti eksperimente koji omogućuju reprodukciju rezultata i protumačiti ih | T4, priprema podataka | Otvoreno |
 | T6 | Sastaviti pisani seminar i prezentaciju | Od T1 nadalje; konačni rezultati iz T5 | Otvoreno |
 | T7 | Reproducirati konačne rezultate i zajedno uvježbati cjelovito objašnjenje | T5, T6 | Otvoreno |
 
-Rok projekta nije poznat: termin dobivamo u tjednu od 2026-11-09, a rok zatim određujemo sami.
-Ovo je redoslijed ovisnosti, a ne vremenski raspored. Faze i zadaci po
-osobama nalaze se u [podjeli rada](PODJELA.md):
+Ovo je redoslijed ovisnosti. Faze i zadaci po osobama nalaze se u [podjeli rada](PODJELA.md):
 
 - T1 pokrivaju A3, B4, C1 te neovisne provjere A9, B9 i C9;
 - T3 pokriva Z2;
@@ -89,10 +87,10 @@ Važne izbore i odbačene mogućnosti zabilježiti u ADR-u.
 
 ## T4: implementacija u Pythonu
 
-Detalji implementacije namjerno su odgođeni. Na početku rada dodati definiciju okruženja
-i zaključane verzije ovisnosti, ponovno upotrebljiv numerički kod i smislene testove, zajedno
-s izvršavanjem projektnih provjera i naredbama za CI. Ponašanje usporediti s neovisnim malim
-primjerima i, kada je korisno, bibliotečnom implementacijom s usklađenim postavkama.
+U B1 postaviti osnovu za Python 3.12, projektne provjere i CI. Zatim dodavati ponovno upotrebljiv
+numerički kod i smislene testove. Ovisnosti zaključati uz kod koji ih prvi koristi.
+Ponašanje usporediti s neovisnim malim primjerima i, kada je korisno, bibliotečnom
+implementacijom s usklađenim postavkama.
 Objasniti razlike u funkciji cilja i skaliranju.
 
 ## T5: eksperimenti i interpretacija

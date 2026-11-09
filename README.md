@@ -24,11 +24,12 @@ KL divergenciju i multiplikativna pravila Leeja i Seunga
 - Lovro: od matrice do faktora;
 - Mislav: od faktora do nota.
 
-Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Zadaci su GitHub issuei
+Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Repozitorijski zadaci su GitHub issuei
 organizirani u milestoneove Faza 0 do Faza 4.
 
-Implementacija NMF-a i eksperimentalni rezultati još ne postoje. Otvoreni su znanstveno Python
-okruženje i rok. Seminar i prezentacija pišu se na Overleafu, odvojeno od GitHuba (ADR-0005).
+Implementacija NMF-a i eksperimentalni rezultati još ne postoje. B1 postavlja osnovu za
+Python 3.12, a ovisnosti dodajemo uz kod koji ih koristi. Tim vodi seminar i prezentaciju
+izvan repozitorija.
 
 Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
 projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),
@@ -50,7 +51,7 @@ python3 tools/check_before_stop.py
 
 Za alate tijeka rada dovoljni su Python 3.11 ili noviji i Git; znanstveni paketi zasad nisu
 potrebni. Provjera pokreće provjere dokumentacije i jedinične testove alata. Numeričke provjere
-izričito označava s NOT RUN dok ne dogovorimo implementacijsko okruženje.
+izričito označava s NOT RUN dok B1 ne postavi projektno okruženje.
 
 Zasebne naredbe, CI i postavljanje lokalnih hookova opisani su u
 [tijeku rada i provjera](docs/plan/PIPELINE.md). Postupanje s nalazima i probno pokretanje
