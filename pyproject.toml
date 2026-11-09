@@ -3,7 +3,9 @@ name = "gitara"
 version = "0.1.0"
 description = "Automatsko prepisivanje gitare u note pomoću NMF-a"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "numpy>=2.5.4",
+]
 
 [build-system]
 requires = ["uv_build==0.13.6"]

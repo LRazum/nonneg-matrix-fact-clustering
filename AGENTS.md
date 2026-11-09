@@ -41,7 +41,7 @@ A pregledava B, B pregledava C, a C pregledava A.
 Za implementaciju koristimo **Python 3.12** i dodajemo ovisnosti kad ih kod zatreba (ADR-0006).
 Način učenja predložaka, parametri STFT-a i hiperparametri još su otvoreni. Tim vodi seminar,
 prezentaciju i raspored izvan repozitorija (ADR-0005). Primjer ili prijedlog metode ne pretvaraj
-u prihvaćenu odluku. Repozitorij zasad nema implementaciju NMF-a.
+u prihvaćenu odluku. Jezgra NMF-a opisana je u metodologiji i pokrivena sintetičkim testovima.
 
 ## 2. Znanstvena i numerička pravila
 
@@ -122,7 +122,7 @@ u prihvaćenu odluku. Repozitorij zasad nema implementaciju NMF-a.
 ## 4. Struktura repozitorija i podaci
 
 Zasad postoje upute, planska/istraživačka dokumentacija, alati tijeka rada, CI konfiguracije
-te lokalne završne provjere. Znanstvena implementacija slijedi kasnije. Trenutačna i planirana
+te lokalne završne provjere. Numerička jezgra je u paketu `gitara`. Trenutačna i planirana
 struktura opisane su u [tijeku rada](docs/plan/PIPELINE.md).
 
 Planirana područja: `src/` za višekratno upotrebljiv Python kod, `tests/` za numeričke provjere,
