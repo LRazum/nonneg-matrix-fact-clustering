@@ -21,8 +21,7 @@ BRANCH_PREFIXES = ("codex/", "mislav/", "sara/", "lovro/")
 
 # Remove an entry when its path is created; the checker reports stale entries.
 PLANNED = frozenset({
-    "src/", "tests/", "experiments/", "data/", "results/",
-    "pyproject.toml", "uv.lock", "tools/check_project.py",
+    "experiments/", "data/", "results/",
 })
 SKIP_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache"}
 FILE_EXTENSIONS = {

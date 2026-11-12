@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Run the shared local checks; --hook uses the Stop-hook JSON protocol.
 
-Until pyproject.toml exists, project checks are explicitly NOT RUN.
-Adding that file requires tools/check_project.py,
-which must run the agreed checks in the agreed environment and propagate failures.
+The project runner checks the locked environment, syntax and tests.
+An existing pyproject.toml without tools/check_project.py is a failure.
 """
 from __future__ import annotations
 

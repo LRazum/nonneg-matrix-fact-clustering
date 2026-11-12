@@ -49,30 +49,32 @@ tools/
   hooks/check_before_stop.py         omotač oko zajedničke završne provjere
 .codex/
   hooks.json                         konfiguracija Codex Stop hooka; povjerenje je lokalno
-pyproject.toml                       planirano: projekt u Pythonu 3.12
-src/                                 planirano: višekratno upotrebljiva Python implementacija
-tests/                               planirano: numeričke provjere i provjere podataka
+pyproject.toml                       projekt u Pythonu 3.12
+uv.lock                              zaključane ovisnosti
+src/gitara/                          paket za višekratno upotrebljiv kod
+tests/                               projektni testovi
 experiments/                         planirano: konfiguracije i reproducibilne ulazne točke
 data/                                planirano: dokumentirana nabava/priprema podataka
 results/                             planirano: označena izvođenja, slike i tablice
 ```
 
 Planirane mape uvode se kada za njih postoji stvaran sadržaj. Tim vodi materijale za predaju
-izvan repozitorija. Alat za zaključavanje ovisnosti odabire se u B1.
+izvan repozitorija.
 Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook aktivan.
 
 ## Provjere dostupne pri postavljanju
 
 `.github/workflows/ci.yml` pokreće se na PR-ovima, pri pushu na `main` i ručnim pokretanjem.
-Izvodi provjeru dokumentacije i testove za `tools/` koji koriste standardnu biblioteku.
-Te provjere ne zahtijevaju NMF paket, odabran skup podataka ni plaćenu uslugu. Još ne provjeravaju
-numeričku implementaciju.
+Jedan posao provjerava dokumentaciju i alate iz `tools/`. Posao „Numeričke provjere” postavlja
+projektno okruženje i pokreće `tools/check_project.py`. Početni projektni test provjerava uvoz.
 
 Pokrenite lokalno iz korijena repozitorija:
 
 ```bash
+uv sync --locked
 python3 tools/check_docs.py
 python3 -m unittest discover -s tools -p 'test_*.py'
+python3 tools/check_project.py
 python3 tools/check_before_stop.py
 python3 tools/daily_check.py --dry-run
 ```
@@ -89,17 +91,17 @@ granu repozitorija i dok GitHub Actions ne dopusti izvođenje.
 
 ## Numeričko okruženje u Pythonu 3.12
 
-B1 iz [podjele rada](PODJELA.md) dodaje specifikaciju za Python 3.12 i dokumentira naredbu
-za postavljanje okruženja, provjere i postupak zaključavanja ovisnosti. Početni CI postavlja
-isto okruženje i pokreće male determinističke provjere. Ovisnosti dodajte i zaključajte uz
-kod koji ih koristi. Velika preuzimanja i duga izvođenja pokreću se zasebno.
+CI koristi `uv` 0.13.6. `uv sync --locked` postavlja projekt u Pythonu 3.12 i instalira
+paket `gitara` u projektno okruženje. Početni projekt ima prazan popis radnih ovisnosti.
+Dodaj ovisnost uz kod koji je prvi koristi i spremi odgovarajuće izmjene u `pyproject.toml`
+i `uv.lock`. Velika preuzimanja i duga izvođenja pokreću se zasebno.
 
-Završna skripta, CI, korijenski popis naredbi i ova stranica moraju se promijeniti zajedno.
-Dok `pyproject.toml` ne postoji, završna skripta označava numeričku provjeru kao NOT RUN.
-Kad ta datoteka postoji, zahtijeva `tools/check_project.py`, uveden zajedno s dogovorenim
-okruženjem radi izvođenja numeričkih provjera. Nedostajuća skripta tada uzrokuje jasno vidljiv
-pad provjere. Numerički CI zadatak mora pasti i pri neispravnom okruženju ili nevaljanom ulazu;
-odsutna provjera nikad se ne računa kao uspješna.
+`tools/check_project.py` prvo provjerava je li okruženje usklađeno s zaključanim ovisnostima.
+Zatim u tom okruženju provjerava sintaksu pomoću `compileall` i pokreće `unittest`.
+Isti pokretač koriste lokalna završna provjera i CI.
+
+Za pokretanja s više procesa postavite `OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS` i
+`MKL_NUM_THREADS` na 1 prije pokretanja. Vrijednosti zapišite u zapis pokretanja.
 
 ## Završni hookovi
 

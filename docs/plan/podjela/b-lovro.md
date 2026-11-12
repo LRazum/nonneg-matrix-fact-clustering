@@ -48,8 +48,8 @@ pokreće numeričke testove.
 
 1. Postavi Python 3.12. Koristi postojeći `unittest` za početnu provjeru. Ovisnost dodaj i
    zaključaj u istoj promjeni koja je prva koristi.
-2. Dodaj `pyproject.toml` s paketom `gitara` u rasporedu `src/`, prazan paket i test uvoza.
-   Zapiši jednu naredbu za postavljanje i postupak zaključavanja ovisnosti.
+2. Uvedi `pyproject.toml`, `uv.lock`, paket `gitara` u rasporedu `src/` i test uvoza.
+   Naredba za postavljanje je `uv sync --locked`.
 3. Napiši `tools/check_project.py`:
    - pokreće testove u projektnom okruženju;
    - nedostaje li okruženje, ispisuje jasnu pogrešku i vraća kod različit od nule;
