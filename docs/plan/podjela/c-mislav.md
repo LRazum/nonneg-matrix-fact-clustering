@@ -31,21 +31,21 @@ naučiti predloške, kako iz aktivacija dobiti note i koliko dobro to radi na no
 | Faza | Zadatak | Ovisi o | Tko čeka tebe |
 |---|---|---|---|
 | 0 | Z0 dogovor (#5) | — | svi |
-| 1 | C1 matematika: model, struktura i jamstva (#13) | Z0 | B9, C7 |
+| 1 | C1 matematika: model, struktura i jamstva | Z0 | B9, C7 |
 | 1 | C2 note iz aktivacija (#14) | B1 | Z1, C4 |
 | 2 | C3 učenje predložaka (#21) | A2, B2 | C4, B6, Z2 |
 | 2 | C4 pokretač unakrsne provjere (#22) | C2, C3, A5, B3 | A6, C5, Z3 |
-| 2 | C9 neovisna provjera dokaza niti A (#23) | A3 | Z3 |
+| 2 | C9 neovisna provjera dokaza niti A | A3 | Z3 |
 | 2 | Z2 plan eksperimenata, ti si nositelj (#24) | Z1, A4, B5, C3 | C5 |
 | 3 | C5 glavni eksperiment (#30) | C4, A6, Z2 | C6, Z4 |
 | 3 | C6 analiza pogrešaka (#31) | C5 | C7 |
-| 3 | C7 seminar: poglavlja niti C (#32) | C1, C5, C6 | Z5 |
-| 4 | C8 slajdovi niti C (#35) | C7 | Z6 |
+| 3 | C7 seminar: poglavlja niti C | C1, C5, C6 | Z5 |
+| 4 | C8 slajdovi niti C | C7 | Z6 |
 
 Najviše ovisiš o drugima. Zato u fazi 1 radi matematiku (C1) i C2, koji se potpuno provjerava na
 umjetnom $H$. C3 možeš početi na umjetnim podacima i prije nego što A2 bude spojen.
 
-## C1: matematika: model, struktura problema i jamstva (#13)
+## C1: matematika: model, struktura problema i jamstva
 
 **Cilj:** nacrt tvojih poglavlja seminara s potpunim izvodima. Skripta je polazište, a ne gotov
 tekst. Uz svaku tvrdnju označi je li citirana, vlastiti izvod ili empirijsko opažanje.
@@ -93,9 +93,10 @@ tekst. Uz svaku tvrdnju označi je li citirana, vlastiti izvod ili empirijsko op
      citiranja.
 7. **Maskirani NMF** (propozicija o maskiranom učenju u skripti, vlastiti izvod):
    - ako $H_0$ ima nule točno tamo gdje je maska nula, pravila čuvaju masku;
-   - početna vrijednost funkcije cilja je konačna ako svaki stupac $a_j\ne0$ ima barem jednu
-     aktivnu komponentu. Inače je potrebna pozadinska komponenta ili izbacivanje okvira;
-   - nerast vrijedi dok $W$ nema nul-stupac i $H$ nema nul-redak;
+   - početna KL vrijednost je konačna kad je $(WH)_{ij}>0$ svugdje gdje je $a_{ij}>0$.
+     Pozitivno inicijalizirani predlošci pokrivaju nenulte okvire koje maska pridružuje
+     barem jednoj komponenti;
+   - za dokaz nerasta obradi aktivne komponente i pretpostavke iz B4;
    - ton koji se ne pojavljuje u skupu za učenje ne može se naučiti.
 8. **Transkripcija i odabir hiperparametara.**
    - Formalno zapiši prag, spajanje okvira u note i najkraće trajanje.
@@ -103,22 +104,23 @@ tekst. Uz svaku tvrdnju označi je li citirana, vlastiti izvod ili empirijsko op
      unakrsna provjera; AGENTS.md, pravilo 7). U suprotnom bi rezultat bio optimistično
      pristran.
 
-**Gotovo kada:** nacrt je u mapi `seminar/`; Lovro ga je neovisno prošao (B9) i nejasnoće su
-zapisane.
+**Gotovo kada:** Lovro je neovisno prošao nacrt (B9) i raspravio nejasnoće s Mislavom.
 
 ## C2: note iz aktivacija (#14)
 
 **Cilj:** `gitara.transcribe`, potpuno testiran na umjetnim podacima.
 
 1. `activations(A, W, objective, max_iter, tol)` poziva Lovrin `gitara.nmf.fit` uz
-   `update_W=False`. Početni $H$ je determinističan (npr. sve jedinice), pa transkripcija ne
-   ovisi o sjemenu. Dok B2 nije spojen, piši prema sučelju iz Lovrina plana i testiraj s
-   jednostavnom zamjenom.
-2. `extract_notes(H, times, PITCHES, threshold, min_duration, retrigger=None)`:
-   1. normalizira $\hat H=H/\max H$ po snimci; ako je $\max H=0$, vraća prazan popis;
-   2. okvir je aktivan ako je $\hat h_{kt}\ge\theta$;
-   3. svaki najdulji niz uzastopnih aktivnih okvira u retku $k$ postaje nota. Precizno
-      definiraj početak i kraj iz `times` (središta okvira) i koraka te to zapiši;
+   `update_W=False`. Početni $H$ ima jedinice za dostupne predloške i nul-retke za nul-stupce
+   u $W$. `fit` prijavljuje neizvedivu KL rekonstrukciju. Dok B2 nije spojen, testiraj
+   izlučivanje nota izravno na umjetnom $H$.
+2. `extract_notes(H, times, PITCHES, frame_step, threshold, min_duration, retrigger=None)`:
+   1. uzima prvih $K$ redaka (tonove) i dijeli ih njihovom najvećom aktivacijom po snimci.
+      Ako je ona nula, vraća prazna polja intervala i visina;
+   2. okvir je aktivan ako je $\hat h_{kt}\ge\theta$, uz $0<\theta\le1$;
+   3. svaki najdulji niz uzastopnih aktivnih okvira u retku $k$ postaje nota. Početak je
+      `times` prvog aktivnog okvira, a kraj `times` prvog sljedećeg neaktivnog okvira.
+      Niz do zadnjeg okvira završava u `times[-1] + frame_step`, uz `frame_step = hop / sr`;
    4. ako je zadan `retrigger` $\delta$, niz se dijeli na lokalnim maksimumima porasta
       $\hat h_{kt}-\hat h_{k,t-1}>\delta$, jer ponovljeni udarac iste note inače postaje
       jedna duga nota;
@@ -128,8 +130,8 @@ zapisane.
    - rubni slučajevi praga;
    - kratka nota se odbacuje;
    - ponovljeni udarac se dijeli;
-   - nul-matrica i nul-redak daju prazan rezultat;
-   - pretvorba okvira u sekunde.
+   - nul-matrica daje prazna polja, a nul-redak ne proizvodi note;
+   - pretvorba okvira u sekunde uključuje ulaz s jednim okvirom.
 
 **Gotovo kada:** testovi prolaze; Lovro je pregledao PR; postupak je spreman za Z1.
 
@@ -141,10 +143,12 @@ zapisane.
    pozadine je svugdje 1.
 2. `learn_templates(blocks, objective, max_iter, tol, seed, background)`:
    - `blocks` je popis parova (spektrogram, klavirska rola);
-   - $W_0$ se uzima iz `default_rng(seed).uniform(0.5, 1.5)`, a $H_0=M$ po bloku;
+   - za dostupne tonove $W_0$ se uzima iz `default_rng(seed).uniform(0.5, 1.5)`, a $H_0=M$ po
+     bloku. Ton bez označenog okvira dobiva nul-stupac već u $W_0$;
    - poziva `fit` s više blokova;
-   - tonove bez ijednog označenog okvira proglašava neaktivnima: stupac od $W$ je nula i
-     indeks se zapisuje.
+   - vraća predloške u redoslijedu `PITCHES`, s nul-stupcima za nedostupne tonove. Za KL
+     provjeri pokriva li maska nenulte okvire. Ako ne pokriva, prijavi ih i zapiši način
+     obrade prije pokretanja (npr. pozadinska komponenta ili izričit odabir okvira za učenje).
 3. `average_templates(blocks)`: predložak tona je prosjek normaliziranih spektara okvira u
    kojima svira samo taj ton. Ako takvih okvira nema, ton je neaktivan.
 4. Testovi (modul `test_templates`):
@@ -222,7 +226,7 @@ Pokreće se **tek kad je plan iz Z2 zapisan**.
    - provjeri sa Sarom (A4) sviraju li svi gitaristi isti repertoar;
    - generalizacija na drugu gitaru ili prostoriju nije provjerena.
 
-## C7: seminar, poglavlja niti C (#32)
+## C7: seminar, poglavlja niti C
 
 1. **Model i struktura:** model, SVD, nejedinstvenost, normalizacija, NP-težina,
    nekonveksnost i konveksnost.
@@ -234,7 +238,7 @@ Pokreće se **tek kad je plan iz Z2 zapisan**.
 Svaki broj i slika imaju identifikator pokretanja. Skroman ili negativan rezultat legitiman
 je ako je pošteno izmjeren.
 
-## C8: slajdovi niti C (#35)
+## C8: slajdovi niti C
 
 Oko 5–7 slajdova:
 
@@ -244,9 +248,9 @@ Oko 5–7 slajdova:
 - glavna tablica i primjer prepisane snimke uz stvarne note;
 - ograničenja.
 
-## C9: neovisna provjera dokaza niti A (#23)
+## C9: neovisna provjera dokaza niti A
 
-Ti si recenzent Sarine niti. Kad A3 bude u PR-u, na papiru neovisno izvedi:
+Ti si recenzent Sarine niti. Kad nacrt A3 bude spreman, na papiru neovisno izvedi:
 
 1. propoziciju o zbrajanju modula: kada je spektar zbroja jednak zbroju spektara;
 2. nenegativnost KL divergencije i kada je jednaka nuli;
@@ -254,7 +258,7 @@ Ti si recenzent Sarine niti. Kad A3 bude u PR-u, na papiru neovisno izvedi:
 4. ekvivalenciju minimizacije KL divergencije i Poissonove izglednosti;
 5. zašto $F_1$ traži najveće sparivanje, a ne pohlepno.
 
-Razlike i nejasnoće zapiši u PR ili issue. Na prolazima Z1 i Z3 ti objašnjavaš nit A, a u Z4
+Razlike i nejasnoće prođi sa Sarom. Na prolazima Z1 i Z3 objašnjavaš nit A, a u Z4
 reproduciraš Sarine eksperimente.
 
 ## Što trebaš znati iz tuđih niti

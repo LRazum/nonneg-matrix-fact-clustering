@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 .claude/settings.local.json
+/.local-archive/
 
 # Python
 __pycache__/

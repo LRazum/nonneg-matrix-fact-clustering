@@ -49,20 +49,16 @@ tools/
   hooks/check_before_stop.py         omotač oko zajedničke završne provjere
 .codex/
   hooks.json                         konfiguracija Codex Stop hooka; povjerenje je lokalno
-pyproject.toml                       planirano: dogovoreno numeričko okruženje
-uv.lock                              planirano: zaključane numeričke ovisnosti
+pyproject.toml                       planirano: projekt u Pythonu 3.12
 src/                                 planirano: višekratno upotrebljiva Python implementacija
 tests/                               planirano: numeričke provjere i provjere podataka
 experiments/                         planirano: konfiguracije i reproducibilne ulazne točke
 data/                                planirano: dokumentirana nabava/priprema podataka
 results/                             planirano: označena izvođenja, slike i tablice
-seminar/                             planirano: izvor pisanog seminara
-presentation/                        planirano: izvor prezentacije
 ```
 
-Planirane mape uvode se kada za njih postoji stvaran sadržaj. Naziv mape ne određuje skup
-podataka, algoritam rješavanja ni format dokumenta. Predložena datoteka zaključanih ovisnosti
-za uv slijedi referentni tijek rada; numeričko okruženje i upravitelj paketa još nisu dogovoreni.
+Planirane mape uvode se kada za njih postoji stvaran sadržaj. Tim vodi materijale za predaju
+izvan repozitorija. Alat za zaključavanje ovisnosti odabire se u B1.
 Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook aktivan.
 
 ## Provjere dostupne pri postavljanju
@@ -91,14 +87,12 @@ podatke. Dnevni tijek rada treba ovlast pisanja prijava (issues) kako bi održav
 Lokalno dodavanje tog tijeka rada ne uključuje zakazana pokretanja dok ne stigne na zadanu
 granu repozitorija i dok GitHub Actions ne dopusti izvođenje.
 
-## Numeričko okruženje: naknadna timska odluka
+## Numeričko okruženje u Pythonu 3.12
 
-Python je dogovoren, a primjena i algoritam odabrani su u ADR-0003. Verzije ovisnosti i
-numeričke naredbe ostaju otvorene do zadatka B1 iz [podjele rada](PODJELA.md). Taj zadatak
-zajedno dodaje specifikaciju okruženja i datoteku zaključanih ovisnosti, a zatim dokumentira
-jednu podržanu naredbu za postavljanje, naredbu za testove i ulaznu točku eksperimenta. Dodajte CI zadatak koji instalira zaključane ovisnosti
-i pokreće male determinističke provjere. Cjelovita preuzimanja podataka i dugačke serije
-eksperimenata držite izvan zadanog PR zadatka, osim uz izričito obrazloženje.
+B1 iz [podjele rada](PODJELA.md) dodaje specifikaciju za Python 3.12 i dokumentira naredbu
+za postavljanje okruženja, provjere i postupak zaključavanja ovisnosti. Početni CI postavlja
+isto okruženje i pokreće male determinističke provjere. Ovisnosti dodajte i zaključajte uz
+kod koji ih koristi. Velika preuzimanja i duga izvođenja pokreću se zasebno.
 
 Završna skripta, CI, korijenski popis naredbi i ova stranica moraju se promijeniti zajedno.
 Dok `pyproject.toml` ne postoji, završna skripta označava numeričku provjeru kao NOT RUN.

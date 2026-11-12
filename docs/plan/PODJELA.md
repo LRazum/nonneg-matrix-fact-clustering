@@ -2,10 +2,9 @@
 
 Raspored niti prihvaćen je u [ADR-0004](adr/0004-divide-work-into-end-to-end-threads.md),
 a tema u [ADR-0003](adr/0003-choose-guitar-transcription-with-kl-nmf.md). Ova stranica je
-zajednički plan. Detaljni koraci za svaku osobu nalaze se u osobnim planovima. Sadržaj planova
-je prijedlog. PR #39 spojen je bez pregleda na GitHubu (ADR-0002, dodatak 2026-11-05), pa Sara i
-Mislav svoje planove potvrđuju ili mijenjaju na sastanku Z0 ili novim PR-om.
-Rok nije poznat, pa faze nemaju datume.
+zajednički plan. Detaljni koraci za svaku osobu nalaze se u osobnim planovima. Prema Lovrinoj
+primopredaji, Sara i Mislav usmeno su potvrdili svoje uloge na Z0. Materijale za predaju i
+raspored tim vodi zasebno.
 
 ## Tko je tko
 
@@ -34,8 +33,8 @@ cijeli projekt, a ne samo svoju nit.
 
 **A pregledava B, B pregledava C, C pregledava A.** Recenzent niti:
 
-1. pregledava njezine PR-ove: kod, testove, matematiku i usklađenost dokumentacije;
-2. neovisno na papiru izvodi njezine dokaze i zapisuje nejasnoće (zadaci A9, B9 i C9);
+1. pregledava njezine PR-ove: kod, testove i usklađenost dokumentacije;
+2. neovisno na papiru izvodi njezine dokaze i o nejasnoćama razgovara s nositeljem niti;
 3. objašnjava tu nit na zajedničkim prolazima, a nositelj ga dopunjuje;
 4. reproducira njezine eksperimente u čistom okruženju (Z4).
 
@@ -44,8 +43,8 @@ bilo kojeg drugog člana tima. Datoteke koje ne pripadaju nijednoj niti traže p
 
 ## Zajednička sučelja
 
-Prijedlog za potvrdu na sastanku Z0. Nakon potvrde mijenja se samo dogovorom, uz ažuriranje
-ove stranice i pogođenih testova.
+Početni ugovor prema [ADR-0006](adr/0006-start-with-python-312-and-simple-interfaces.md).
+Promjene uskladite s pogođenim pozivateljima i testovima.
 
 ```text
 src/gitara/
@@ -70,15 +69,22 @@ results/               odabrane tablice i slike; results/runs/ izvan Gita
 
 Dogovori o podacima:
 
-- **Spektrogram** je `numpy` polje `float64` oblika `(m, n)`: $m$ frekvencijskih binova i $n$
-  okvira. Uz njega uvijek idu `freqs` (oblik `(m,)`, u Hz) i `times` (oblik `(n,)`, u sekundama,
-  središta prozora).
+- **Spektrogram** je `float64` polje `A` oblika `(m, n)`: $m$ frekvencijskih binova i $n$
+  okvira. `stft_magnitude` vraća i `freqs` (oblik `(m,)`, Hz) te `times` (oblik `(n,)`, s).
+  Prozor se centrira uz dopunu nulama, pa je `times[t] = t * hop / sr`. Početak note je vrijeme
+  prvog aktivnog okvira, a kraj vrijeme prvog idućeg neaktivnog okvira. Ako je zadnji okvir
+  aktivan, kraj je njegovo vrijeme uvećano za `hop / sr`.
+- **Pretprocesiranje** radi po snimci. STFT računa amplitudu. Ako A4 uvede normalizaciju
+  razine, primjenjuje se zasebno i bilježi uz pokretanje. Predmemoriju uvodimo kad zatreba.
 - **Tonovi** su cijeli MIDI brojevi u konstanti `PITCHES` (prijedlog: 40–88, tj. E2–E6,
   $K=49$; potvrditi iz anotacija u A4). Retci od $H$ i stupci od $W$ slijede redoslijed iz
-  `PITCHES`. Pozadinska komponenta, ako je uvedemo, zadnji je redak.
+  `PITCHES`. Nedostupan predložak ima nul-stupac u $W$ i nul-redak u $H$. Jezgra prihvaća
+  neaktivne komponente, a transkripcija zadržava isti raspored tonova. Ako u eksperimentu
+  koristimo pozadinsku komponentu, ide na kraj i preskače se pri izdvajanju nota.
 - **Note** su par `(intervals, pitches)`: `intervals` je oblika `(N, 2)` (početak i kraj u
-  sekundama), a `pitches` oblika `(N,)` (MIDI, `float`). Herci se koriste samo unutar
-  `gitara.evaluate`.
+  sekundama), a `pitches` oblika `(N,)` (MIDI, `float`). Učitač anotacija `load_notes` uz taj
+  par vraća i `strings`, polje oblika `(N,)` za analizu pogrešaka po žici. Vrednovanje i
+  klavirska rola koriste samo intervale i visine.
 - **Klavirska rola** je `bool` matrica oblika `(K, n)`.
 - **Gitarist** je cijeli broj 0–5 iz prefiksa naziva snimke, a **način** je `comp` ili `solo`.
 - **Nevaljan ulaz** (NaN, negativne vrijednosti, krivi oblici) izaziva `ValueError` s jasnom
@@ -88,16 +94,17 @@ Dogovori o podacima:
 
 ## Faze, milestonei i zadaci
 
-Svaki zadatak je GitHub issue s oznakom niti (`nit:A`, `nit:B`, `nit:C`, `nit:zajedničko`),
-oznakama područja i milestoneom faze. Brojevi issuea navedeni su u zagradama.
+Repozitorijski zadaci imaju GitHub issue s oznakom niti i milestoneom faze. Brojevi
+repozitorijskih issuea navedeni su u zagradama. Tim vodi pisanje, pregled tekstova i
+pripremu obrane zasebno.
 
 | Faza (milestone) | Završava | Zadaci |
 |---|---|---|
 | **Faza 0: dogovor** | Potvrđena podjela i sučelja; radi okruženje | Z0 (#5), B1 (#6) |
-| **Faza 1: temelji i prva faktorizacija** | Prolazom 1: prva faktorizacija jedne stvarne snimke | A1 (#7), A2 (#8), A3 (#9), B2 (#10), B3 (#11), B4 (#12), C1 (#13), C2 (#14), Z1 (#15) |
-| **Faza 2: cijeli lanac na jednoj podjeli** | Zapisanim planom eksperimenata i prolazom 2 | A4 (#16), A5 (#17), A9 (#18), B5 (#19), B9 (#20), C3 (#21), C4 (#22), C9 (#23), Z2 (#24), Z3 (#25) |
-| **Faza 3: svi rezultati, seminar i slajdovi** | Svim rezultatima i nacrtima poglavlja | A6 (#26), A7 (#27), B6 (#28), B7 (#29), C5 (#30), C6 (#31), C7 (#32) |
-| **Faza 4: reprodukcija i probna obrana** | Reproduciranim rezultatima i probnom obranom | A8 (#33), B8 (#34), C8 (#35), Z4 (#36), Z5 (#37), Z6 (#38) |
+| **Faza 1: temelji i prva faktorizacija** | Prolazom 1: prva faktorizacija jedne stvarne snimke | A1 (#7), A2 (#8), B2 (#10), B3 (#11), C2 (#14), Z1 (#15) |
+| **Faza 2: cijeli lanac na jednoj podjeli** | Zapisanim planom eksperimenata i prolazom 2 | A4 (#16), A5 (#17), B5 (#19), C3 (#21), C4 (#22), Z2 (#24), Z3 (#25) |
+| **Faza 3: rezultati** | Svim planiranim rezultatima | A6 (#26), B6 (#28), C5 (#30), C6 (#31) |
+| **Faza 4: reprodukcija** | Reproduciranim rezultatima | Z4 (#36) |
 
 Ovisnosti među zadacima navedene su u svakom issueu i osobnom planu. Najvažnije su:
 
@@ -113,25 +120,19 @@ provjeriti na umjetnim podacima.
 
 ### Z0: dogovor (#5)
 
-Sudjeluju svi. Sastanak traje oko sat vremena.
+Lovro je prenio da su Sara i Mislav na sastanku usmeno potvrdili uloge. Tim je dogovorio
+Python 3.12 i postupno dodavanje ovisnosti. Lovro je prepustio pojednostavljenje tehničkih
+sučelja, koja su zapisana iznad. B1 je prvi implementacijski zadatak.
 
-- [ ] Sara i Mislav pregledavaju svoje planove (spojeni u PR-u #39 bez pregleda na GitHubu).
-  Potvrđuju ih ili traže izmjene; promjene se unose i u issuee.
-- [ ] Potvrditi zajednička sučelja s ove stranice ili ih izmijeniti.
-- [ ] Dogovoriti Python ovisnosti. Prijedlog: `numpy`, `scipy`, `matplotlib`, `mir_eval` samo za
-  provjeru vrednovanja, okvir za testove (`pytest` ili `unittest`) i `uv` za zaključane verzije.
-  B1 ih zatim provodi.
-- [ ] Dogovoriti format seminara i prezentacije. Prijedlog je LaTeX, kao skripta, u mapama
-  `seminar/` i `presentation/`. Saznati rok i zahtjeve kolegija.
-- [ ] Svatko lokalno: klonirati repozitorij, pokrenuti `python3 tools/check_before_stop.py` i
-  provjeriti povjerenje hookovima (vidi [tijek rada](PIPELINE.md)).
-- [ ] Svatko pročitati Dio I [skripte](../research/skripta-gitara/skripta-gitara.pdf)
-  (intuitivni pregled) i L1, odjeljke 1–2.
+Pri početku rada svatko provjerava klon i pokreće `python3 tools/check_before_stop.py`
+(vidi [tijek rada](PIPELINE.md)). Priprema za matematiku je Dio I
+[skripte](../research/skripta-gitara/skripta-gitara.pdf) i L1, odjeljci 1–2.
 
 ### Z1: prolaz 1, prva faktorizacija jedne stvarne snimke (#15)
 
 Sara pokazuje spektrogram i klavirsku rolu jedne snimke. Lovro na njoj pokreće KL-NMF bez
-nadzora i pokazuje krivulju funkcije cilja. Mislav iz dobivenog $H$ izvlači note.
+nadzora i pokazuje aktivacije i krivulju funkcije cilja. Mislav pokazuje izdvajanje nota na
+malom $H$ s poznatim tonovima. Transkripcija stvarne snimke koristi označene predloške iz C3.
 
 Nit objašnjava njezin recenzent: Sara objašnjava B, Lovro C, a Mislav A. Pitanja, nejasnoće i
 tko je stvarno sudjelovao zapisujemo u issue.
@@ -160,15 +161,15 @@ Svatko reproducira nit koju pregledava:
 - Lovro reproducira eksperimente niti C;
 - Mislav reproducira eksperimente niti A.
 
-Koraci su: čist klon, `uv sync --frozen` (ako tako dogovorimo u B1), ponovno pokretanje i
+Koraci su čist klon, instalacija zaključanih ovisnosti prema uputama iz B1, ponovno pokretanje i
 usporedba brojeva. Razlike i neuspjehe zapisujemo; ne skrivamo ih.
 
-### Z5: uvod, zaključak i usklađivanje oznaka (#37)
+### Z5: uvod, zaključak i usklađivanje oznaka
 
-Zajedno pišemo uvod i zaključak seminara. Provjeravamo da seminar, slajdovi i kod koriste iste
-oznake, parametre i brojeve.
+Tim zasebno usklađuje tekst. Za provjeru oznaka, parametara i brojeva koristi kod i
+identifikatore pokretanja.
 
-### Z6: prolaz 3, probna obrana (#38)
+### Z6: prolaz 3, probna obrana
 
 Pitanja iz dodatka skripte dijelimo nasumično, tako da svatko dobije i pitanja iz tuđih niti.
 Svatko izlaže i dio koji nije njegov. Praznine zapisujemo i zatim ih ponovno obrađujemo.

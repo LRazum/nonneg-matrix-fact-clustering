@@ -33,13 +33,13 @@ dobit ćeš i pitanja iz tuđih niti.
 | 0 | Z0 dogovor (#5) | — | svi |
 | 1 | A1 podaci (#7) | Z0; za spajanje B1 | A2, A4 |
 | 1 | A2 STFT i klavirska rola (#8) | A1, B1 | Z1, B5, C3 |
-| 1 | A3 matematika: zvuk, spektrogram i KL (#9) | Z0 | C9, A7 |
+| 1 | A3 matematika: zvuk, spektrogram i KL | Z0 | C9, A7 |
 | 2 | A4 provjera pretprocesiranja (#16) | A2, B3 | Z2 |
 | 2 | A5 vrednovanje na razini nota (#17) | B1 | C4 |
-| 2 | A9 neovisna provjera dokaza niti B (#18) | B4 | Z3 |
+| 2 | A9 neovisna provjera dokaza niti B | B4 | Z3 |
 | 3 | A6 spektralni vrhovi i osjetljivost STFT-a (#26) | A2, C4 | C5 |
-| 3 | A7 seminar: poglavlja niti A (#27) | A3–A6 | Z5 |
-| 4 | A8 slajdovi niti A (#33) | A7 | Z6 |
+| 3 | A7 seminar: poglavlja niti A | A3–A6 | Z5 |
+| 4 | A8 slajdovi niti A | A7 | Z6 |
 
 Ako te nešto blokira, počni sljedeći zadatak koji ne ovisi o blokadi. A3 i A5 možeš početi
 odmah nakon Z0, a A5 se dobro testira bez stvarnih podataka.
@@ -117,16 +117,16 @@ klavirsku rolu.
      harmonika najvišeg i najnižeg tona ostaje ispod granice?
 2. `stft_magnitude(y, sr, n_win, hop, f_max)` vraća `(A, freqs, times)`. Implementiraj STFT
    sam pomoću `numpy.fft.rfft` i usporedi ga sa `scipy.signal.stft` u testu. Tako ćeš znati
-   objasniti svaki korak. Odluči o centriranju okvira i dopuni na rubovima i zapiši odluku.
-   `times` su središta prozora.
+   objasniti svaki korak. Dopuni signal nulama tako da prvi prozor ima središte na prvom
+   uzorku. Središta su `times[t] = t * hop / sr`. Normalizacija razine zaseban je korak iz A4.
 3. Pretvorbe: `midi_to_hz(p)` $=440\cdot 2^{(p-69)/12}$ i `hz_to_midi(f)`.
 4. Konstanta `PITCHES`: cijeli MIDI brojevi 40–88. Potvrdi raspon iz anotacija u A4.
 5. `piano_roll(intervals, pitches, times, PITCHES)` vraća `bool` matricu $(K,n)$:
    $R_{kt}=1$ ako postoji nota s $\mathrm{round}(p)=\texttt{PITCHES}[k]$ i
    $\text{početak}\le t<\text{kraj}$. Note izvan raspona broji i prijavljuje, a ne odbacuje
    ih prešutno.
-6. Predmemorija: spektrograme spremaj u mapu data/processed/ (izvan Gita) kao NumPy datoteke, uz zapis
-   parametara. Ako se parametri promijene, predmemorija se ne smije prešutno koristiti.
+6. Za prvi prolaz računaj spektrogram po snimci. Ako kasnija pokretanja trebaju predmemoriju,
+   spremaj je izvan Gita, uz parametre koji određuju kada se može ponovno koristiti.
 7. Testovi (modul `test_spectrogram`):
    - sinus točno na frekvenciji nekog bina daje najveću vrijednost u tom binu, s amplitudom
      koju izračunaš iz zbroja vrijednosti prozora;
@@ -137,10 +137,10 @@ klavirsku rolu.
    - NaN na ulazu izaziva `ValueError`;
    - klavirska rola na ručno zadanim notama.
 
-**Gotovo kada:** spektrogrami svih snimki postoje lokalno; testovi prolaze; Lovro može
+**Gotovo kada:** spektrogrami se mogu izračunati za sve snimke; testovi prolaze; Lovro može
 pokrenuti NMF na jednoj snimki za Z1.
 
-## A3: matematika od zvuka do matrice i KL divergencija (#9)
+## A3: matematika od zvuka do matrice i KL divergencija
 
 **Cilj:** nacrt tvojih poglavlja seminara s potpunim izvodima. Sve izvode prođi sama na
 papiru, pa ih tek onda zapiši. Skripta je polazište, a ne gotov tekst. Uz svaku tvrdnju
@@ -193,8 +193,7 @@ označi je li citirana, vlastiti izvod ili empirijsko opažanje.
 10. Uskladi oznake s [metodologijom](../METHODOLOGY.md): $A$ je $m\times n$, s frekvencijama u
     retcima i okvirima u stupcima.
 
-**Gotovo kada:** nacrt je u dogovorenom formatu u mapi `seminar/`; Mislav je neovisno prošao
-izvode (C9) i nejasnoće su zapisane u issueu.
+**Gotovo kada:** Mislav je neovisno prošao izvode (C9) i raspravio nejasnoće sa Sarom.
 
 ## A4: provjera pretprocesiranja podataka (#16)
 
@@ -282,7 +281,7 @@ su povezani s pokretanjem; tim je o nalazima obaviješten prije Z2.
 **Gotovo kada:** parametri su odabrani bez testnih gitarista; metoda vrhova radi kroz Mislavov
 pokretač; rezultati imaju zapis podrijetla.
 
-## A7: seminar, poglavlja niti A (#27)
+## A7: seminar, poglavlja niti A
 
 Nacrt iz A3 dopuni podacima i rezultatima:
 
@@ -297,16 +296,16 @@ Nacrt iz A3 dopuni podacima i rezultatima:
 
 Svaka slika i broj imaju identifikator pokretanja. Preuzete slike odvoji od naših i citiraj.
 
-## A8: slajdovi niti A (#33)
+## A8: slajdovi niti A
 
 Oko 4–6 slajdova: zvuk → spektrogram → matrica $A$; zašto je zbroj približan; KL prema
 Frobeniusu na jednoj slici; kako mjerimo $F_1$. Iste oznake i brojevi kao u seminaru.
 Pripremi kratko objašnjenje bez slajdova za probnu obranu (Z6).
 
-## A9: neovisna provjera dokaza niti B (#18)
+## A9: neovisna provjera dokaza niti B
 
-Ti si recenzentica Lovrine niti. Kad B4 bude u PR-u, bez gledanja u njegov tekst na papiru
-izvedi:
+Ti si recenzentica Lovrine niti. Kad nacrt B4 bude spreman, bez gledanja u njegov tekst
+na papiru izvedi:
 
 1. gradijente $\nabla_H D=W^T(\mathbf 1-A\oslash WH)$ i $\nabla_W D=(\mathbf 1-A\oslash WH)H^T$;
 2. uvjete optimalnosti na nenegativnom ortantu i primjer stacionarne točke koja nije minimum;
@@ -314,9 +313,8 @@ izvedi:
 4. lemu o pomoćnoj funkciji, majorantu preko Jensenove nejednakosti i teorem o nerastu
    (L3, odjeljak 6, teorem 2).
 
-Usporedi svoj izvod s Lovrinim i sa L3. Svaku razliku ili nejasnoću zapiši u issue ili kao
-komentar u PR-u. Na prolazima Z1 i Z3 ti objašnjavaš nit B, a u Z4 reproduciraš Lovrine
-eksperimente.
+Usporedi svoj izvod s Lovrinim i s L3 pa s Lovrom raspravi razlike. Na prolazima Z1 i Z3
+objašnjavaš nit B, a u Z4 reproduciraš Lovrine eksperimente.
 
 ## Što trebaš znati iz tuđih niti
 

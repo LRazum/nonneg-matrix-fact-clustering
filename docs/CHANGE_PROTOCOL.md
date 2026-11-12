@@ -50,7 +50,7 @@ Provjerite svaki primjenjivi redak. Proširite tablicu kada se uvede nova vrsta 
 | Stanje ili redoslijed zadataka | Pripadajući redak u `docs/plan/TASKS.md`, ovisnosti i dokaz dovršenosti; stanje projekta ili metodologije ako se promijenila etapa ili otvorena odluka. |
 | Pravilo repozitorija ili postupak pregleda | Najprije ADR; korijenski `AGENTS.md`; ovaj protokol; `.github/pull_request_template.md`; pripadajuće provjere i njihovi testovi. `CLAUDE.md` ostaje poveznica `@AGENTS.md`. |
 | Naziv datoteke, mapa ili dokument | Sve poveznice i putanje u tekstu; stablo u `docs/plan/PIPELINE.md`; `docs/INDEX.md`; popis planiranih putanja u `tools/check_docs.py`; pogođene putanje u CI-ju i hookovima. |
-| Provjera, naredba, ovisnost ili CI zadatak | Test ako sadrži logiku; naredbe u korijenskom `AGENTS.md`; `docs/plan/PIPELINE.md`; `tools/check_before_stop.py`; `.github/workflows/ci.yml` gdje je primjenjivo. Buduće numeričko okruženje zahtijeva i `pyproject.toml` i pregledanu datoteku zaključanih ovisnosti. |
+| Provjera, naredba, ovisnost ili CI zadatak | Test ako sadrži logiku; naredbe u korijenskom `AGENTS.md`; `docs/plan/PIPELINE.md`; `tools/check_before_stop.py`; `.github/workflows/ci.yml` gdje je primjenjivo. Projektno okruženje zahtijeva `pyproject.toml`. Uvođenje ili promjena ovisnosti zahtijeva pregledanu datoteku zaključanih verzija. |
 | Dnevna provjera ili postupak s nalazima | `docs/plan/AI_REVIEW.md`; `.github/workflows/daily-check.yml`; `tools/daily_check.py` i njegovi testovi; ovlasti provjere i eventualno odobrenje objavljivanja. |
 | Novi ADR ili promjena odluke | Format ADR-a opisan u nastavku; `docs/INDEX.md`; svako pogođeno pravilo, plan, naredba i artefakt iz ove tablice. Sačuvajte izvornu povijest odluke. |
 

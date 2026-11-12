@@ -32,12 +32,12 @@ iz tuđih niti.
 | 0 | B1 okruženje, provjere i CI (#6) | Z0 | sav kod |
 | 1 | B2 jezgra NMF-a (#10) | B1 | Z1, B5, C3 |
 | 1 | B3 zapis podrijetla (#11) | B1 | A4, B5, C4 |
-| 1 | B4 matematika: optimalnost, pravila i nerast (#12) | Z0 | A9, B7 |
+| 1 | B4 matematika: optimalnost, pravila i nerast | Z0 | A9, B7 |
 | 2 | B5 algoritam na stvarnim spektrogramima (#19) | A2, B2, B3 | Z2, B6 |
-| 2 | B9 neovisna provjera dokaza niti C (#20) | C1 | Z3 |
+| 2 | B9 neovisna provjera dokaza niti C | C1 | Z3 |
 | 3 | B6 konvergencija i stabilnost (#28) | B5, C3 | B7, Z4 |
-| 3 | B7 seminar: poglavlja niti B (#29) | B4–B6 | Z5 |
-| 4 | B8 slajdovi niti B (#34) | B7 | Z6 |
+| 3 | B7 seminar: poglavlja niti B | B4–B6 | Z5 |
+| 4 | B8 slajdovi niti B | B7 | Z6 |
 
 B1 je usko grlo: dok ne postoji okruženje, nitko ne može spojiti kod. Napravi ga odmah nakon Z0.
 
@@ -46,34 +46,29 @@ B1 je usko grlo: dok ne postoji okruženje, nitko ne može spojiti kod. Napravi 
 **Cilj:** jedna podržana naredba za postavljanje, testove i CI. Završna provjera tada stvarno
 pokreće numeričke testove.
 
-1. Provedi ovisnosti dogovorene na Z0. Prijedlog:
-   - Python 3.12;
-   - `numpy`, `scipy` i `matplotlib`;
-   - `mir_eval` kao razvojnu ovisnost, samo za provjeru vrednovanja;
-   - okvir za testove;
-   - `uv` za zaključane verzije.
-2. Dodaj `pyproject.toml` s paketom `gitara` u rasporedu `src/` i zaključaj verzije u `uv.lock`.
-   Dodaj prazan paket i jedan test koji samo uvozi paket.
+1. Postavi Python 3.12. Koristi postojeći `unittest` za početnu provjeru. Ovisnost dodaj i
+   zaključaj u istoj promjeni koja je prva koristi.
+2. Dodaj `pyproject.toml` s paketom `gitara` u rasporedu `src/`, prazan paket i test uvoza.
+   Zapiši jednu naredbu za postavljanje i postupak zaključavanja ovisnosti.
 3. Napiši `tools/check_project.py`:
-   - pokreće testove u zaključanom okruženju, npr. `uv run --frozen` i zatim okvir za testove;
-   - nedostaje li `uv` ili okruženje, ispisuje jasnu pogrešku i vraća kod različit od nule;
+   - pokreće testove u projektnom okruženju;
+   - nedostaje li okruženje, ispisuje jasnu pogrešku i vraća kod različit od nule;
    - nikad ne javlja uspjeh kad provjera nije pokrenuta.
 
    Za njegovu logiku dodaj testove u `tools/`, kao za ostale alate.
-4. U `.github/workflows/ci.yml` dodaj posao „Numeričke provjere”. On instalira `uv`
-   (akcija zaključana punim SHA-om, kao postojeće), izvodi `uv sync --frozen` i pokreće
-   `tools/check_project.py`. U zaštiti grane `main` dodaj ga kao obveznu provjeru.
+4. U `.github/workflows/ci.yml` dodaj posao „Numeričke provjere”. On postavlja isto okruženje i
+   pokreće `tools/check_project.py`. U zaštiti grane `main` dodaj ga kao obveznu provjeru.
 5. Iz popisa `PLANNED` u `tools/check_docs.py` ukloni stvorene putanje. Ažuriraj:
    - naredbe u `AGENTS.md` (odjeljak 5);
    - [tijek rada](../PIPELINE.md) i `README.md`;
    - docstring u `tools/check_before_stop.py`.
 
-   Napiši ADR za okruženje.
+   Upute uskladi s [ADR-0006](../adr/0006-start-with-python-312-and-simple-interfaces.md).
 6. Zapiši varijable za broj dretvi (`OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS`,
    `MKL_NUM_THREADS`). One su važne za mjerenje vremena i za memoriju na računalima od oko
    8 GB RAM-a.
 
-**Gotovo kada:** CI je zelen s novim poslom. Sara i Mislav kod sebe izvode `uv sync` i
+**Gotovo kada:** CI je zelen s novim poslom. Sara i Mislav kod sebe postave okruženje i pokrenu
 `python3 tools/check_before_stop.py` bez pogreške. Sara je pregledala PR.
 
 ## B2: jezgra NMF-a (#10)
@@ -94,7 +89,7 @@ pokreće numeričke testove.
 
    `NMFResult` sadrži `W`, `Hs`, `objective` (vrijednosti po iteracijama), `n_iter`,
    `stop_reason` (`"tol"`, `"max_iter"` ili `"zero_objective"`) i `inactive` (indekse
-   komponenti s nul-stupcem u $W$ ili nul-retkom u $H$).
+   komponenti s nul-stupcem u $W$ ili nul-retkom u svakom bloku $H_b$).
 3. **Pravila**, uz $\oslash$ kao dijeljenje po elementima:
    - KL:
      $H\leftarrow H\odot\bigl(W^T(A\oslash(WH))\bigr)\oslash(W^T\mathbf 1)$ i
@@ -105,17 +100,22 @@ pokreće numeričke testove.
 
    Točno odredi gdje ulazi ε (samo u nazivnike i u $A\oslash(WH)$) i to zapiši u docstring i u
    B4. Teorem vrijedi za pravilo bez ε, pa je ε izmjena koju treba objasniti.
+   Za omjer ažuriranja s nulom u brojniku i nazivniku koristi faktor 1, koji čuva postojeću
+   vrijednost. U $A\oslash(WH)$ koristi nulu na mjestima gdje je $A=0$. KL cilj ima vrijednost
+   $+\infty$ ako je $A>0$ na mjestu gdje je $WH=0$. `fit` takvu početnu ili ažuriranu
+   rekonstrukciju prijavljuje kao numerički neuspjeh.
 4. **Redoslijed** u jednoj iteraciji: najprije svi $H_b$, zatim $W$. Na kraju iteracije
    normaliziraj stupce od $W$ na $\ell_1$-normu 1 i istim faktorima pomnoži retke od $H_b$.
-   Umnožak $WH$ i funkcija cilja se pritom ne mijenjaju; to je test, ne pretpostavka.
+   Preskoči nul-stupce i primijeni preskaliranje samo kad se ažuriraju oba faktora.
+   Umnožak $WH$ i funkcija cilja ostaju isti, što provjeri testom.
 5. **Zaustavljanje:** relativni pad $(f_t-f_{t+1})/f_t<\texttt{tol}$ ili `max_iter`. Razlog
    zaustavljanja uvijek se vraća.
 6. **Provjera ulaza:**
    - oblici blokova, $W_0$ i $H_0$ su usklađeni;
    - sve je konačno i nenegativno;
-   - $W_0$ nema nul-stupac.
+   - nul-stupac u $W_0$ i nul-redak u svakom $H_{0,b}$ dopušteni su i zadržavaju svoje mjesto.
 
-   U suprotnom se izaziva `ValueError`. Ništa se ne odsijeca prešutno.
+   Za nevaljane oblike ili vrijednosti izaziva se `ValueError`.
 7. **Memorija:** blokovi se obrađuju jedan po jedan, a zbrojevi za $W$ akumuliraju se. Matrica
    svih snimki za učenje ($m\approx500$ binova, stotine tisuća okvira) zauzela bi nekoliko GB,
    pa je ne spajaj.
@@ -132,7 +132,8 @@ pokreće numeričke testove.
    6. normalizacija ne mijenja $WH$ ni funkciju cilja;
    7. uz `update_W=False` matrica $W$ ostaje točno ista;
    8. dva bloka daju isto što i jedan spojeni blok;
-   9. negativan ulaz, NaN, krivi oblici i nul-stupac u $W_0$ izazivaju `ValueError`;
+   9. negativan ulaz, NaN i krivi oblici izazivaju `ValueError`. Nulta komponenta s valjanom
+      rekonstrukcijom ostaje na istom indeksu, a nedopuštena KL rekonstrukcija se prijavljuje;
    10. `kl_divergence(A, A) == 0`, vrijednost je nenegativna na nasumičnim podacima, a
        konvencija $0\log0$ radi.
 
@@ -159,7 +160,7 @@ koristiti `fit` u C2 i C3.
 
 **Gotovo kada:** Sara (A4) i Mislav (C4) mogu ga koristiti; Sara je pregledala PR.
 
-## B4: matematika: optimalnost, multiplikativna pravila i nerast (#12)
+## B4: matematika optimalnosti, multiplikativnih pravila i nerasta
 
 **Cilj:** nacrt tvojih poglavlja seminara s potpunim izvodima. Skripta je polazište, a ne gotov
 tekst. Svaki izvod prođi na papiru; uz svaku tvrdnju označi je li citirana, vlastiti izvod ili
@@ -204,8 +205,7 @@ empirijsko opažanje.
 8. **Mali primjer.** Jedna ručno izračunata iteracija na matrici $2\times2$; isti brojevi idu u
    test 5 iz B2.
 
-**Gotovo kada:** nacrt je u mapi `seminar/`; Sara ga je neovisno prošla (A9) i nejasnoće su
-zapisane.
+**Gotovo kada:** Sara je neovisno prošla nacrt (A9) i raspravila nejasnoće s Lovrom.
 
 ## B5: algoritam na stvarnim spektrogramima (#19)
 
@@ -242,7 +242,7 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
 **Gotovo kada:** slike konvergencije i stabilnosti imaju identifikatore pokretanja; zaključci su
 u nacrtu poglavlja; sva sjemena su prikazana, ne samo povoljna.
 
-## B7: seminar, poglavlja niti B (#29)
+## B7: seminar, poglavlja niti B
 
 Nacrt iz B4 dopuni:
 
@@ -253,7 +253,7 @@ Nacrt iz B4 dopuni:
 
 Svaka tvrdnja u kodu (npr. „funkcija cilja ne raste”) ima pripadajući test ili pokretanje.
 
-## B8: slajdovi niti B (#34)
+## B8: slajdovi niti B
 
 Oko 4–6 slajdova:
 
@@ -262,9 +262,9 @@ Oko 4–6 slajdova:
 - slika pomoćne funkcije koja leži iznad funkcije cilja;
 - krivulje konvergencije, s porukom što je dokazano, a što samo opaženo.
 
-## B9: neovisna provjera dokaza niti C (#20)
+## B9: neovisna provjera dokaza niti C
 
-Ti si recenzent Mislavove niti. Kad C1 bude u PR-u, na papiru neovisno izvedi:
+Ti si recenzent Mislavove niti. Kad nacrt C1 bude spreman, na papiru neovisno izvedi:
 
 1. nejedinstvenost: $(WD)(D^{-1}H)=WH$ i permutacije; normalizacija čuva $WH$;
 2. primjer nekonveksnosti punog problema i dokaz konveksnosti po $H$ uz fiksni $W$. Za KL je
@@ -273,7 +273,7 @@ Ti si recenzent Mislavove niti. Kad C1 bude u PR-u, na papiru neovisno izvedi:
    leme 1 i kritika u L4, odjeljak 3.1; primjer zapinjanja u točki koja nije stacionarna;
 4. propoziciju o maskiranom NMF-u.
 
-Razlike i nejasnoće zapiši u PR ili issue. Na prolazima Z1 i Z3 ti objašnjavaš nit C, a u Z4
+Razlike i nejasnoće prođi s Mislavom. Na prolazima Z1 i Z3 objašnjavaš nit C, a u Z4
 reproduciraš Mislavov glavni eksperiment.
 
 ## Što trebaš znati iz tuđih niti
