@@ -27,9 +27,9 @@ KL divergenciju i multiplikativna pravila Leeja i Seunga
 Svaka nit sadrži matematiku, kod, eksperimente i dio seminara. Repozitorijski zadaci su GitHub issuei
 organizirani u milestoneove Faza 0 do Faza 4.
 
-Paket `gitara` postavljen je za Python 3.12 i ima test uvoza. Implementacija NMF-a i
-eksperimentalni rezultati slijede. Ovisnosti dodajemo uz kod koji ih koristi. Tim vodi seminar i
-prezentaciju izvan repozitorija.
+Paket `gitara` postavljen je za Python 3.12. Modul `gitara.nmf` implementira KL i Frobeniusova
+multiplikativna ažuriranja, a sintetički testovi provjeravaju ponašanje jezgre. Primjena na
+GuitarSetu slijedi. Tim vodi seminar i prezentaciju izvan repozitorija.
 
 Predajemo pisani seminar, prezentaciju, kod i ponovljive rezultate. Seminar, prezentacija i
 projektna dokumentacija pišu se na hrvatskom. [Opseg projekta](docs/plan/PROJECT.md),
@@ -50,8 +50,8 @@ uv sync --locked
 python3 tools/check_before_stop.py
 ```
 
-Završna provjera obuhvaća dokumentaciju, testove alata i projektne provjere. U projektu se
-zasad provjeravaju sintaksa i uvoz paketa.
+Završna provjera obuhvaća dokumentaciju, testove alata i projektne provjere, uključujući
+sintaksu, uvoz paketa i numeričke testove NMF-a.
 
 Zasebne naredbe, CI i postavljanje lokalnih hookova opisani su u
 [tijeku rada i provjera](docs/plan/PIPELINE.md). Postupanje s nalazima i probno pokretanje

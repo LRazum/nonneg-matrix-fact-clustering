@@ -67,12 +67,35 @@ W\leftarrow W\odot\frac{(A\oslash WH)H^T}{\mathbf 1H^T},
 $$
 
 uz dijeljenje po elementima. Frobeniusova formulacija gore ostaje referentna metoda. Izvode
-razrađuju zadaci A3, B4 i C1. Numeričke zaštite (ε), normalizacija i zaustavljanje opisuju
-se ovdje kad ih tim odabere. Dodavanje ε mijenja pravilo za koje vrijedi teorem. Implementacija
-zadržava neaktivne komponente na istim indeksima. U omjerima ažuriranja koristi faktor 1 za
-nulti brojnik i nazivnik. U omjeru $A\oslash WH$ doprinos mjesta s $A=0$ je nula, uključujući
-$A=WH=0$. Pozitivan $A$ uz $WH=0$ daje beskonačnu KL vrijednost i izvođenje se prijavljuje kao
-neuspjelo. B4 razrađuje uvjete dokaza za aktivne komponente.
+razrađuju zadaci A3, B4 i C1. Izvor pravila su odjeljci 4–6, teoremi 1 i 2 u
+[radu Leeja i Seunga](https://proceedings.neurips.cc/paper/2000/file/f9d1152547c0bde01830b7e8bd60024c-Paper.pdf).
+
+### 2.2 Numerička izvedba B2
+
+Za blok $b$ neka je $A_b$ oblika $m\times n_b$, $W$ oblika $m\times r$, a $H_b$ oblika
+$r\times n_b$. Cilj je zbroj divergencija ili pogrešaka po blokovima. U jednoj iteraciji
+najprije se izračuna svaki slobodni $H_b$ uz isto $W$. Zatim se ažurira slobodni $W$, uz zbroj
+brojnika i nazivnika preko blokova. Kad se ažuriraju oba faktora, svaki nenulti stupac od $W$
+dijeli se svojim zbrojem, a pripadni redci svih $H_b$ množe se istim zbrojem. Time se
+$WH_b$ čuva do pogreške zaokruživanja. Blokovi se ne spajaju. Privremeni spektrogram i
+rekonstrukcija zauzimaju prostor reda $m\max_b n_b$, uz spremljene faktore i akumulatore.
+
+Podaci i faktori računaju se u aritmetici `float64`. Za omjer ažuriranja s nulom i u brojniku
+i u nazivniku faktor je 1. Nulti elementi faktora zadržavaju se, a nulte komponente ostaju na
+istim indeksima. Za $A\oslash WH$ mjesta s $A=0$ daju nulu. Pozitivan $A$ uz $WH=0$ izvan je
+domene konačne KL divergencije. Funkcija cilja tada vraća $+\infty$, a `fit` prijavljuje
+neuspjeh. Kada je ε pozitivan, djelitelji u ažuriranju i u $A\oslash WH$ imaju donju granicu ε
+(zadano $10^{-12}$). S ε = 0 koriste se izvorni djelitelji i opisane konvencije za nule.
+Funkcija cilja računa se na stvarnom $WH$ bez ε. Za bliske pozitivne vrijednosti $a$ i $v$
+račun koristi $t=(a-v)/v$ i $(1+t)\log(1+t)-t$. Za $|t|<10^{-4}$ evaluira se razvoj do
+člana $t^4$, a ostatak počinje članom $-t^5/20$. To smanjuje poništavanje znamenki blizu nule.
+
+Povijest cilja uključuje početnu vrijednost i vrijednost nakon svake iteracije. Iteracija
+završava kad cilj dosegne nulu, dosegne se najveći broj iteracija ili je nenegativni relativni
+pad strogo manji od tolerancije. Tolerancija nula isključuje tu provjeru. Porast se zadržava
+u povijesti. Nerast iz izvornog dokaza odnosi se na točna multiplikativna pravila pod njihovim
+pretpostavkama. U kodu su porasti mogući zbog zaštite ε ili aritmetike s pomičnim zarezom.
+Ograničenja stacionarnosti opisuje [Gillis, odjeljak 3.1.2](https://arxiv.org/abs/1401.5226v2).
 
 ## 3. Izvod odabranog algoritma
 

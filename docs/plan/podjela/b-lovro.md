@@ -98,8 +98,8 @@ pokreće numeričke testove.
      $H\leftarrow H\odot(W^TA)\oslash(W^TWH)$ i
      $W\leftarrow W\odot\sum_b A_bH_b^T\oslash\bigl(W\sum_b H_bH_b^T\bigr)$.
 
-   Točno odredi gdje ulazi ε (samo u nazivnike i u $A\oslash(WH)$) i to zapiši u docstring i u
-   B4. Teorem vrijedi za pravilo bez ε, pa je ε izmjena koju treba objasniti.
+   Djelitelji u ažuriranju i u $A\oslash(WH)$ imaju donju granicu ε. S ε = 0 koristi se
+   izvorni djelitelj. Teorem vrijedi za pravilo bez ε pod pretpostavkama izvornog dokaza.
    Za omjer ažuriranja s nulom u brojniku i nazivniku koristi faktor 1, koji čuva postojeću
    vrijednost. U $A\oslash(WH)$ koristi nulu na mjestima gdje je $A=0$. KL cilj ima vrijednost
    $+\infty$ ako je $A>0$ na mjestu gdje je $WH=0$. `fit` takvu početnu ili ažuriranu
@@ -108,8 +108,9 @@ pokreće numeričke testove.
    normaliziraj stupce od $W$ na $\ell_1$-normu 1 i istim faktorima pomnoži retke od $H_b$.
    Preskoči nul-stupce i primijeni preskaliranje samo kad se ažuriraju oba faktora.
    Umnožak $WH$ i funkcija cilja ostaju isti, što provjeri testom.
-5. **Zaustavljanje:** relativni pad $(f_t-f_{t+1})/f_t<\texttt{tol}$ ili `max_iter`. Razlog
-   zaustavljanja uvijek se vraća.
+5. **Zaustavljanje:** cilj nula, nenegativni relativni pad $(f_t-f_{t+1})/f_t<\texttt{tol}$
+   ili `max_iter`. Tolerancija nula isključuje provjeru relativnog pada. Povijest uključuje
+   početnu vrijednost i eventualne poraste. Razlog zaustavljanja uvijek se vraća.
 6. **Provjera ulaza:**
    - oblici blokova, $W_0$ i $H_0$ su usklađeni;
    - sve je konačno i nenegativno;
@@ -202,8 +203,15 @@ empirijsko opažanje.
    - ε i kako mijenja pravilo, pa teorem više ne vrijedi doslovno;
    - zaustavljanje (L1, 3.1.7): relativni pad i najveći broj iteracija;
    - složenost $O(mnr)$ po iteraciji i memorija.
-8. **Mali primjer.** Jedna ručno izračunata iteracija na matrici $2\times2$; isti brojevi idu u
-   test 5 iz B2.
+8. **Mali primjer.** Za $A=\left[\begin{smallmatrix}1&3\\2&4\end{smallmatrix}\right]$,
+   $W_0=\left[\begin{smallmatrix}1&1\\1&2\end{smallmatrix}\right]$ i $H_0$ pun jedinica,
+   stupci od $W_0H_0$ jednaki su $(2,3)^T$. Omjer $A\oslash(W_0H_0)$ ima retke
+   $(1/2,3/2)$ i $(2/3,4/3)$. Nakon množenja s $W_0^T$ prvi redak dijelimo s 2, a drugi s 3:
+   dobivamo $H_1$ s retcima $(7/12,17/12)$ i $(11/18,25/18)$.
+   Zatim $W_0H_1$ ima retke $(43/36,101/36)$ i $(65/36,151/36)$. Oba retka od $H_1$
+   imaju zbroj 2. Uvrštavanjem u pravilo za $W$ dobivamo retke
+   $(4350/4343,4336/4343)$ i $(9801/9815,19644/9815)$. Ovi brojevi su referenca
+   testa B2 uz ε = 0 i isključenu normalizaciju.
 
 **Gotovo kada:** Sara je neovisno prošla nacrt (A9) i raspravila nejasnoće s Lovrom.
 

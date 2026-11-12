@@ -66,7 +66,8 @@ Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook akt
 
 `.github/workflows/ci.yml` pokreće se na PR-ovima, pri pushu na `main` i ručnim pokretanjem.
 Jedan posao provjerava dokumentaciju i alate iz `tools/`. Posao „Numeričke provjere” postavlja
-projektno okruženje i pokreće `tools/check_project.py`. Početni projektni test provjerava uvoz.
+projektno okruženje i pokreće `tools/check_project.py`. Projektni testovi provjeravaju uvoz
+paketa i svojstva NMF-a na sintetičkim podacima.
 
 Pokrenite lokalno iz korijena repozitorija:
 
@@ -92,7 +93,7 @@ granu repozitorija i dok GitHub Actions ne dopusti izvođenje.
 ## Numeričko okruženje u Pythonu 3.12
 
 CI koristi `uv` 0.13.6. `uv sync --locked` postavlja projekt u Pythonu 3.12 i instalira
-paket `gitara` u projektno okruženje. Početni projekt ima prazan popis radnih ovisnosti.
+paket `gitara` u projektno okruženje. Jezgra NMF-a u B2 koristi NumPy.
 Dodaj ovisnost uz kod koji je prvi koristi i spremi odgovarajuće izmjene u `pyproject.toml`
 i `uv.lock`. Velika preuzimanja i duga izvođenja pokreću se zasebno.
 
