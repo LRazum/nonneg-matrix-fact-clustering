@@ -155,6 +155,7 @@ class FitTests(unittest.TestCase):
             A = np.load(path, mmap_mode="r")
             mapped = fit([A], [[1, 1], [1, 2]], [[[1, 1], [1, 1]]], max_iter=2)
             dense = fit([A.astype(np.float64)], [[1, 1], [1, 2]], [[[1, 1], [1, 1]]], max_iter=2)
+            del A  # Windows cannot delete a file that is still memory-mapped.
             assert_allclose(mapped.W, dense.W)
             assert_allclose(mapped.Hs[0], dense.Hs[0])
 
