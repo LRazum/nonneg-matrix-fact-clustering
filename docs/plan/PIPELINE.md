@@ -67,7 +67,8 @@ Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook akt
 `.github/workflows/ci.yml` pokreće se na PR-ovima, pri pushu na `main` i ručnim pokretanjem.
 Jedan posao provjerava dokumentaciju i alate iz `tools/`. Posao „Numeričke provjere” postavlja
 projektno okruženje i pokreće `tools/check_project.py`. Projektni testovi provjeravaju uvoz
-paketa i svojstva NMF-a na sintetičkim podacima.
+paketa, svojstva NMF-a na sintetičkim podacima i zapis podrijetla u privremenom git
+repozitoriju.
 
 Pokrenite lokalno iz korijena repozitorija:
 
@@ -102,7 +103,8 @@ Zatim u tom okruženju provjerava sintaksu pomoću `compileall` i pokreće `unit
 Isti pokretač koriste lokalna završna provjera i CI.
 
 Za pokretanja s više procesa postavite `OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS` i
-`MKL_NUM_THREADS` na 1 prije pokretanja. Vrijednosti zapišite u zapis pokretanja.
+`MKL_NUM_THREADS` na 1 prije pokretanja. `gitara.provenance` njihove vrijednosti sprema u
+zapis pokretanja.
 
 ## Završni hookovi
 
@@ -171,7 +173,13 @@ Stanje 2026-11-05, nakon Lovrine izričite upute da se postavi tijek rada na Git
 
 ## Najmanji skup podataka o podrijetlu za prijavljeno izvođenje
 
-Konkretan format zapisa odaberite tijekom implementacije. Mora sačuvati:
+Zapis vodi `gitara.provenance`. Svako pokretanje dobiva novu mapu unutar results/runs/ (izvan
+Gita) s datotekom run.json i, ako radno stablo nije čisto, datotekom `uncommitted.diff`. Diff
+obuhvaća i neverzionirane datoteke koje Git ne ignorira. Mapa nastaje na početku pokretanja,
+pa prekinuto pokretanje ostaje zapisano sa statusom `running`. Modul sam bilježi identifikator,
+vrijeme, status, naredbu, commit i diff, okruženje, sjemena i MD5 manifesta. Izvor podataka,
+pretprocesiranje, funkciju cilja, rang i ostale postavke pozivatelj navodi u konfiguraciji, a
+metrike i razlog zaustavljanja u rezultatima. Zapis mora sačuvati:
 
 - Jedinstven identifikator izvođenja, vremensku oznaku, status i korištenu naredbu/konfiguraciju.
 - Commit koda i podatak o necommitiranim promjenama u radnom stablu. Sačuvajte pripadajuće

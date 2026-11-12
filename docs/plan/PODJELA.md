@@ -91,6 +91,10 @@ Dogovori o podacima:
   porukom. Ništa se prešutno ne popravlja.
 - **Slučajnost** dolazi samo iz `numpy.random.default_rng(seed)`, a sjeme je uvijek parametar.
 - **Svako pokretanje eksperimenta** zapisuje podrijetlo preko `gitara.provenance`.
+  Na početku `start_run(name, config, seeds=..., manifest=...)` stvara novu mapu unutar
+  results/runs/ i vraća zapis. Artefakti pokretanja spremaju se u mapu `record["dir"]`.
+  Na kraju `finish_run(record, "ok", results)` ili
+  `finish_run(record, "failed", errors=[...])` zapisuje ishod.
 
 ## Faze, milestonei i zadaci
 
