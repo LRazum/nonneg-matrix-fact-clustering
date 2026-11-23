@@ -4,9 +4,10 @@ import unittest
 from pathlib import Path
 
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_allclose, assert_array_equal
+from scipy.io import wavfile
 
-from gitara.data import Track, list_tracks, load_notes, parse_track_id
+from gitara.data import Track, list_tracks, load_audio, load_notes, parse_track_id
 
 
 def make_fake_guitarset(root: Path) -> None:
@@ -166,4 +167,64 @@ class LoadNotesTests(unittest.TestCase):
     def test_missing_file_is_reported(self) -> None:
         with self.assertRaises(FileNotFoundError):
             load_notes(self.track)
-            
+
+
+def sine(frequency: float, seconds: float = 1.0, rate: int = 44_100, amplitude: float = 0.5):
+    """A 16-bit PCM sine wave, as stored in a GuitarSet WAV file."""
+    time = np.arange(int(seconds * rate)) / rate
+    return np.round(amplitude * 32_767 * np.sin(2 * np.pi * frequency * time)).astype(np.int16)
+
+
+class LoadAudioTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self._tmp.name) / "00_Rock1-100-C_comp_mic.wav"
+        self.track = Track("00_Rock1-100-C_comp", 0, "comp", self.path, Path("unused.jams"))
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def write(self, samples: np.ndarray, rate: int = 44_100) -> None:
+        wavfile.write(self.path, rate, samples)
+
+    def test_original_rate_only_rescales_samples(self) -> None:
+        self.write(np.array([-32_768, 0, 16_384, 32_767], dtype=np.int16))
+        signal = load_audio(self.track, sr=44_100)
+        assert_array_equal(signal, [-1.0, 0.0, 0.5, 32_767 / 32_768])
+        self.assertEqual(signal.dtype, np.float64)
+
+    def test_resampled_sine_keeps_its_frequency_and_amplitude(self) -> None:
+        self.write(sine(440.0))
+        signal = load_audio(self.track)
+        self.assertEqual(signal.shape, (22_050,))
+        spectrum = np.abs(np.fft.rfft(signal))
+        frequencies = np.fft.rfftfreq(signal.size, d=1 / 22_050)
+        self.assertEqual(frequencies[np.argmax(spectrum)], 440.0)
+        middle = signal[2_000:-2_000]  # away from the filter's edge effects
+        assert_allclose(np.sqrt(np.mean(middle**2)), 0.5 / np.sqrt(2), rtol=1e-3)
+
+    def test_content_above_the_new_nyquist_frequency_is_removed(self) -> None:
+        self.write(sine(15_000.0))  # above 22 050 / 2 = 11 025 Hz
+        signal = load_audio(self.track)[2_000:-2_000]
+        self.assertLess(np.sqrt(np.mean(signal**2)), 1e-3 * 0.5 / np.sqrt(2))
+
+    def test_unexpected_formats_are_rejected(self) -> None:
+        cases = {
+            "stereo": (np.zeros((100, 2), dtype=np.int16), 44_100),
+            "48 kHz": (np.zeros(100, dtype=np.int16), 48_000),
+            "float samples": (np.zeros(100, dtype=np.float32), 44_100),
+        }
+        for label, (samples, rate) in cases.items():
+            self.write(samples, rate)
+            with self.subTest(label), self.assertRaisesRegex(ValueError, "00_Rock1-100-C_comp"):
+                load_audio(self.track)
+
+    def test_invalid_sample_rate_is_rejected(self) -> None:
+        self.write(sine(440.0, seconds=0.01))
+        for sr in (0, -22_050, 22_050.0, True):
+            with self.subTest(sr=sr), self.assertRaises(ValueError):
+                load_audio(self.track, sr=sr)
+
+    def test_missing_file_is_reported(self) -> None:
+        with self.assertRaises(FileNotFoundError):
+            load_audio(self.track)

@@ -16,9 +16,12 @@ import json
 import re
 from collections import Counter
 from dataclasses import dataclass
+from math import gcd
 from pathlib import Path
 
 import numpy as np
+from scipy.io import wavfile
+from scipy.signal import resample_poly
 
 ANNOTATION_DIR = "annotation"
 AUDIO_DIR = "audio_mono-mic"
@@ -28,6 +31,9 @@ MODES = ("comp", "solo")
 TRACKS_PER_PLAYER_AND_MODE = 30
 N_STRINGS = 6
 NOTE_NAMESPACE = "note_midi"
+SOURCE_SAMPLE_RATE = 44_100
+SAMPLE_RATE = 22_050
+INT16_SCALE = 32_768
 
 _TRACK_ID = re.compile(
     r"(?P<player>0[0-5])_(?:BN|Funk|Jazz|Rock|SS)[1-3]-\d{2,3}-[A-G][#b]?_(?P<mode>comp|solo)"
@@ -162,3 +168,36 @@ def _string_index(data_source: object, track: Track) -> int:
     if not isinstance(data_source, str) or data_source not in {str(k) for k in range(N_STRINGS)}:
         raise ValueError(f"{track.track_id}: unexpected string label {data_source!r}")
     return int(data_source)
+
+
+def load_audio(track: Track, sr: int = SAMPLE_RATE) -> np.ndarray:
+    """Return the microphone recording of ``track`` as ``float64`` samples at ``sr`` Hz.
+
+    GuitarSet stores mono 16-bit PCM at 44 100 Hz. Samples are divided by 32 768, so the
+    stored values lie in [-1, 1). For ``sr`` below 44 100 Hz the signal is resampled with
+    ``scipy.signal.resample_poly``, whose low-pass filter removes content above the new
+    Nyquist frequency ``sr / 2`` before decimation. After filtering, a few samples may lie
+    slightly outside [-1, 1]; they are not clipped. The level is not normalized: whether and
+    how to normalize is a separate, explicit preprocessing decision (task A4).
+    """
+    if isinstance(sr, bool) or not isinstance(sr, int) or sr <= 0:
+        raise ValueError(f"sr must be a positive integer, got {sr!r}")
+    path = track.audio_path
+    if not path.is_file():
+        raise FileNotFoundError(f"missing audio for {track.track_id}: {path}")
+
+    rate, samples = wavfile.read(path) # čita zaglavlje i vraća frekvenciju i polje uzoraka
+    if samples.ndim != 1:
+        raise ValueError(f"{track.track_id}: expected mono audio, got shape {samples.shape}")
+    if samples.dtype != np.int16:
+        raise ValueError(f"{track.track_id}: expected 16-bit PCM, got {samples.dtype}")
+    if rate != SOURCE_SAMPLE_RATE:
+        raise ValueError(f"{track.track_id}: expected {SOURCE_SAMPLE_RATE} Hz, got {rate} Hz")
+
+    signal = samples.astype(np.float64) / INT16_SCALE # pretvorba u float i u [-1, 1)
+    if sr != rate:
+        common = gcd(sr, rate) # kraćenje omjera frekvencija
+        signal = resample_poly(signal, sr // common, rate // common) # filter protiv aliasinga
+    if not np.all(np.isfinite(signal)):
+        raise ValueError(f"{track.track_id}: non-finite audio samples")
+    return signal
