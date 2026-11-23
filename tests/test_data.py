@@ -1,13 +1,26 @@
+import csv
 import json
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 from scipy.io import wavfile
 
-from gitara.data import Track, list_tracks, load_audio, load_notes, parse_track_id
+from gitara.data import (
+    Archive,
+    Track,
+    download,
+    list_tracks,
+    load_audio,
+    load_notes,
+    md5_file,
+    parse_track_id,
+    verify_manifest,
+    write_manifest,
+)
 
 
 def make_fake_guitarset(root: Path) -> None:
@@ -51,8 +64,9 @@ class ListTracksTests(unittest.TestCase):
         self.assertEqual(ids, sorted(ids))
         first = tracks[0]
         self.assertEqual((first.player, first.mode), (0, "comp"))
-        self.assertEqual(first.annotation_path, self.root / "annotation" / f"{first.track_id}.jams")
-        self.assertEqual(first.audio_path, self.root / "audio_mono-mic" / f"{first.track_id}_mic.wav")
+        annotation = self.root / "annotation" / f"{first.track_id}.jams"
+        audio = self.root / "audio_mono-mic" / f"{first.track_id}_mic.wav"
+        self.assertEqual((first.annotation_path, first.audio_path), (annotation, audio))
         for player in range(6):
             self.assertEqual(sum(track.player == player for track in tracks), 60)
 
@@ -76,6 +90,7 @@ class ListTracksTests(unittest.TestCase):
     def test_missing_folder_is_reported(self) -> None:
         with self.assertRaises(FileNotFoundError):
             list_tracks(self.root / "nowhere")
+
 
 def note(time: float, duration: float, value: float) -> dict:
     return {"time": time, "duration": duration, "value": value, "confidence": None}
@@ -228,3 +243,112 @@ class LoadAudioTests(unittest.TestCase):
     def test_missing_file_is_reported(self) -> None:
         with self.assertRaises(FileNotFoundError):
             load_audio(self.track)
+
+
+class Md5Tests(unittest.TestCase):
+    def test_known_vectors_in_small_chunks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "abc"
+            path.write_bytes(b"abc")
+            # MD5 test vectors from RFC 1321; chunk_size=1 exercises the chunked reading.
+            self.assertEqual(md5_file(path, chunk_size=1), "900150983cd24fb0d6963f7d28e17f72")
+            path.write_bytes(b"")
+            self.assertEqual(md5_file(path), "d41d8cd98f00b204e9800998ecf8427e")
+
+
+class DownloadTests(unittest.TestCase):
+    """``download`` with a fake ``fetch`` that copies local zip files instead of using Zenodo."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+        self.root = self.tmp / "raw"
+        self.server = self.tmp / "server"
+        self.server.mkdir()
+        self.fetched: list[str] = []
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def make_zip(self, name: str, members: dict[str, bytes]) -> Archive:
+        path = self.server / name
+        with zipfile.ZipFile(path, "w") as archive:
+            for member, content in members.items():
+                archive.writestr(member, content)
+        folder, suffix = ("annotation", ".jams") if name.startswith("annotation") else (
+            "audio_mono-mic", "_mic.wav")
+        return Archive(path.stat().st_size, md5_file(path), folder, suffix)
+
+    def fetch(self, url: str, destination: Path) -> None:
+        name = url.rsplit("/", 1)[1].split("?")[0]
+        self.fetched.append(name)
+        destination.write_bytes((self.server / name).read_bytes())
+
+    def test_downloads_checks_and_unpacks(self) -> None:
+        archives = {
+            "annotation.zip": self.make_zip("annotation.zip", {"00_Rock1-100-C_comp.jams": b"{}"}),
+            "audio_mono-mic.zip": self.make_zip(
+                "audio_mono-mic.zip", {"00_Rock1-100-C_comp_mic.wav": b"RIFF"}),
+        }
+        download(self.root, archives, self.fetch)
+        self.assertEqual(self.fetched, ["annotation.zip", "audio_mono-mic.zip"])
+        annotation = self.root / "annotation" / "00_Rock1-100-C_comp.jams"
+        audio = self.root / "audio_mono-mic" / "00_Rock1-100-C_comp_mic.wav"
+        self.assertEqual((annotation.read_bytes(), audio.read_bytes()), (b"{}", b"RIFF"))
+
+        download(self.root, archives, self.fetch)  # valid archives are not fetched again
+        self.assertEqual(len(self.fetched), 2)
+
+    def test_wrong_checksum_is_rejected_and_nothing_is_unpacked(self) -> None:
+        good = self.make_zip("annotation.zip", {"00_Rock1-100-C_comp.jams": b"{}"})
+        wrong = Archive(good.size, "0" * 32, good.folder, good.suffix)
+        with self.assertRaisesRegex(ValueError, "MD5"):
+            download(self.root, {"annotation.zip": wrong}, self.fetch)
+        self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_unexpected_member_is_rejected(self) -> None:
+        for member in ("../00_Rock1-100-C_comp.jams", "notes.jams",
+                       "folder/00_Rock1-100-C_comp.jams"):
+            archive = self.make_zip("annotation.zip", {member: b"{}"})
+            with self.subTest(member=member), self.assertRaisesRegex(ValueError, "unexpected"):
+                download(self.root, {"annotation.zip": archive}, self.fetch)
+            self.assertFalse((self.tmp / "00_Rock1-100-C_comp.jams").exists())
+
+
+class ManifestTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name) / "raw"
+        self.root.mkdir()
+        make_fake_guitarset(self.root)
+        self.manifest = Path(self._tmp.name) / "manifest.csv"
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def test_written_manifest_lists_every_file_and_verifies(self) -> None:
+        (self.root / "annotation" / "00_Rock1-100-C#_comp.jams").write_bytes(b"abc")
+        write_manifest(self.root, self.manifest)
+        with self.manifest.open(newline="", encoding="utf-8") as file:
+            rows = list(csv.DictReader(file))
+        self.assertEqual(len(rows), 720)
+        self.assertEqual(
+            rows[0], {"path": "annotation/00_Rock1-100-C#_comp.jams", "bytes": "3",
+                      "md5": "900150983cd24fb0d6963f7d28e17f72"})
+        self.assertNotIn("\r", self.manifest.read_text(encoding="utf-8"))
+        verify_manifest(self.root, self.manifest)
+
+    def test_changed_or_missing_files_are_reported(self) -> None:
+        write_manifest(self.root, self.manifest)
+        (self.root / "audio_mono-mic" / "03_Rock2-104-C#_solo_mic.wav").write_bytes(b"x")
+        changed = "changed audio_mono-mic/03_Rock2-104-C#_solo_mic.wav"
+        with self.assertRaisesRegex(ValueError, changed):
+            verify_manifest(self.root, self.manifest)
+
+        write_manifest(self.root, self.manifest)
+        (self.root / "annotation" / "05_Rock3-129-C#_solo.jams").unlink()
+        (self.root / "audio_mono-mic" / "05_Rock3-129-C#_solo_mic.wav").unlink()
+        (self.root / "annotation" / "05_Rock3-129-C#_comp.jams").unlink()
+        (self.root / "audio_mono-mic" / "05_Rock3-129-C#_comp_mic.wav").unlink()
+        with self.assertRaises(ValueError):  # list_tracks already refuses the incomplete set
+            verify_manifest(self.root, self.manifest)

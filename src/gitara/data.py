@@ -1,4 +1,4 @@
-"""GuitarSet recordings: listing tracks and, later, loading audio and notes.
+"""GuitarSet recordings: download, listing tracks, and loading audio and notes.
 
 ``root`` is the folder into which the two GuitarSet 1.1.0 archives (Zenodo record 3371780)
 are unpacked, normally ``data/raw``::
@@ -12,9 +12,16 @@ A track id looks like ``00_BN1-129-Eb_comp``: player (00-05), style and chord pr
 
 from __future__ import annotations
 
+import argparse
+import csv
+import hashlib
 import json
 import re
+import shutil
+import urllib.request
+import zipfile
 from collections import Counter
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from math import gcd
 from pathlib import Path
@@ -35,6 +42,31 @@ SOURCE_SAMPLE_RATE = 44_100
 SAMPLE_RATE = 22_050
 INT16_SCALE = 32_768
 
+DEFAULT_ROOT = Path("data", "raw")
+DEFAULT_MANIFEST = Path("data", "manifest.csv")
+ZENODO_URL = "https://zenodo.org/records/3371780/files/{name}?download=1"
+
+
+@dataclass(frozen=True)
+class Archive:
+    """A GuitarSet archive on Zenodo and the folder it is unpacked into."""
+
+    size: int
+    md5: str
+    folder: str
+    suffix: str
+
+
+# Size and MD5 from https://zenodo.org/api/records/3371780 (GuitarSet 1.1.0), checked 2026-11-14.
+ARCHIVES = {
+    "annotation.zip": Archive(
+        39_132_574, "b39b78e63d3446f2e54ddb7a54df9b10", ANNOTATION_DIR, ".jams"
+    ),
+    "audio_mono-mic.zip": Archive(
+        656_927_981, "275966d6610ac34999b58426beb119c3", AUDIO_DIR, AUDIO_SUFFIX
+    ),
+}
+
 _TRACK_ID = re.compile(
     r"(?P<player>0[0-5])_(?:BN|Funk|Jazz|Rock|SS)[1-3]-\d{2,3}-[A-G][#b]?_(?P<mode>comp|solo)"
 )
@@ -43,6 +75,7 @@ _TRACK_ID = re.compile(
 @dataclass(frozen=True)
 class Track:
     """One GuitarSet recording and the paths of its two files."""
+
     track_id: str
     player: int
     mode: str
@@ -186,7 +219,7 @@ def load_audio(track: Track, sr: int = SAMPLE_RATE) -> np.ndarray:
     if not path.is_file():
         raise FileNotFoundError(f"missing audio for {track.track_id}: {path}")
 
-    rate, samples = wavfile.read(path) # čita zaglavlje i vraća frekvenciju i polje uzoraka
+    rate, samples = wavfile.read(path)  # čita zaglavlje i vraća frekvenciju i polje uzoraka
     if samples.ndim != 1:
         raise ValueError(f"{track.track_id}: expected mono audio, got shape {samples.shape}")
     if samples.dtype != np.int16:
@@ -194,10 +227,143 @@ def load_audio(track: Track, sr: int = SAMPLE_RATE) -> np.ndarray:
     if rate != SOURCE_SAMPLE_RATE:
         raise ValueError(f"{track.track_id}: expected {SOURCE_SAMPLE_RATE} Hz, got {rate} Hz")
 
-    signal = samples.astype(np.float64) / INT16_SCALE # pretvorba u float i u [-1, 1)
+    signal = samples.astype(np.float64) / INT16_SCALE  # pretvorba u float i u [-1, 1)
     if sr != rate:
-        common = gcd(sr, rate) # kraćenje omjera frekvencija
-        signal = resample_poly(signal, sr // common, rate // common) # filter protiv aliasinga
+        common = gcd(sr, rate)  # kraćenje omjera frekvencija
+        signal = resample_poly(signal, sr // common, rate // common)  # filtar protiv aliasinga
     if not np.all(np.isfinite(signal)):
         raise ValueError(f"{track.track_id}: non-finite audio samples")
     return signal
+
+
+def md5_file(path: str | Path, chunk_size: int = 1 << 20) -> str:
+    """Return the MD5 checksum of a file, read in chunks of ``chunk_size`` bytes."""
+    digest = hashlib.md5()
+    with Path(path).open("rb") as file:
+        while chunk := file.read(chunk_size):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _fetch(url: str, destination: Path) -> None:
+    with urllib.request.urlopen(url) as response, destination.open("wb") as file:
+        shutil.copyfileobj(response, file)
+
+
+def download(
+    root: str | Path = DEFAULT_ROOT,
+    archives: Mapping[str, Archive] = ARCHIVES,
+    fetch: Callable[[str, Path], None] = _fetch,
+) -> None:
+    """Download the GuitarSet archives into ``root``, check them and unpack them.
+
+    An archive that is already present with the right size and MD5 is not downloaded again.
+    A download with the wrong size or MD5 is deleted and raises ``ValueError`` before anything
+    is unpacked. Zenodo does not resume interrupted downloads, so a file is always fetched whole.
+    """
+    root = Path(root)
+    root.mkdir(parents=True, exist_ok=True)
+    for name, archive in archives.items():
+        path = root / name
+        if not _archive_is_valid(path, archive):
+            partial = path.with_name(path.name + ".part")
+            fetch(ZENODO_URL.format(name=name), partial)
+            if not _archive_is_valid(partial, archive):
+                partial.unlink()
+                raise ValueError(f"downloaded {name} does not match the expected size and MD5")
+            partial.replace(path)
+        _unpack(path, root / archive.folder, archive.suffix)
+
+
+def _archive_is_valid(path: Path, archive: Archive) -> bool:
+    if not path.is_file() or path.stat().st_size != archive.size:
+        return False
+    return md5_file(path) == archive.md5
+
+
+def _unpack(path: Path, folder: Path, suffix: str) -> None:
+    """Unpack a flat archive whose members are all named ``<track_id><suffix>``.
+
+    Checking every name first also rules out paths that would escape ``folder``.
+    """
+    with zipfile.ZipFile(path) as archive:
+        members = archive.infolist()
+        for member in members:
+            name = member.filename
+            if not (name.endswith(suffix) and _TRACK_ID.fullmatch(name.removesuffix(suffix))):
+                raise ValueError(f"unexpected member {name!r} in {path.name}")
+        folder.mkdir(parents=True, exist_ok=True)
+        for member in members:
+            target_path = folder / member.filename
+            with archive.open(member) as source, target_path.open("wb") as target:
+                shutil.copyfileobj(source, target)
+
+
+def _dataset_files(root: Path) -> list[Path]:
+    files = []
+    for track in list_tracks(root):
+        files += [track.annotation_path, track.audio_path]
+    return sorted(files, key=lambda path: path.relative_to(root).as_posix())
+
+
+def write_manifest(
+    root: str | Path = DEFAULT_ROOT, manifest: str | Path = DEFAULT_MANIFEST
+) -> None:
+    """Write the size and MD5 of every annotation and audio file under ``root`` to a CSV file.
+
+    Paths are relative to ``root`` and use ``/``, so the manifest is the same on every system.
+    """
+    root = Path(root)
+    with Path(manifest).open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file, lineterminator="\n")
+        writer.writerow(["path", "bytes", "md5"])
+        for path in _dataset_files(root):
+            name = path.relative_to(root).as_posix()
+            writer.writerow([name, path.stat().st_size, md5_file(path)])
+
+
+def verify_manifest(
+    root: str | Path = DEFAULT_ROOT, manifest: str | Path = DEFAULT_MANIFEST
+) -> None:
+    """Check that the files under ``root`` are exactly those listed in ``manifest``.
+
+    Raises ``ValueError`` naming missing, unexpected or changed files.
+    """
+    root = Path(root)
+    with Path(manifest).open(newline="", encoding="utf-8") as file:
+        expected = {row["path"]: (int(row["bytes"]), row["md5"]) for row in csv.DictReader(file)}
+    actual = {path.relative_to(root).as_posix(): path for path in _dataset_files(root)}
+    problems = [f"missing {name}" for name in sorted(expected.keys() - actual.keys())]
+    problems += [f"unexpected {name}" for name in sorted(actual.keys() - expected.keys())]
+    for name in sorted(expected.keys() & actual.keys()):
+        path = actual[name]
+        if (path.stat().st_size, md5_file(path)) != expected[name]:
+            problems.append(f"changed {name}")
+    if problems:
+        raise ValueError(f"{len(problems)} file(s) differ from {manifest}: {problems[:5]}")
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Command line: ``python -m gitara.data download`` or ``python -m gitara.data manifest``."""
+    parser = argparse.ArgumentParser(
+        prog="python -m gitara.data", description=__doc__.splitlines()[0]
+    )
+    parser.add_argument("command", choices=["download", "manifest"])
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    args = parser.parse_args(argv)
+    if args.command == "download":
+        download(args.root)
+        tracks = list_tracks(args.root)
+        if args.manifest.is_file():
+            verify_manifest(args.root, args.manifest)
+            print(f"{len(tracks)} tracks downloaded; all files match {args.manifest}")
+        else:
+            print(f"{len(tracks)} tracks downloaded; no manifest {args.manifest} to check against")
+    else:
+        write_manifest(args.root, args.manifest)
+        print(f"manifest written to {args.manifest}")
+
+
+if __name__ == "__main__":
+    main()
