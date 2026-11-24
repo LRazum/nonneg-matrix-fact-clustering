@@ -13,7 +13,7 @@ import warnings
 import numpy as np
 
 SAMPLE_RATE = 22_050  # uzoraka u sekundi
-N_WIN = 2048  # duljina prozora N 
+N_WIN = 2048  # duljina prozora N
 HOP = 512  # korak h između susjednih okvira
 F_MAX = 5_500.0  # gornja granica frekvencije, binovi iznad toga se odbacuju
 
