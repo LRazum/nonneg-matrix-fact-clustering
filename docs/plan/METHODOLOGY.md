@@ -185,6 +185,41 @@ interpretabilnost i ograničenja raspraviti odvojeno od kvalitete rekonstrukcije
 izdvojeni skup za evaluaciju, parametre predobrade odrediti na dijelu za učenje i razvoj,
 a konačni evaluacijski skup ne koristiti za podešavanje.
 
+### 6.1 Mjere uspjeha na razini nota (A5)
+
+`gitara.evaluate.note_scores` uspoređuje procijenjene note $\mathcal E$ sa stvarnima
+$\mathcal R$. Par $(r, e)$ je dopušten ako se početci razlikuju najviše za $\Delta = 50$ ms, a
+visine najviše za 50 centi, tj. $100\,|p_e - p_r| \le 50$ u MIDI jedinicama. Kraj note se ne
+uspoređuje: ton gitare zamire postupno, pa je kraj nesiguran i u anotacijama. Oktava nije
+pogodak. Udaljenosti se prije usporedbe zaokružuju na 4 decimale, kao u `mir_eval`, kako
+razlika od točno 50 ms ili 50 centi ne bi bila odbijena zbog pogreške zaokruživanja.
+
+Svaka nota smije sudjelovati u najviše jednom paru, pa je $\mathrm{TP}$ veličina najvećeg
+sparivanja u bipartitnom grafu dopuštenih parova; računa ga
+`scipy.sparse.csgraph.maximum_bipartite_matching`. Pohlepno sparivanje s najbližom notom
+nije dovoljno: može potrošiti stvarnu notu koja je jedina mogućnost za neku drugu procjenu, pa
+daje manji $\mathrm{TP}$; po Bergeovu teoremu sparivanje je najveće točno kad nema
+proširujućeg puta. Zatim je $P = \mathrm{TP}/|\mathcal E|$, $R = \mathrm{TP}/|\mathcal R|$ i
+$F_1 = 2PR/(P+R)$.
+Za $\mathcal E = \emptyset$ preciznost nije definirana (vraća se `nan` uz upozorenje), a
+dogovorno je $F_1 = 0$; isto vrijedi za odziv kad je $\mathcal R = \emptyset$. Unison iste
+visine na dvjema žicama (odjeljak 4.1) jedna procjena može pokriti samo jednom, pa ograničava
+odziv za najviše 0,26 %. Test na 100 nasumičnih transkripcija daje iste $P$, $R$ i $F_1$ kao
+`mir_eval.transcription.precision_recall_f1_overlap` uz `offset_ratio=None` (Raffel i sur.,
+ISMIR 2014).
+
+**Zbrajanje preko snimki (prijedlog, čeka potvrdu tima).** `gitara.evaluate.pool_scores` zbraja
+$\mathrm{TP}$, $|\mathcal R|$ i $|\mathcal E|$ preko snimki prije dijeljenja (mikro-prosjek), pa
+svaka nota vrijedi jednako i snimka bez procjena ne čini mjeru nedefiniranom. Mikro-$F_1$ nije
+prosjek $F_1$ po snimkama. Predlažemo:
+
+1. Glavna mjera: mikro-$F_1$ za svakog od šest testnih gitarista u unakrsnoj provjeri;
+   izvještavaju se svih šest vrijednosti, njihov prosjek i raspon. Svaki fold vrijedi
+   jednako, a usporedba metoda čita se po gitaristima.
+2. Sporedna mjera, radi usporedbe s literaturom: srednji $F_1$ po snimkama, posebno za `comp` i
+   `solo`.
+3. Za analizu pogrešaka: $F_1$ i sparene note (`matches`) svake snimke.
+
 ## 7. Pisano i usmeno objašnjenje
 
 Seminar povezuje problem, matricu, funkciju cilja, izvod, kod, eksperimente i zaključke.
