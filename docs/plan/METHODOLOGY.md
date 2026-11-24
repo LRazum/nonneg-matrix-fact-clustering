@@ -147,6 +147,42 @@ na tonove iz `PITCHES` dio je klavirske role (A2). Postupanje s poznatim greška
 s pomaknutim anotacijama, unisoni i duplikati na susjednim žicama) predlaže se u issueu #7 i
 čeka potvrdu tima.
 
+### 4.2 Spektrogram i klavirska rola (A2)
+
+`gitara.spectrogram.stft_magnitude` računa amplitudni spektrogram
+$A_{kt}=\bigl|\sum_{n=0}^{N-1} w[n]\,y[tH+n-N/2]\,e^{-2\pi i kn/N}\bigr|$, gdje je
+$w[n]=\tfrac12-\tfrac12\cos(2\pi n/N)$ periodični Hannov prozor, a signal je s obje strane
+dopunjen s $N/2$ nula. Okvir $t$ centriran je na uzorku $tH$, pa je
+$t_j = jH/f_s$; to je zajedničko sučelje iz [podjele rada](PODJELA.md). Implementacija koristi
+`numpy.fft.rfft`, a test je uspoređuje sa `scipy.signal.stft` (podudaranje do $10^{-9}$).
+
+Početni parametri (konačan izbor u A6) su $f_s = 22\,050$ Hz, $N = 2048$ (92,9 ms),
+$H = 512$ (23,2 ms, preklapanje 75 %) i $f_{\max} = 5{,}5$ kHz, pa je
+$\Delta f = f_s/N \approx 10{,}77$ Hz i $m = 511$ binova. Ispod granice ostaje 66 harmonika
+tona E2 (82,4 Hz), 6 harmonika tona A5 (880 Hz, najviši ton u anotacijama) i 4 harmonika tona E6
+(1318,5 Hz, vrh raspona `PITCHES`). Polustepen ispod oko 181 Hz uži je od jednog bina (kod E2
+iznosi 4,9 Hz), pa se susjedni duboki tonovi razlikuju po višim harmonicima, a ne po osnovnoj
+frekvenciji. Dulji prozor poboljšao bi frekvencijsku, a pogoršao vremensku rezoluciju.
+
+Amplituda se ne normalizira: sinus amplitude $a$ točno na frekvenciji bina daje $a\sum_n w[n]/2$.
+Model $A\approx WH$ pretpostavlja da se amplitude nota zbrajaju. Za kompleksne spektre to vrijedi
+točno, a za module vrijedi samo nejednakost trokuta $|X_1+X_2|\le|X_1|+|X_2|$; jednakost je
+približna kad se spektri ne preklapaju. Kod tonova s zajedničkim harmonicima (npr. oktava) zbroj
+modula može precijeniti stvarni spektar. Test to ilustrira na dvama udaljenim sinusima
+(relativna razlika ispod $10^{-4}$ u unutrašnjim okvirima); u rubnim okvirima nagli početak i
+kraj signala razlijevaju energiju po svim binovima.
+
+`gitara.spectrogram.piano_roll` vraća logičku matricu $R\in\{0,1\}^{K\times n}$ s
+$R_{kt}=1$ ako neka nota visine $\lfloor p+\tfrac12\rfloor=\texttt{PITCHES}[k]$ zadovoljava
+$t_0\le t_j<t_0+d$. Note izvan raspona `PITCHES` (MIDI 40–88, $K = 49$) izostavljaju se uz
+upozorenje s njihovim brojem. Najkraća nota traje 0,029 s, dulje od koraka od 23,2 ms, pa svaka
+nota pokriva barem jedan okvir.
+
+Na svih 360 snimki (2026-11-24): svaka ima 511 binova i 621–1969 okvira (14,4–45,7 s), ukupno
+472 560 okvira (oko 3,05 h zvuka). Spektrogram svih snimki u `float64` zauzeo bi oko 1,9 GB, pa
+se računa po snimci. Najveća vrijednost u $A$ je 368,5. Nijedna nota nije bez okvira i nijedna
+nije izvan raspona 40–88.
+
 ## 5. Provjera implementacije
 
 Na početku implementacije postaviti Python 3.12. Ovisnosti zaključati uz kod koji ih prvi koristi.
