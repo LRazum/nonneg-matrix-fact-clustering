@@ -10,6 +10,7 @@ matching in the bipartite graph of allowed pairs. This follows the onset-only no
 from __future__ import annotations
 
 import warnings
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 import numpy as np
@@ -77,14 +78,54 @@ def note_scores(
         matches = np.zeros((0, 2), dtype=np.int64)
     tp = len(matches)
 
+    precision, recall, f1 = _precision_recall_f1(tp, n_ref, n_est)
+    return NoteScores(precision, recall, f1, tp, n_ref, n_est, matches.astype(np.int64))
+
+
+@dataclass(frozen=True)
+class PooledScores:
+    """Micro-averaged scores of several tracks: counts are summed before dividing."""
+
+    precision: float
+    recall: float
+    f1: float
+    tp: int
+    n_ref: int
+    n_est: int
+    n_tracks: int
+
+
+def pool_scores(scores: Iterable[NoteScores]) -> PooledScores:
+    """Pool per-track scores into ``P = sum TP / sum n_est``, ``R = sum TP / sum n_ref``.
+
+    Every note counts equally, so this is not the mean of the per-track F1 values. The
+    project's main measure is this pooled F1 over the tracks of one test player.
+    """
+    scores = list(scores)
+    if not scores:
+        raise ValueError("pool_scores needs at least one track")
+    tp = sum(score.tp for score in scores)
+    n_ref = sum(score.n_ref for score in scores)
+    n_est = sum(score.n_est for score in scores)
+    precision, recall, f1 = _precision_recall_f1(tp, n_ref, n_est, stacklevel=3)
+    return PooledScores(precision, recall, f1, tp, n_ref, n_est, len(scores))
+
+
+def _precision_recall_f1(
+    tp: int, n_ref: int, n_est: int, stacklevel: int = 3
+) -> tuple[float, float, float]:
     if n_est == 0:
-        warnings.warn("no estimated notes: precision is undefined", UserWarning, stacklevel=2)
+        warnings.warn(
+            "no estimated notes: precision is undefined", UserWarning, stacklevel=stacklevel
+        )
     if n_ref == 0:
-        warnings.warn("no reference notes: recall is undefined", UserWarning, stacklevel=2)
+        warnings.warn(
+            "no reference notes: recall is undefined", UserWarning, stacklevel=stacklevel
+        )
     precision = tp / n_est if n_est else float("nan")
     recall = tp / n_ref if n_ref else float("nan")
     f1 = 2 * precision * recall / (precision + recall) if tp else 0.0
-    return NoteScores(precision, recall, f1, tp, n_ref, n_est, matches.astype(np.int64))
+    return precision, recall, f1
 
 
 def _notes(intervals: np.ndarray, pitches: np.ndarray, label: str):

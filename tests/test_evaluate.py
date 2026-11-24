@@ -6,7 +6,7 @@ from itertools import permutations
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
-from gitara.evaluate import note_scores
+from gitara.evaluate import note_scores, pool_scores
 
 
 def notes(*rows: tuple[float, float]) -> tuple[np.ndarray, np.ndarray]:
@@ -126,6 +126,45 @@ class NoteScoresTests(unittest.TestCase):
                 note_scores(*args)
         with self.assertRaises(ValueError):
             note_scores(*good, *good, onset_tol=-0.01)
+
+
+class PoolScoresTests(unittest.TestCase):
+    def test_counts_are_summed_before_dividing(self) -> None:
+        # Track 1: 2 of 2 reference notes found, no false notes, so F1 = 1.
+        first = note_scores(*notes((0.0, 60.0), (1.0, 62.0)), *notes((0.0, 60.0), (1.0, 62.0)))
+        # Track 2: 1 of 8 reference notes found with 1 estimate, so P = 1, R = 1/8, F1 = 2/9.
+        reference = notes(*[(float(t), 60.0) for t in range(8)])
+        second = note_scores(*reference, *notes((0.0, 60.0)))
+        pooled = pool_scores([first, second])
+        self.assertEqual((pooled.tp, pooled.n_ref, pooled.n_est, pooled.n_tracks), (3, 10, 3, 2))
+        assert_allclose((pooled.precision, pooled.recall, pooled.f1), (1.0, 0.3, 6 / 13))
+        # The pooled F1 is not the mean of the per-track F1 values, (1 + 2/9) / 2 = 11/18.
+        self.assertNotAlmostEqual(pooled.f1, (first.f1 + second.f1) / 2)
+
+    def test_one_track_pools_to_itself(self) -> None:
+        single = note_scores(*notes((0.0, 60.0), (1.0, 62.0)), *notes((0.0, 60.0)))
+        pooled = pool_scores([single])
+        self.assertEqual((pooled.precision, pooled.recall, pooled.f1, pooled.tp),
+                         (single.precision, single.recall, single.f1, single.tp))
+
+    def test_track_without_estimates_does_not_make_the_pool_undefined(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            silent = note_scores(*notes((0.0, 60.0)), *notes())
+        found = note_scores(*notes((0.0, 60.0)), *notes((0.0, 60.0)))
+        pooled = pool_scores([silent, found])
+        assert_allclose((pooled.precision, pooled.recall, pooled.f1), (1.0, 0.5, 2 / 3))
+
+    def test_no_estimates_at_all_and_no_tracks(self) -> None:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            silent = note_scores(*notes((0.0, 60.0)), *notes())
+        with self.assertWarnsRegex(UserWarning, "precision is undefined"):
+            pooled = pool_scores([silent, silent])
+        self.assertTrue(np.isnan(pooled.precision))
+        self.assertEqual(pooled.f1, 0.0)
+        with self.assertRaises(ValueError):
+            pool_scores([])
 
 
 @unittest.skipUnless(importlib.util.find_spec("mir_eval"), "mir_eval is not installed")
