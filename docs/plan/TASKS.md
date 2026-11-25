@@ -13,7 +13,7 @@ Svi su zadaci zajednički: nositelj vodi zadatak, a recenzent iz pregleda u krug
 | T1 | Razviti zajedničko matematičko razumijevanje na temelju Gillisa i dopunske literature | Kontekst T0 | Spremno za početak |
 | T2 | Odabrati konkretan problem i skup podataka s opravdanim NMF prikazom | Kontekst T0 | Odlučeno 2026-11-05: ADR-0003 (GuitarSet, prepisivanje gitare) |
 | T3 | Dogovoriti funkciju cilja, algoritam i plan eksperimenata | T1, T2 | Djelomično: funkcija cilja i algoritam u ADR-0003; plan eksperimenata je zadatak Z2 |
-| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | B1 i jezgra B2 provjereni su lokalno. Slijedi pregled i povezivanje s ostalim nitima |
+| T4 | Implementirati i provjeriti dogovorenu NMF metodu u Pythonu | T3 | B1 i jezgra B2 pregledani su u PR-ovima #41 i #42. Zapis podrijetla B3 provjeren je lokalno i čeka pregled. Slijedi povezivanje s ostalim nitima |
 | T5 | Provesti eksperimente koji omogućuju reprodukciju rezultata i protumačiti ih | T4, priprema podataka | Otvoreno |
 | T6 | Sastaviti pisani seminar i prezentaciju | Od T1 nadalje; konačni rezultati iz T5 | Otvoreno |
 | T7 | Reproducirati konačne rezultate i zajedno uvježbati cjelovito objašnjenje | T5, T6 | Otvoreno |

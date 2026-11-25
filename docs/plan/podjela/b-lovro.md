@@ -145,18 +145,23 @@ koristiti `fit` u C2 i C3.
 
 **Cilj:** `gitara.provenance`, tako da svaki broj u seminaru ima izvor (AGENTS.md, pravilo 6).
 
-1. `start_run(name, config)` vraća zapis s ovim podacima:
-   - identifikator (vrijeme i kratki hash);
-   - naredba i konfiguracija;
-   - git commit i podatak ima li necommitiranih promjena. Ako ih ima, sprema se i diff;
-   - verzija Pythona i paketa, platforma i varijable dretvi;
-   - MD5 manifesta podataka i sjemena.
-2. `finish_run(record, status, results, errors)` sprema zapis u novu mapu unutar
-   results/runs/ (izvan Gita). Nikad ne prepisuje postojeću mapu. Neuspjelo pokretanje također
-   se sprema, sa statusom i porukom pogreške.
+1. `start_run(name, config, *, seeds, manifest=None)` stvara novu mapu unutar results/runs/
+   (izvan Gita) i u nju zapisuje run.json sa statusom `running`. Zapis sadrži:
+   - identifikator (vrijeme, naziv i nasumični sufiks);
+   - naredbu i konfiguraciju;
+   - git commit i podatak ima li necommitiranih promjena. Ako ih ima, sprema se diff koji
+     obuhvaća i neverzionirane datoteke, a `git apply` na tom commitu vraća pokrenuti kod;
+   - verziju Pythona i paketa, platformu i varijable dretvi;
+   - MD5 manifesta podataka (ili izričito `null`) i sjemena.
+
+   Mapa nastaje već na početku: artefakti pokretanja idu u nju, a prekinuto pokretanje ostavlja
+   zapis sa statusom `running`. Postojeća mapa nikad se ne prepisuje.
+2. `finish_run(record, status, results, errors)` zapisuje ishod `ok` ili `failed`. Neuspjelo
+   pokretanje mora imati poruku pogreške. Završeni zapis više se ne mijenja.
 3. Testovi:
-   - u privremenom git repozitoriju zapis prepoznaje necommitirane promjene;
-   - postojeća mapa se ne prepisuje;
+   - u privremenom git repozitoriju zapis prepoznaje necommitirane promjene, a diff primijenjen
+     na čistom klonu vraća iste datoteke;
+   - postojeća mapa se ne prepisuje, a završeni zapis se ne mijenja;
    - neuspjelo pokretanje je zapisano.
 
 **Gotovo kada:** Sara (A4) i Mislav (C4) mogu ga koristiti; Sara je pregledala PR.
