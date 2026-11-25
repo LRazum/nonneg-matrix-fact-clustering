@@ -53,7 +53,7 @@ pyproject.toml                       projekt u Pythonu 3.12
 uv.lock                              zaključane ovisnosti
 src/gitara/                          paket za višekratno upotrebljiv kod
 tests/                               projektni testovi
-experiments/                         planirano: konfiguracije i reproducibilne ulazne točke
+experiments/                         reproducibilne ulazne točke eksperimenata (`python -m experiments.<naziv>`)
 data/                                README i manifest GuitarSeta; sirove datoteke su izvan Gita
 results/                             planirano: označena izvođenja, slike i tablice
 ```
@@ -106,7 +106,8 @@ datotekama koje sami zapišu u privremenu mapu. Izvor, licenca i poznate greške
 u [opisu podataka](../../data/README.md).
 
 `tools/check_project.py` prvo provjerava je li okruženje usklađeno s zaključanim ovisnostima.
-Zatim u tom okruženju provjerava sintaksu pomoću `compileall` i pokreće `unittest`.
+Zatim u tom okruženju provjerava sintaksu u `src`, `tests` i `experiments` pomoću `compileall`
+i pokreće `unittest`.
 Isti pokretač koriste lokalna završna provjera i CI.
 
 Za pokretanja s više procesa postavite `OPENBLAS_NUM_THREADS`, `OMP_NUM_THREADS` i

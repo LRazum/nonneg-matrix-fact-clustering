@@ -22,7 +22,7 @@ def main() -> int:
         return status
 
     commands = [
-        ["python", "-m", "compileall", "-q", "src", "tests"],
+        ["python", "-m", "compileall", "-q", "src", "tests", "experiments"],
         ["python", "-m", "unittest", "discover", "-s", "tests", "-v"],
     ]
     for command in commands:
