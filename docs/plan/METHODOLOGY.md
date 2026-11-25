@@ -124,6 +124,29 @@ Ako je primjena klasteriranje, definirati pretvorbu težina u dodjelu klasterima
 normalizaciju i nejednoznačne dodjele. Prikaz temama ili komponentama i čvrsta particija
 različiti su rezultati. Težine uz dodatne pretpostavke mogu predstavljati vjerojatnosti.
 
+### 4.1 Podaci i učitavanje (A1)
+
+Koristimo GuitarSet 1.1.0 (Zenodo 3371780, CC BY 4.0): 360 snimki šest gitarista, za svaki od
+30 isječaka po jednu snimku pratnje (`comp`) i jednu solo snimku (`solo`). Ulaz je snimka
+mikrofona (mono, 16 bita, 44 100 Hz), a referentne note potječu iz heksafonskog pickupa.
+Izvor, kontrolni zbrojevi, provjere i poznate greške zapisani su u
+[opisu podataka](../../data/README.md); arhive i datoteke provjeravaju se prema MD5 vrijednostima
+i manifestu `data/manifest.csv`.
+
+`gitara.data.load_audio` dijeli uzorke s $2^{15}$, pa su u $[-1,1)$, a zatim ih preuzorkuje na
+22 050 Hz funkcijom `scipy.signal.resample_poly`, čiji niskopropusni filtar uklanja sadržaj iznad
+nove Nyquistove frekvencije od 11 025 Hz prije prorjeđivanja. Harmonici koje koristimo leže
+ispod oko 5,5 kHz. Razina se ne normalizira i vrijednosti se ne odrezuju: generalizirana KL
+divergencija je homogena, $D(cA\,\|\,cV)=c\,D(A\,\|\,V)$, pa bi normalizacija promijenila
+težinu snimki u funkciji cilja. Najveće vrijednosti snimki razlikuju se oko 17 puta; odluka o
+normalizaciji pripada provjeri pretprocesiranja (A4).
+
+`gitara.data.load_notes` vraća note iz anotacija `note_midi` kao intervale $[t_0, t_0+d]$ u
+sekundama, izvorne necijele MIDI visine i žice 0–5, sortirano po početku. Zaokruživanje visina
+na tonove iz `PITCHES` dio je klavirske role (A2). Postupanje s poznatim greškama (dvije snimke
+s pomaknutim anotacijama, unisoni i duplikati na susjednim žicama) predlaže se u issueu #7 i
+čeka potvrdu tima.
+
 ## 5. Provjera implementacije
 
 Na početku implementacije postaviti Python 3.12. Ovisnosti zaključati uz kod koji ih prvi koristi.

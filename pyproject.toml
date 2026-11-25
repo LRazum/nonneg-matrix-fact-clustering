@@ -5,6 +5,7 @@ description = "Automatsko prepisivanje gitare u note pomoću NMF-a"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "numpy>=2.5.4",
+    "scipy>=1.18.1",
 ]
 
 [build-system]

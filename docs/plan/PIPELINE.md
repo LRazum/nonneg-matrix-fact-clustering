@@ -54,7 +54,7 @@ uv.lock                              zaključane ovisnosti
 src/gitara/                          paket za višekratno upotrebljiv kod
 tests/                               projektni testovi
 experiments/                         planirano: konfiguracije i reproducibilne ulazne točke
-data/                                planirano: dokumentirana nabava/priprema podataka
+data/                                README i manifest GuitarSeta; sirove datoteke su izvan Gita
 results/                             planirano: označena izvođenja, slike i tablice
 ```
 
@@ -97,6 +97,13 @@ CI koristi `uv` 0.13.6. `uv sync --locked` postavlja projekt u Pythonu 3.12 i in
 paket `gitara` u projektno okruženje. Jezgra NMF-a u B2 koristi NumPy.
 Dodaj ovisnost uz kod koji je prvi koristi i spremi odgovarajuće izmjene u `pyproject.toml`
 i `uv.lock`. Velika preuzimanja i duga izvođenja pokreću se zasebno.
+
+Modul `gitara.data` (A1) koristi SciPy za čitanje WAV datoteka i preuzorkovanje. GuitarSet
+(oko 0,7 GB) preuzima se zasebno, naredbom `uv run python -m gitara.data download`, u mapu
+data/raw/ izvan Gita. Naredba provjerava MD5 arhiva i svaku raspakiranu datoteku uspoređuje s
+manifestom `data/manifest.csv`. Projektni testovi ne trebaju te podatke: rade s malim
+datotekama koje sami zapišu u privremenu mapu. Izvor, licenca i poznate greške skupa opisani su
+u [opisu podataka](../../data/README.md).
 
 `tools/check_project.py` prvo provjerava je li okruženje usklađeno s zaključanim ovisnostima.
 Zatim u tom okruženju provjerava sintaksu pomoću `compileall` i pokreće `unittest`.

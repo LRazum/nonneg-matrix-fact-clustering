@@ -151,6 +151,7 @@ python3 -m unittest discover -s tools -p 'test_*.py' -v
 python3 tools/check_project.py
 python3 tools/check_before_stop.py
 python3 tools/daily_check.py --dry-run  # treba pristup čitanju GitHuba; ništa ne objavljuje
+uv run python -m gitara.data download  # preuzima GuitarSet (~0,7 GB) i provjerava manifest
 gh issue list --label finding --state open
 ```
 
