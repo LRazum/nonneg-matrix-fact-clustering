@@ -272,6 +272,32 @@ prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a s
    `gitara.nmf.stationarity`, uz gradijente iz `gitara.nmf.gradients` (opis u
    [metodologiji](../METHODOLOGY.md), odjeljak 2.2).
 
+**Stanje (2026-11-25):** proveden je dio koji ne čeka cijele foldove. Zaključci su opažanja,
+a ne teoremi.
+
+- **Bez nadzora:** `20261125T101917Z-stability-638725` (commit `601ebec`), 10 sjemena, `tol`
+  $10^{-4}$.
+  - KL staje nakon 373–593 iteracija, Frobenius nakon 1380–2000.
+  - Završne vrijednosti: KL 3181,3–3286,4, Frobenius 1027,5–1238,7.
+  - Nakon Hungarian sparivanja srednja kosinusna sličnost s prvim sjemenom je 0,83–0,90, a bez
+    sparivanja 0,05–0,15. Sličnost iznad 0,99 ima samo 12–20 (KL) i 9–17 (Frobenius) od 49
+    komponenti, pa sjemena dolaze do različitih faktorizacija, a ne samo do permutacija.
+  - Uravnotežena udaljenost od stacionarnosti na kraju iznosi za KL 39–89 % ($W$) i 38–63 %
+    ($H$) početne vrijednosti, a za Frobenius 8–12 % i 12–18 %. Relativni pad ispod $10^{-4}$
+    dakle ne znači blizinu stacionarne točke. Početna vrijednost je zasićena
+    ($\min(x,g)\le x$), pa omjer nije mjera napretka u strogom smislu.
+- **S maskom:** `20261125T101427Z-template_stability-ef8b7e` (commit `c9816a3`).
+  - Postavke: 12 snimki (po jedna za svaki par gitarista i načina), 6 foldova, 3 sjemena,
+    `tol` $10^{-4}$. Zamjena za C3 daje isti $W$ kao `learn_templates` iz #52.
+  - Kroz sjemena medijan kosinusne sličnosti je 1,0, a najmanja vrijednost 0,9995 (KL) i 0,989
+    (Frobenius).
+  - Kroz foldove medijan je 0,97 (KL) i 0,96 (Frobenius). Najniži su rijetko označeni tonovi,
+    npr. MIDI 71 (0,70).
+- Pokretanje `20261125T100918Z-stability-28d39b` mjerilo je stacionarnost uz
+  $\ell_1$-normalizaciju iz `fit` i ne koristi se (vidi #50).
+- Ostaju cijeli foldovi s `learn_templates`, usporedba vremena transkripcije (korak 1) i slike u
+  `results/` za B7.
+
 **Gotovo kada:** slike konvergencije i stabilnosti imaju identifikatore pokretanja; zaključci su
 u nacrtu poglavlja; sva sjemena su prikazana, ne samo povoljna.
 
