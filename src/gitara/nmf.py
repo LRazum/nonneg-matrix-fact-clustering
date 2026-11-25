@@ -160,6 +160,31 @@ def _total_objective(
     return total
 
 
+def _check_objective(objective: object) -> None:
+    if not isinstance(objective, str) or objective not in ("kl", "frobenius"):
+        raise ValueError("objective must be 'kl' or 'frobenius'")
+
+
+def _factor_inputs(
+    blocks: Sequence[ArrayLike], W: ArrayLike, Hs: Sequence[ArrayLike], w_name: str, h_name: str,
+) -> tuple[tuple[NDArray, ...], NDArray, tuple[NDArray, ...]]:
+    try:
+        inputs, factors = tuple(blocks), tuple(Hs)
+    except TypeError as error:
+        raise ValueError(f"blocks and {h_name} must be sequences of matrices") from error
+    if not inputs or len(inputs) != len(factors):
+        raise ValueError(f"blocks and {h_name} must contain the same positive number of matrices")
+
+    w = _matrix(W, w_name)
+    m, rank = w.shape
+    data_blocks = tuple(_matrix(block, f"blocks[{i}]") for i, block in enumerate(inputs))
+    h_blocks = tuple(_matrix(H, f"{h_name}[{i}]") for i, H in enumerate(factors))
+    for i, (A, H) in enumerate(zip(data_blocks, h_blocks, strict=True)):
+        if A.shape[0] != m or H.shape != (rank, A.shape[1]):
+            raise ValueError(f"Incompatible {w_name}, blocks[{i}] and {h_name}[{i}] shapes")
+    return data_blocks, w, h_blocks
+
+
 def _nonnegative_option(value: float, name: str) -> float:
     if isinstance(value, Real) and not isinstance(value, bool):
         try:
@@ -202,8 +227,7 @@ def fit(
     not satisfy that check. max_iter=0 evaluates the initial factors only.
     Invalid inputs raise ValueError and numerical failures raise FloatingPointError.
     """
-    if not isinstance(objective, str) or objective not in ("kl", "frobenius"):
-        raise ValueError("objective must be 'kl' or 'frobenius'")
+    _check_objective(objective)
     if isinstance(max_iter, (bool, np.bool_)) or not isinstance(max_iter, Integral) or max_iter < 0:
         raise ValueError("max_iter must be a nonnegative integer")
     tol = _nonnegative_option(tol, "tol")
@@ -211,20 +235,8 @@ def fit(
     if not all(isinstance(flag, (bool, np.bool_)) for flag in (update_W, update_H, normalize)):
         raise ValueError("update_W, update_H and normalize must be boolean")
 
-    try:
-        inputs, initial_h = tuple(blocks), tuple(H0s)
-    except TypeError as error:
-        raise ValueError("blocks and H0s must be sequences of matrices") from error
-    if not inputs or len(inputs) != len(initial_h):
-        raise ValueError("blocks and H0s must contain the same positive number of matrices")
-
-    initial_w = _matrix(W0, "W0")
-    m, rank = initial_w.shape
-    data_blocks = tuple(_matrix(block, f"blocks[{i}]") for i, block in enumerate(inputs))
-    h_blocks = tuple(_matrix(H, f"H0s[{i}]") for i, H in enumerate(initial_h))
-    for i, (A, H) in enumerate(zip(data_blocks, h_blocks, strict=True)):
-        if A.shape[0] != m or H.shape != (rank, A.shape[1]):
-            raise ValueError(f"Incompatible W0, blocks[{i}] and H0s[{i}] shapes")
+    data_blocks, initial_w, h_blocks = _factor_inputs(blocks, W0, H0s, "W0", "H0s")
+    rank = initial_w.shape[1]
 
     with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
         W = np.array(initial_w, dtype=np.float64, copy=True)
@@ -254,3 +266,69 @@ def fit(
         used |= np.any(H > 0, axis=1)
     inactive = tuple(np.flatnonzero(~used | ~np.any(W > 0, axis=0)).tolist())
     return NMFResult(W, Hs, tuple(history), len(history) - 1, stop_reason, inactive)
+
+
+def gradients(
+    blocks: Sequence[ArrayLike],
+    W: ArrayLike,
+    Hs: Sequence[ArrayLike],
+    *,
+    objective: Objective = "kl",
+) -> tuple[Matrix, tuple[Matrix, ...]]:
+    """Return the gradients of the total objective with respect to W and to each H_b.
+
+    With R_b = 1 - A_b / (W H_b) for KL (zero ratio where A_b = 0) and R_b = W H_b - A_b
+    for the Frobenius objective (1/2)||A_b - W H_b||_F^2, the gradient is W^T R_b for H_b
+    and the sum over blocks of R_b H_b^T for W. Positive data at zero reconstruction is
+    outside the KL domain and raises FloatingPointError.
+    """
+    _check_objective(objective)
+    data_blocks, w, h_blocks = _factor_inputs(blocks, W, Hs, "W", "Hs")
+    with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
+        W = np.asarray(w, dtype=np.float64)
+        grad_w = np.zeros_like(W)
+        grad_hs = []
+        for block, h in zip(data_blocks, h_blocks, strict=True):
+            A, H = np.asarray(block, dtype=np.float64), np.asarray(h, dtype=np.float64)
+            V = W @ H
+            residual = 1 - _kl_ratio(A, V, 0.0) if objective == "kl" else V - A
+            grad_hs.append(W.T @ residual)
+            grad_w += residual @ H.T
+    return grad_w, tuple(grad_hs)
+
+
+def stationarity(
+    blocks: Sequence[ArrayLike],
+    W: ArrayLike,
+    Hs: Sequence[ArrayLike],
+    *,
+    objective: Objective = "kl",
+    balance: bool = True,
+) -> tuple[float, float]:
+    """Return the Frobenius norms of min(W, grad_W) and of min(H_b, grad_H_b) over all blocks.
+
+    For x >= 0, min(x, g) = 0 exactly when g >= 0 and x g = 0, so both values are zero
+    exactly at a first-order (KKT) point over the nonnegative orthant. The values change
+    under the rescaling W D, D^{-1} H that keeps WH. With ``balance`` they are taken at the
+    balanced representative, in which column k of W and row k of H (over all blocks) have
+    equal l2 norms; it is the same for every positive diagonal D, so the result does not
+    depend on the scaling. Components with a zero column or row are left as they are.
+    """
+    _check_objective(objective)
+    data_blocks, w, h_blocks = _factor_inputs(blocks, W, Hs, "W", "Hs")
+    W = np.asarray(w, dtype=np.float64)
+    Hs = [np.asarray(H, dtype=np.float64) for H in h_blocks]
+    if balance:
+        w_norms = np.linalg.norm(W, axis=0)
+        h_norms = np.sqrt(sum(np.linalg.norm(H, axis=1) ** 2 for H in Hs))
+        scales = np.ones_like(w_norms)
+        both = (w_norms > 0) & (h_norms > 0)
+        scales[both] = np.sqrt(h_norms[both] / w_norms[both])
+        W = W * scales
+        Hs = [H / scales[:, None] for H in Hs]
+    grad_w, grad_hs = gradients(data_blocks, W, Hs, objective=objective)
+    w_residual = np.linalg.norm(np.minimum(W, grad_w))
+    h_residual = np.sqrt(sum(
+        np.linalg.norm(np.minimum(H, grad)) ** 2 for H, grad in zip(Hs, grad_hs, strict=True)
+    ))
+    return float(w_residual), float(h_residual)
