@@ -5,17 +5,22 @@ Run from the repository root, after ``uv run python -m gitara.data download``::
     uv run python -m experiments.convergence
 
 Only the training players of one leave-one-player-out fold are read; the held-out player
-is never loaded. Two settings are studied:
+is never loaded. Three settings are studied:
 
 * ``unsupervised``: one recording, random positive ``W0`` and ``H0`` of rank ``--rank``;
 * ``masked``: template learning on a seeded sample of training recordings. ``H0`` is the
   piano-roll mask with an always-active background row and ``W0`` is drawn from
   ``uniform(0.5, 1.5)``, as planned for ``gitara.templates`` (C3). A pitch without any
-  labelled frame gets a zero column in ``W0``.
+  labelled frame gets a zero column in ``W0``;
+* ``transcription``: the recording of the unsupervised setting, which is not in the masked
+  sample, with ``W`` fixed to the templates learned with the same objective and seed (and
+  the first eps) and ``H0`` equal to one for every template with a nonzero column, as planned
+  for ``gitara.transcribe`` (C2). Only ``H`` is updated.
 
-Every (objective, eps, seed) combination runs ``fit`` with ``tol=0`` for ``--max-iter``
-(``--masked-max-iter``) iterations. The iterates do not depend on ``tol``, so one objective history shows where
-``fit`` would stop for every tolerance in ``TOLS``. A failed combination, e.g. a zero
+Every (objective, eps, seed) combination runs ``fit`` with ``tol=0`` for ``--max-iter``,
+``--masked-max-iter`` or ``--transcription-max-iter`` iterations. The iterates do not depend
+on ``tol``, so one objective history shows where ``fit`` would stop for every tolerance in
+``TOLS``. A failed combination, e.g. a zero
 denominator with ``eps=0``, is recorded and reported, not skipped. The peak memory that
 ``fit`` allocates on top of the data is measured in a separate short run with
 ``tracemalloc``, so that tracing does not distort the timing.
@@ -51,7 +56,7 @@ TOLS = (1e-3, 1e-4, 1e-5)
 SHIFTED_TRACKS = ("04_BN3-154-E_comp", "04_Jazz1-200-B_comp")
 MEMORY_ITERATIONS = 2
 PUBLISHED = Path("results", "convergence")
-FIGURES = ("unsupervised.png", "masked.png")
+FIGURES = ("unsupervised.png", "masked.png", "transcription.png")
 
 
 def max_relative_increase(history: Sequence[float]) -> float:
@@ -98,12 +103,17 @@ def masked_start(
 
 def run_setting(
     blocks: Sequence[NDArray], W0: NDArray, H0s: Sequence[NDArray], *,
-    objective: str, eps: float, max_iter: int,
+    objective: str, eps: float, max_iter: int, update_W: bool = True,
 ) -> dict[str, Any]:
-    """Run ``fit`` with ``tol=0`` and summarize its history; a numerical failure is returned."""
+    """Run ``fit`` with ``tol=0`` and summarize its history; a numerical failure is returned.
+
+    The summary keeps the final ``W`` and the objective history; both are left out of
+    ``run.json``.
+    """
     start = time.perf_counter()
     try:
-        result = fit(blocks, W0, H0s, objective=objective, eps=eps, max_iter=max_iter, tol=0)
+        result = fit(blocks, W0, H0s, objective=objective, eps=eps, max_iter=max_iter, tol=0,
+                     update_W=update_W)
     except FloatingPointError as error:
         return {"status": "failed", "error": repr(error), "seconds": time.perf_counter() - start}
     seconds = time.perf_counter() - start
@@ -134,14 +144,17 @@ def run_setting(
         },
         "inactive": list(result.inactive),
         "history": list(history),
+        "W": result.W,
     }
 
 
-def peak_memory(blocks: Sequence[NDArray], W0: NDArray, H0s: Sequence[NDArray], objective: str) -> int:
+def peak_memory(
+    blocks: Sequence[NDArray], W0: NDArray, H0s: Sequence[NDArray], objective: str, update_W: bool = True,
+) -> int:
     """Peak bytes allocated by a short ``fit`` run, excluding the data already in memory."""
     tracemalloc.start()
     try:
-        fit(blocks, W0, H0s, objective=objective, max_iter=MEMORY_ITERATIONS, tol=0)
+        fit(blocks, W0, H0s, objective=objective, max_iter=MEMORY_ITERATIONS, tol=0, update_W=update_W)
         return tracemalloc.get_traced_memory()[1]
     finally:
         tracemalloc.stop()
@@ -172,19 +185,35 @@ def training_sample(
 
 
 def study(
-    blocks: Sequence[NDArray], starts: dict[int, tuple[NDArray, list[NDArray]]], max_iter: int,
+    blocks: Sequence[NDArray], starts: dict[tuple[str, int], tuple[NDArray, list[NDArray]]],
+    seeds: Sequence[int], max_iter: int, update_W: bool = True,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    """Run every (objective, eps, seed) combination from the given starting factors."""
+    """Run every (objective, eps, seed) combination from the starts keyed by (objective, seed).
+
+    A missing start, e.g. templates whose learning failed, is recorded as a failed run.
+    """
     runs = []
     for objective in OBJECTIVES:
         for eps in EPS_VALUES:
-            for seed, (W0, H0s) in starts.items():
-                summary = run_setting(blocks, W0, H0s, objective=objective, eps=eps, max_iter=max_iter)
+            for seed in seeds:
+                if (objective, seed) in starts:
+                    W0, H0s = starts[objective, seed]
+                    summary = run_setting(blocks, W0, H0s, objective=objective, eps=eps,
+                                          max_iter=max_iter, update_W=update_W)
+                else:
+                    summary = {"status": "failed", "error": "no starting factors"}
                 runs.append({"objective": objective, "eps": eps, "seed": seed, **summary})
                 print(_describe(runs[-1]), flush=True)
-    W0, H0s = next(iter(starts.values()))
-    memory = {objective: peak_memory(blocks, W0, H0s, objective) for objective in OBJECTIVES}
+    memory = {
+        objective: peak_memory(blocks, *starts[objective, seed], objective, update_W)
+        for objective in OBJECTIVES for seed in seeds[:1] if (objective, seed) in starts
+    }
     return runs, memory
+
+
+def transcription_start(W: NDArray, n: int) -> tuple[NDArray, list[NDArray]]:
+    """``(W, [H0])`` with ``H0`` one for every nonzero column of ``W`` and zero otherwise."""
+    return W, [np.ones((W.shape[1], n)) * (W.sum(axis=0) > 0)[:, None]]
 
 
 def _describe(run: dict[str, Any]) -> str:
@@ -272,6 +301,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], help="initializations")
     parser.add_argument("--max-iter", type=int, default=2000, help="unsupervised iterations")
     parser.add_argument("--masked-max-iter", type=int, default=200, help="masked iterations")
+    parser.add_argument("--transcription-max-iter", type=int, default=1000,
+                        help="transcription iterations")
     parser.add_argument("--publish", type=Path, metavar="RUN_DIR",
                         help=f"copy a finished run to {PUBLISHED} instead of running")
     return parser
@@ -290,6 +321,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         list(tracks.values()), args.held_out_player, args.tracks_per_group,
         np.random.default_rng(args.selection_seed),
     )
+    if unsupervised in sample:
+        raise ValueError(f"{unsupervised.track_id} is in the masked sample, so it is not new for transcription")
     config = {
         "data": "GuitarSet 1.1.0, audio_mono-mic, data/README.md",
         "preprocessing": {
@@ -315,6 +348,12 @@ def main(argv: Sequence[str] | None = None) -> None:
             "tracks": [track.track_id for track in sample],
             "init": "W0 uniform(0.5, 1.5) on labelled pitches and background, H0 = mask",
             "background": True,
+        },
+        "transcription": {
+            "track": unsupervised.track_id,
+            "max_iter": args.transcription_max_iter,
+            "W": "fixed: masked templates with the same objective and seed, eps = first eps",
+            "init": "H0 = 1 for templates with a nonzero column, 0 otherwise",
         },
         "init_seeds": args.seeds,
     }
@@ -347,17 +386,21 @@ def _experiment(
     for seed in args.seeds:
         rng = np.random.default_rng(seed)
         starts[seed] = (rng.uniform(0.5, 1.5, (m, args.rank)), [rng.uniform(0.5, 1.5, (args.rank, n))])
+    starts = {(objective, seed): start for seed, start in starts.items() for objective in OBJECTIVES}
     print(f"unsupervised: {unsupervised.track_id}, A {m}x{n}, rank {args.rank}", flush=True)
-    runs, memory = study([A], starts, args.max_iter)
+    runs, memory = study([A], starts, args.seeds, args.max_iter)
     results["unsupervised"] = {"shape": [m, n], "data_bytes": A.nbytes, "peak_fit_bytes": memory}
 
     pairs = [spectrogram_and_roll(track) for track in sample]
     blocks, rolls = [A for A, _ in pairs], [roll for _, roll in pairs]
     n_frames = sum(block.shape[1] for block in blocks)
-    starts = {seed: masked_start(rolls, m, np.random.default_rng(seed)) for seed in args.seeds}
+    starts = {
+        (objective, seed): masked_start(rolls, m, np.random.default_rng(seed))
+        for seed in args.seeds for objective in OBJECTIVES
+    }
     labelled = np.any([roll.any(axis=1) for roll in rolls], axis=0)
     print(f"masked: {len(blocks)} tracks, {n_frames} frames, {int(labelled.sum())} labelled pitches", flush=True)
-    masked_runs, masked_memory = study(blocks, starts, args.masked_max_iter)
+    masked_runs, masked_memory = study(blocks, starts, args.seeds, args.masked_max_iter)
     results["masked"] = {
         "shape": [m, n_frames],
         "data_bytes": sum(block.nbytes for block in blocks),
@@ -365,15 +408,31 @@ def _experiment(
         "peak_fit_bytes": masked_memory,
     }
 
-    for name, setting_runs in (("unsupervised", runs), ("masked", masked_runs)):
+    starts = {
+        (run["objective"], run["seed"]): transcription_start(run["W"], n)
+        for run in masked_runs if run["status"] == "ok" and run["eps"] == EPS_VALUES[0]
+    }
+    print(f"transcription: {unsupervised.track_id} with fixed masked templates", flush=True)
+    transcription_runs, transcription_memory = study(
+        [A], starts, args.seeds, args.transcription_max_iter, update_W=False,
+    )
+    results["transcription"] = {"shape": [m, n], "data_bytes": A.nbytes, "peak_fit_bytes": transcription_memory}
+
+    titles = {
+        "unsupervised": f"Bez nadzora: {unsupervised.track_id}, r = {args.rank}",
+        "masked": f"S maskom: {len(blocks)} snimki gitarista za učenje",
+        "transcription": f"Transkripcija: {unsupervised.track_id}, fiksni predlošci iz učenja s maskom",
+    }
+    settings = (("unsupervised", runs), ("masked", masked_runs), ("transcription", transcription_runs))
+    for name, setting_runs in settings:
         curves[name] = [
             {key: run[key] for key in ("objective", "eps", "seed", "history")}
             for run in setting_runs if run["status"] == "ok"
         ]
-        results[name]["runs"] = [{k: v for k, v in run.items() if k != "history"} for run in setting_runs]
-        title = (f"Bez nadzora: {unsupervised.track_id}, r = {args.rank}" if name == "unsupervised"
-                 else f"S maskom: {len(blocks)} snimki gitarista za učenje")
-        plot_setting(setting_runs, title, run_dir / f"{name}.png")
+        results[name]["runs"] = [
+            {k: v for k, v in run.items() if k not in ("history", "W")} for run in setting_runs
+        ]
+        plot_setting(setting_runs, titles[name], run_dir / f"{name}.png")
     return results, curves
 
 
