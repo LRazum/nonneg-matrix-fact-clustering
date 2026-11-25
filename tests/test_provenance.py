@@ -11,8 +11,8 @@ from gitara.provenance import finish_run, start_run
 
 def git(cwd: Path, *args: str) -> str:
     return subprocess.run(
-        ["git", "-c", "user.name=Test", "-c", "user.email=test@example.com",
-         "-c", "commit.gpgsign=false", *args],
+        ["git", "-c", "core.autocrlf=false", "-c", "user.name=Test",
+         "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", *args],
         cwd=cwd, check=True, capture_output=True, text=True,
     ).stdout
 
