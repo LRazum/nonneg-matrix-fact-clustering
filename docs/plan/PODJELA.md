@@ -60,7 +60,8 @@ tests/                 test_<modul>.py uz svaki modul
 experiments/
   data_checks.py       A  provjera pretprocesiranja
   stft_sensitivity.py  A  osjetljivost na parametre STFT-a
-  convergence.py       B  konvergencija i stabilnost
+  convergence.py       B  konvergencija (B5)
+  stability.py         B  nejedinstvenost i udaljenost od stacionarnosti (B6)
   cv.py                C  unakrsna provjera po gitaristu za sve metode
   errors.py            C  analiza pogrešaka
 data/                  README i manifest kontrolnih zbrojeva; sirovi podaci izvan Gita

@@ -248,7 +248,9 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
    - kosinusna sličnost istog tona kroz sjemena i kroz foldove (maska fiksira permutaciju);
    - kod NMF-a bez nadzora na jednoj snimki pokaži nejedinstvenost: komponente se uparuju
      tek nakon permutacije (Hungarian) i skaliranja. To je eksperimentalna ilustracija
-     Mislavove matematike.
+     Mislavove matematike. Taj dio i udaljenost od stacionarnosti (korak 3) ne čekaju C3:
+     `python -m experiments.stability` sparuje stupce od $W$ iz više sjemena s prvim
+     sjemenom i mjeri `stationarity` na početku i na kraju.
 3. **Udaljenost od stacionarnosti** na kraju: npr. $\|\min(H,\nabla_Hf)\|$. Usporedi s onim
    što je dokazano. Nerast je teorem, a mala udaljenost na kraju je opažanje. Mjera je
    `gitara.nmf.stationarity`, uz gradijente iz `gitara.nmf.gradients` (opis u
