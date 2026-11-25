@@ -270,8 +270,8 @@ def _parser() -> argparse.ArgumentParser:
                         help="masked: tracks per training (player, mode)")
     parser.add_argument("--selection-seed", type=int, default=0, help="masked: track sample")
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], help="initializations")
-    parser.add_argument("--max-iter", type=int, default=1000, help="unsupervised iterations")
-    parser.add_argument("--masked-max-iter", type=int, default=500, help="masked iterations")
+    parser.add_argument("--max-iter", type=int, default=2000, help="unsupervised iterations")
+    parser.add_argument("--masked-max-iter", type=int, default=200, help="masked iterations")
     parser.add_argument("--publish", type=Path, metavar="RUN_DIR",
                         help=f"copy a finished run to {PUBLISHED} instead of running")
     return parser
