@@ -237,6 +237,19 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
 4. Utjecaj ε: vrijednosti $10^{-12}$ i $10^{-9}$ te bez ε gdje je to sigurno.
 5. `python -m experiments.convergence` sa zapisom podrijetla; slike i JSON u `results/`.
 
+**Stanje (2026-11-25):** provedeno pokretanje `20261125T092016Z-convergence-6f2ff9`. Rezultati i
+prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a slike u mapi
+[results/convergence/](../../../results/convergence/README.md). Odstupanja od plana:
+
+1. Dodana je i transkripcija (fiksni $W$, ažurira se samo $H$), jer korak 3 traži prijedlog i za
+   nju.
+2. Učenje s maskom koristi zamjenu za C3 prema njegovom planu: uzorak od 20 snimki gitarista
+   0–4, a ne cijeli fold. Gitarist 5 nije učitan.
+3. Dvije snimke s pomaknutim anotacijama izostavljene su vlastitom konstantom dok `gitara.data`
+   nema `EXCLUDED_TRACKS` (prijedlog u #7).
+4. Dva ranija pokretanja istog dana prekinuta su i zapisana kao neuspjela, s razlogom: prvo zbog
+   nepotrebno dugog učenja s maskom i opterećenog računala, drugo zbog dodavanja transkripcije.
+
 ## B6: konvergencija i stabilnost (#28)
 
 1. **KL prema Frobeniusu:**
