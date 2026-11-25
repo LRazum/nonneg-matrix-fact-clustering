@@ -5,15 +5,19 @@ Run from the repository root, after ``uv run python -m gitara.data download``::
     uv run python -m experiments.stability
 
 NMF of one training recording is run from several random starts for each objective. The
-columns of every ``W`` are matched to those of the first start by the Hungarian method on
+columns of every ``W`` are matched to those of every other start by the Hungarian method on
 their cosine similarity (``scipy.optimize.linear_sum_assignment``). A matched similarity of 1
-for every column would mean the same factorization up to permutation and scaling; lower
-values, together with different final objective values, show that the starts reach different
-factorizations of the same data.
+for every column would mean the same factorization up to permutation and scaling. The data
+are not exactly of the chosen rank, so lower values, together with different final objective
+values, show that the starts reach different approximate factorizations of the same matrix.
+The figure uses the first start as an arbitrary reference; ``pairwise`` in the record
+summarizes all pairs, so an unusual first start would show there.
 
 The distance to stationarity (``gitara.nmf.stationarity``) is measured at the start and at the
-end of every run, in the balanced representative, so it does not depend on the scaling.
-Non-increase of the objective is a theorem; a small final distance is only an observation.
+end of every run, in the balanced representative, so it does not depend on the scaling. It is
+reported as is and divided by the Frobenius norm of the data. Non-increase of the objective is
+a theorem; a small final distance is only an observation. Running with ``--tol 0`` and a fixed
+``--max-iter`` is the control for differences caused by early stopping.
 The template stability across seeds and folds with the mask needs ``gitara.templates`` (C3)
 and is not part of this script.
 
@@ -40,6 +44,9 @@ from gitara.provenance import finish_run, start_run
 from gitara.spectrogram import F_MAX, HOP, N_WIN, PITCHES, SAMPLE_RATE
 
 OBJECTIVES = ("kl", "frobenius")
+# Options passed to fit and written to the record from the same constants.
+EPS = 1e-12
+NORMALIZE = True
 
 
 def cosine_matrix(X: NDArray, Y: NDArray) -> NDArray[np.float64]:
@@ -68,11 +75,13 @@ def run_starts(
 ) -> list[dict[str, Any]]:
     """Fit from each seed and record the factors, objective and stationarity at start and end."""
     m, n = A.shape
+    scale = float(np.linalg.norm(A))
     runs = []
     for seed in seeds:
         rng = np.random.default_rng(seed)
         W0, H0 = rng.uniform(0.5, 1.5, (m, rank)), rng.uniform(0.5, 1.5, (rank, n))
-        result = fit([A], W0, [H0], objective=objective, max_iter=max_iter, tol=tol)
+        result = fit([A], W0, [H0], objective=objective, max_iter=max_iter, tol=tol, eps=EPS,
+                     normalize=NORMALIZE)
         start = stationarity([A], W0, [H0], objective=objective)
         end = stationarity([A], result.W, result.Hs, objective=objective)
         runs.append({
@@ -80,6 +89,7 @@ def run_starts(
             "n_iter": result.n_iter, "stop_reason": result.stop_reason,
             "initial": result.objective[0], "final": result.objective[-1],
             "stationarity_start": list(start), "stationarity_end": list(end),
+            "stationarity_end_relative": [value / scale for value in end],
         })
     return runs
 
@@ -100,6 +110,22 @@ def compare_to_first(runs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
             "matched_above_0.99": int(np.count_nonzero(matched > 0.99)),
         })
     return rows
+
+
+def pairwise(runs: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    """Matched mean cosine similarity over every pair of runs, and per seed against the others."""
+    n = len(runs)
+    means = np.full((n, n), np.nan)
+    for i in range(n):
+        for j in range(i + 1, n):
+            _, matched = match_components(runs[i]["W"], runs[j]["W"])
+            means[i, j] = means[j, i] = matched.mean()
+    pairs = means[np.triu_indices(n, 1)]
+    return {
+        "pairs": int(pairs.size),
+        "matched_mean": {"mean": float(pairs.mean()), "min": float(pairs.min()), "max": float(pairs.max())},
+        "per_seed_mean": {str(run["seed"]): float(np.nanmean(means[i])) for i, run in enumerate(runs)},
+    }
 
 
 def plot(comparisons: dict[str, list[dict[str, Any]]], title: str, path: Path) -> None:
@@ -199,21 +225,22 @@ def main(argv: Sequence[str] | None = None) -> None:
         "objectives": list(OBJECTIVES),
         "max_iter": args.max_iter,
         "tol": args.tol,
-        "eps": 1e-12,
-        "normalize": True,
-        "matching": "Hungarian on cosine similarity of W columns, reference = first seed",
+        "eps": EPS,
+        "normalize": NORMALIZE,
+        "matching": "Hungarian on cosine similarity of W columns; figure vs first seed, record also all pairs",
     }
     record = start_run("stability", config, seeds=args.seeds, manifest=DEFAULT_MANIFEST)
     run_dir = Path(record["dir"])
     try:
         A, roll = spectrogram_and_roll(track)
-        results, comparisons = {}, {}
+        results, comparisons = {"data_norm": float(np.linalg.norm(A))}, {}
         for objective in OBJECTIVES:
             runs = run_starts(A, args.rank, args.seeds, objective, args.max_iter, args.tol)
             comparisons[objective] = compare_to_first(runs)
             results[objective] = {
                 "runs": [{key: value for key, value in run.items() if key not in ("W", "H")} for run in runs],
                 "comparisons": comparisons[objective],
+                "pairwise": pairwise(runs),
             }
             if objective == "kl":
                 plot_activations(runs[0]["W"], runs[0]["H"], roll,

@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
-from experiments.stability import compare_to_first, cosine_matrix, match_components, run_starts
+from experiments.stability import compare_to_first, cosine_matrix, match_components, pairwise, run_starts
 
 
 class MatchingTests(unittest.TestCase):
@@ -34,6 +34,17 @@ class MatchingTests(unittest.TestCase):
         self.assertEqual(row["matched_above_0.99"], 3)
         self.assertLess(row["same_index_mean"], 0.5)
 
+    def test_pairwise_covers_every_pair_and_flags_an_unusual_seed(self) -> None:
+        W = np.eye(4) + 0.1
+        other = np.random.default_rng(6).random((4, 4))
+        runs = [{"seed": 0, "W": other}, {"seed": 1, "W": W}, {"seed": 2, "W": W[:, [3, 1, 0, 2]] * 2}]
+        summary = pairwise(runs)
+        self.assertEqual(summary["pairs"], 3)
+        self.assertAlmostEqual(summary["matched_mean"]["max"], 1)
+        # Seeds 1 and 2 agree; the first seed is the odd one out and has the lowest mean.
+        per_seed = summary["per_seed_mean"]
+        self.assertLess(per_seed["0"], min(per_seed["1"], per_seed["2"]))
+
 
 class FactorTests(unittest.TestCase):
     def test_run_starts_records_each_seed(self) -> None:
@@ -45,6 +56,8 @@ class FactorTests(unittest.TestCase):
             self.assertLessEqual(run["final"], run["initial"])
             self.assertEqual(run["W"].shape, (6, 2))
             self.assertEqual(len(run["stationarity_start"]), 2)
+            assert_allclose(run["stationarity_end_relative"],
+                            np.array(run["stationarity_end"]) / np.linalg.norm(A))
 
 
 if __name__ == "__main__":

@@ -14,7 +14,10 @@ test player g learns from the sampled recordings of the other players, as in the
 leave-one-player-out split; this script only describes stability and selects nothing. The
 mask fixes the order of the components, so template k is compared directly between runs: the
 mean and smallest pairwise cosine similarity across seeds within each fold, and across folds
-for each seed. A pitch unlabelled in some of the compared training sets has no value.
+for each seed. A pitch unlabelled in some of the compared training sets has no value. The
+sample is drawn from all six players, because every fold leaves out a different one; the
+recordings of a test player therefore appear in the training sets of the other folds. Nothing
+from this script is used to choose parameters.
 
 Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json``,
 ``templates.npz`` with every learned ``W`` and ``template_stability.png``.
@@ -38,6 +41,10 @@ from gitara.nmf import fit
 from gitara.provenance import finish_run, start_run
 from gitara.spectrogram import F_MAX, HOP, N_WIN, PITCHES, SAMPLE_RATE
 
+# Options passed to fit and written to the record from the same constants.
+EPS = 1e-12
+NORMALIZE = True
+
 OBJECTIVES = ("kl", "frobenius")
 
 
@@ -51,7 +58,8 @@ def learn_masked(
     A pitch without labelled frames has a zero column.
     """
     W0, H0s = masked_start(rolls, blocks[0].shape[0], np.random.default_rng(seed))
-    result = fit(blocks, W0, H0s, objective=objective, max_iter=max_iter, tol=tol)
+    result = fit(blocks, W0, H0s, objective=objective, max_iter=max_iter, tol=tol, eps=EPS,
+                 normalize=NORMALIZE)
     return result.W, result.n_iter
 
 
@@ -144,8 +152,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         "objectives": list(OBJECTIVES),
         "max_iter": args.max_iter,
         "tol": args.tol,
-        "eps": 1e-12,
-        "normalize": True,
+        "eps": EPS,
+        "normalize": NORMALIZE,
         "folds": args.folds,
         "tracks_per_group": args.tracks_per_group,
         "selection_seed": args.selection_seed,
