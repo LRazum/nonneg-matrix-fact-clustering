@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
-from gitara.nmf import fit, frobenius, kl_divergence
+from gitara.nmf import fit, frobenius, gradients, kl_divergence, stationarity
 
 
 class ObjectiveTests(unittest.TestCase):
@@ -201,6 +201,98 @@ class FitTests(unittest.TestCase):
             fit([[[1]]], [[0]], [[[0]]])
         with self.assertRaises(FloatingPointError):
             fit([[[1]]], [[1e300]], [[[1e300]]], objective="frobenius")
+
+
+
+def total_objective(objective: str, blocks, W, Hs) -> float:
+    loss = kl_divergence if objective == "kl" else frobenius
+    return sum(loss(A, W @ H) for A, H in zip(blocks, Hs, strict=True))
+
+
+def central_differences(f, X: np.ndarray, step: float = 1e-6) -> np.ndarray:
+    G = np.zeros_like(X)
+    for index in np.ndindex(X.shape):
+        E = np.zeros_like(X)
+        E[index] = step
+        G[index] = (f(X + E) - f(X - E)) / (2 * step)
+    return G
+
+
+class GradientTests(unittest.TestCase):
+    def test_gradients_match_central_differences(self) -> None:
+        rng = np.random.default_rng(11)
+        blocks = [rng.uniform(0.1, 1, (4, 3)), rng.uniform(0.1, 1, (4, 2))]
+        blocks[0][0, 0] = 0  # a zero datum follows the 0 log 0 convention
+        W = rng.uniform(0.5, 1.5, (4, 2))
+        Hs = [rng.uniform(0.5, 1.5, (2, 3)), rng.uniform(0.5, 1.5, (2, 2))]
+        for objective in ("kl", "frobenius"):
+            grad_w, grad_hs = gradients(blocks, W, Hs, objective=objective)
+            with self.subTest(objective=objective, factor="W"):
+                numeric = central_differences(lambda X: total_objective(objective, blocks, X, Hs), W)
+                assert_allclose(grad_w, numeric, rtol=1e-6, atol=1e-8)
+            for b, grad in enumerate(grad_hs):
+                with self.subTest(objective=objective, factor=f"H{b}"):
+                    def f(X, b=b):
+                        return total_objective(objective, blocks, W, [X if i == b else H for i, H in enumerate(Hs)])
+                    assert_allclose(grad, central_differences(f, Hs[b]), rtol=1e-6, atol=1e-8)
+
+    def test_multiplicative_updates_are_scaled_gradient_steps(self) -> None:
+        # KL: eta = H / (W^T 1) and W / (1 H^T); Frobenius: eta = H / (W^T W H) and W / (W H H^T).
+        rng = np.random.default_rng(12)
+        A, W, H = rng.random((5, 4)), rng.uniform(0.5, 1.5, (5, 2)), rng.uniform(0.5, 1.5, (2, 4))
+        scales = {
+            "kl": (lambda: W.sum(axis=0)[:, None], lambda: H.sum(axis=1)[None, :]),
+            "frobenius": (lambda: W.T @ W @ H, lambda: W @ H @ H.T),
+        }
+        for objective, (h_scale, w_scale) in scales.items():
+            with self.subTest(objective=objective):
+                grad_w, (grad_h,) = gradients([A], W, [H], objective=objective)
+                options = dict(objective=objective, max_iter=1, tol=0, eps=0, normalize=False)
+                h_step = fit([A], W, [H], update_W=False, **options).Hs[0]
+                w_step = fit([A], W, [H], update_H=False, **options).W
+                assert_allclose(h_step, H - H / h_scale() * grad_h, rtol=1e-12)
+                assert_allclose(w_step, W - W / w_scale() * grad_w, rtol=1e-12)
+
+    def test_exact_factorization_is_stationary(self) -> None:
+        rng = np.random.default_rng(13)
+        W, Hs = rng.uniform(0.5, 1.5, (4, 2)), [rng.uniform(0.5, 1.5, (2, 3)), rng.uniform(0.5, 1.5, (2, 1))]
+        blocks = [W @ H for H in Hs]
+        for objective in ("kl", "frobenius"):
+            self.assertEqual(stationarity(blocks, W, Hs, objective=objective), (0.0, 0.0))
+
+    def test_frobenius_origin_is_stationary_but_not_a_minimum(self) -> None:
+        A = np.array([[1.0, 2.0], [3.0, 1.0]])
+        W, H = np.zeros((2, 1)), np.zeros((1, 2))
+        self.assertEqual(stationarity([A], W, [H], objective="frobenius"), (0.0, 0.0))
+        t = 1e-2
+        self.assertLess(frobenius(A, (t * np.ones((2, 1))) @ (t * np.ones((1, 2)))), frobenius(A, W @ H))
+        # The KL objective is infinite there: positive data at zero reconstruction.
+        with self.assertRaisesRegex(FloatingPointError, "KL"):
+            stationarity([A], W, [H], objective="kl")
+
+    def test_stationarity_detects_a_non_kkt_point(self) -> None:
+        A = np.array([[1.0, 2.0], [3.0, 1.0]])
+        W, H = np.ones((2, 1)), np.ones((1, 2))
+        for objective in ("kl", "frobenius"):
+            w_residual, h_residual = stationarity([A], W, [H], objective=objective)
+            self.assertGreater(min(w_residual, h_residual), 0)
+        # A zero entry with a negative gradient violates the KKT conditions: min(0, g) = g.
+        _, (grad_h,) = gradients([A], W, [np.array([[0.0, 1.0]])], objective="frobenius")
+        self.assertLess(grad_h[0, 0], 0)
+        self.assertAlmostEqual(
+            stationarity([A], W, [np.array([[0.0, 1.0]])], objective="frobenius")[1],
+            np.linalg.norm(np.minimum([[0.0, 1.0]], grad_h)),
+        )
+
+    def test_invalid_inputs_are_rejected(self) -> None:
+        A, W, H = np.ones((2, 2)), np.ones((2, 1)), np.ones((1, 2))
+        cases = [
+            ([A], -W, [H], "kl"), ([A], W, [np.ones((1, 3))], "kl"), ([A], W, [], "kl"),
+            ([A * np.nan], W, [H], "frobenius"), ([A], W, [H], "l2"),
+        ]
+        for blocks, W_, Hs, objective in cases:
+            with self.subTest(objective=objective), self.assertRaises(ValueError):
+                gradients(blocks, W_, Hs, objective=objective)
 
 
 if __name__ == "__main__":
