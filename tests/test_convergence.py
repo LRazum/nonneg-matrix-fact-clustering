@@ -1,3 +1,5 @@
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -5,8 +7,8 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from experiments.convergence import (
-    SHIFTED_TRACKS, masked_start, max_relative_increase, run_setting, stopping_iteration,
-    training_sample,
+    FIGURES, SHIFTED_TRACKS, masked_start, max_relative_increase, publish, run_setting,
+    stopping_iteration, training_sample,
 )
 from gitara.data import Track
 from gitara.nmf import fit
@@ -86,6 +88,31 @@ class RunSettingTests(unittest.TestCase):
             self.assertEqual(t, stopping_iteration(summary["history"], float(tol)))
             if t is not None:
                 self.assertGreaterEqual(summary["gap_at_stop"][tol], 0)
+
+
+class PublishTests(unittest.TestCase):
+    def test_published_record_has_no_local_paths_and_dirty_runs_are_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            run_dir, out_dir = Path(directory, "run"), Path(directory, "out")
+            run_dir.mkdir()
+            for name in FIGURES:
+                (run_dir / name).write_bytes(b"png")
+            record = {
+                "id": "x", "dir": str(run_dir), "status": "ok", "git": {"dirty": False},
+                "command": ["/home/someone/.venv/bin/python", "-m", "experiments.convergence"],
+            }
+            (run_dir / "run.json").write_text(json.dumps(record), encoding="utf-8")
+            publish(run_dir, out_dir)
+            summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertNotIn("dir", summary)
+            self.assertEqual(summary["command"], ["python", "-m", "experiments.convergence"])
+            self.assertNotIn("someone", (out_dir / "summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(sorted(p.name for p in out_dir.iterdir()), sorted([*FIGURES, "summary.json"]))
+
+            record["git"]["dirty"] = True
+            (run_dir / "run.json").write_text(json.dumps(record), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                publish(run_dir, Path(directory, "other"))
 
 
 if __name__ == "__main__":

@@ -22,11 +22,14 @@ denominator with ``eps=0``, is recorded and reported, not skipped. The peak memo
 
 Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json`` with the
 summary, ``curves.json`` with every objective history and one figure per setting.
+``--publish results/runs/<id>`` copies the figures of a finished run of committed code and
+its record, without local absolute paths, to ``results/convergence/`` for the seminar.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import time
 import tracemalloc
 from collections.abc import Sequence
@@ -47,6 +50,8 @@ TOLS = (1e-3, 1e-4, 1e-5)
 # Annotations with a constant offset (marl/GuitarSet#5); exclusion proposed in issue #7.
 SHIFTED_TRACKS = ("04_BN3-154-E_comp", "04_Jazz1-200-B_comp")
 MEMORY_ITERATIONS = 2
+PUBLISHED = Path("results", "convergence")
+FIGURES = ("unsupervised.png", "masked.png")
 
 
 def max_relative_increase(history: Sequence[float]) -> float:
@@ -238,6 +243,20 @@ def plot_setting(runs: Sequence[dict[str, Any]], title: str, path: Path) -> None
     plt.close(fig)
 
 
+def publish(run_dir: Path, out_dir: Path = PUBLISHED) -> None:
+    """Copy the figures and the record of a finished run, without local paths, to ``out_dir``."""
+    record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+    if record["status"] != "ok" or record["git"]["dirty"]:
+        raise ValueError(f"run {record['id']} must have finished ok on a clean work tree")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for name in FIGURES:
+        shutil.copy2(run_dir / name, out_dir / name)
+    del record["dir"]
+    record["command"] = ["python", *record["command"][1:]]
+    text = json.dumps(record, indent=2, ensure_ascii=False) + "\n"
+    (out_dir / "summary.json").write_text(text, encoding="utf-8")
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="GuitarSet folder")
@@ -250,11 +269,16 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2], help="initializations")
     parser.add_argument("--max-iter", type=int, default=1000, help="unsupervised iterations")
     parser.add_argument("--masked-max-iter", type=int, default=500, help="masked iterations")
+    parser.add_argument("--publish", type=Path, metavar="RUN_DIR",
+                        help=f"copy a finished run to {PUBLISHED} instead of running")
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> None:
     args = _parser().parse_args(argv)
+    if args.publish:
+        publish(args.publish)
+        return
     tracks = {track.track_id: track for track in list_tracks(args.root)}
     unsupervised = tracks[args.unsupervised_track]
     if unsupervised.player == args.held_out_player:
