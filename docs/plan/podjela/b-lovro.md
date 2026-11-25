@@ -250,7 +250,9 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
      tek nakon permutacije (Hungarian) i skaliranja. To je eksperimentalna ilustracija
      Mislavove matematike.
 3. **Udaljenost od stacionarnosti** na kraju: npr. $\|\min(H,\nabla_Hf)\|$. Usporedi s onim
-   što je dokazano. Nerast je teorem, a mala udaljenost na kraju je opažanje.
+   što je dokazano. Nerast je teorem, a mala udaljenost na kraju je opažanje. Mjera je
+   `gitara.nmf.stationarity`, uz gradijente iz `gitara.nmf.gradients` (opis u
+   [metodologiji](../METHODOLOGY.md), odjeljak 2.2).
 
 **Gotovo kada:** slike konvergencije i stabilnosti imaju identifikatore pokretanja; zaključci su
 u nacrtu poglavlja; sva sjemena su prikazana, ne samo povoljna.
