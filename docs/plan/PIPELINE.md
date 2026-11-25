@@ -55,7 +55,7 @@ src/gitara/                          paket za višekratno upotrebljiv kod
 tests/                               projektni testovi
 experiments/                         reproducibilne ulazne točke eksperimenata (`python -m experiments.<naziv>`)
 data/                                README i manifest GuitarSeta; sirove datoteke su izvan Gita
-results/                             planirano: označena izvođenja, slike i tablice
+results/                             odabrane slike i sažeci pokretanja; results/runs/ je izvan Gita
 ```
 
 Planirane mape uvode se kada za njih postoji stvaran sadržaj. Tim vodi materijale za predaju
