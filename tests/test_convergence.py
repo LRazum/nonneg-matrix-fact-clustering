@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 
 from experiments.convergence import (
     FIGURES, SHIFTED_TRACKS, masked_start, max_relative_increase, publish, run_setting,
-    stopping_iteration, training_sample,
+    stopping_iteration, training_sample, transcription_start,
 )
 from gitara.data import Track
 from gitara.nmf import fit
@@ -72,6 +72,18 @@ class SetupTests(unittest.TestCase):
 
 
 class RunSettingTests(unittest.TestCase):
+    def test_transcription_keeps_templates_and_inactive_rows(self) -> None:
+        rng = np.random.default_rng(3)
+        W = rng.uniform(0.5, 1.5, (5, 3))
+        W[:, 1] = 0
+        W0, (H0,) = transcription_start(W, 4)
+        assert_array_equal(H0, [[1] * 4, [0] * 4, [1] * 4])
+        summary = run_setting([rng.random((5, 4))], W0, [H0], objective="kl", eps=1e-12,
+                              max_iter=30, update_W=False)
+        assert_array_equal(summary["W"], W)
+        self.assertEqual(summary["inactive"], [1])
+        self.assertEqual(summary["max_relative_increase"], 0.0)
+
     def test_numerical_failure_is_returned(self) -> None:
         summary = run_setting([[[1.0]]], [[0.0]], [[[1.0]]], objective="kl", eps=0, max_iter=5)
         self.assertEqual(summary["status"], "failed")
