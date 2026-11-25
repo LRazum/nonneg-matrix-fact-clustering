@@ -29,6 +29,8 @@
 /experiments/convergence.py         @saragrguric
 /experiments/stability.py           @saragrguric
 /tests/test_stability.py            @saragrguric
+/experiments/template_stability.py  @saragrguric
+/tests/test_template_stability.py   @saragrguric
 /pyproject.toml                     @saragrguric
 /uv.lock                            @saragrguric
 /tools/check_project.py             @saragrguric

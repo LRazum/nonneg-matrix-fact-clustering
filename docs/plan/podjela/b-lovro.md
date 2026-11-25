@@ -251,6 +251,9 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
      Mislavove matematike. Taj dio i udaljenost od stacionarnosti (korak 3) ne čekaju C3:
      `python -m experiments.stability` sparuje stupce od $W$ iz više sjemena s prvim
      sjemenom i mjeri `stationarity` na početku i na kraju.
+   - `python -m experiments.template_stability` uspoređuje predloške naučene s maskom kroz
+     sjemena i foldove. Dok C3 nije spojen, uči ih zamjenska funkcija `learn_masked`
+     (početak iz plana C3 i `fit`); kad C3 stigne, mijenja se samo ona.
 3. **Udaljenost od stacionarnosti** na kraju: npr. $\|\min(H,\nabla_Hf)\|$. Usporedi s onim
    što je dokazano. Nerast je teorem, a mala udaljenost na kraju je opažanje. Mjera je
    `gitara.nmf.stationarity`, uz gradijente iz `gitara.nmf.gradients` (opis u

@@ -62,6 +62,7 @@ experiments/
   stft_sensitivity.py  A  osjetljivost na parametre STFT-a
   convergence.py       B  konvergencija (B5)
   stability.py         B  nejedinstvenost i udaljenost od stacionarnosti (B6)
+  template_stability.py B stabilnost predložaka s maskom kroz sjemena i foldove (B6)
   cv.py                C  unakrsna provjera po gitaristu za sve metode
   errors.py            C  analiza pogrešaka
 data/                  README i manifest kontrolnih zbrojeva; sirovi podaci izvan Gita
