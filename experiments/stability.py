@@ -17,8 +17,10 @@ Non-increase of the objective is a theorem; a small final distance is only an ob
 The template stability across seeds and folds with the mask needs ``gitara.templates`` (C3)
 and is not part of this script.
 
-Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json`` and
-``stability.png``.
+Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json``,
+``stability.png`` and ``activations.png``. The latter shows, for the first KL start, the
+activations ``H`` with components ordered by the frequency of their largest template bin,
+under the annotated piano roll of the same recording (for the first walkthrough, Z1).
 """
 from __future__ import annotations
 
@@ -81,7 +83,8 @@ def run_starts(
         start = stationarity([A], *normalized(W0, [H0]), objective=objective)
         end = stationarity([A], result.W, result.Hs, objective=objective)
         runs.append({
-            "seed": seed, "W": result.W, "n_iter": result.n_iter, "stop_reason": result.stop_reason,
+            "seed": seed, "W": result.W, "H": result.Hs[0],
+            "n_iter": result.n_iter, "stop_reason": result.stop_reason,
             "initial": result.objective[0], "final": result.objective[-1],
             "stationarity_start": list(start), "stationarity_end": list(end),
         })
@@ -139,6 +142,38 @@ def plot(comparisons: dict[str, list[dict[str, Any]]], title: str, path: Path) -
     plt.close(fig)
 
 
+def plot_activations(W: NDArray, H: NDArray, roll: NDArray, title: str, path: Path) -> None:
+    """Piano roll above the activations in dB, rows ordered by the peak bin of each template."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    ink, muted, grid = "#0b0b0b", "#898781", "#e1e0d9"
+    order = np.argsort(np.argmax(W, axis=0), kind="stable")
+    end = H.shape[1] * HOP / SAMPLE_RATE
+    floor = 1e-4 * H.max()  # 80 dB below the largest activation
+    H_db = 20 * np.log10(np.maximum(H[order], floor) / H.max())
+    fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(10, 6.5))
+    fig.patch.set_facecolor("#fcfcfb")
+    top.imshow(roll, aspect="auto", origin="lower", cmap="Greys", interpolation="nearest",
+               extent=(0, end, PITCHES[0] - 0.5, PITCHES[-1] + 0.5))
+    top.set_ylabel("MIDI visina (anotacija)")
+    image = bottom.imshow(H_db, aspect="auto", origin="lower", cmap="Blues", interpolation="nearest",
+                          extent=(0, end, -0.5, H.shape[0] - 0.5), vmin=-80, vmax=0)
+    bottom.set_ylabel("komponenta, po vršnoj frekvenciji")
+    bottom.set_xlabel("vrijeme (s)")
+    colorbar = fig.colorbar(image, ax=[top, bottom], shrink=0.5, label="aktivacija (dB)")
+    colorbar.ax.tick_params(colors=muted, labelcolor=ink)
+    for ax in (top, bottom):
+        ax.tick_params(colors=muted, labelcolor=ink)
+        for spine in ax.spines.values():
+            spine.set_color(grid)
+    fig.suptitle(title, color=ink)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="GuitarSet folder")
@@ -178,15 +213,19 @@ def main(argv: Sequence[str] | None = None) -> None:
     record = start_run("stability", config, seeds=args.seeds, manifest=DEFAULT_MANIFEST)
     run_dir = Path(record["dir"])
     try:
-        A, _ = spectrogram_and_roll(track)
+        A, roll = spectrogram_and_roll(track)
         results, comparisons = {}, {}
         for objective in OBJECTIVES:
             runs = run_starts(A, args.rank, args.seeds, objective, args.max_iter, args.tol)
             comparisons[objective] = compare_to_first(runs)
             results[objective] = {
-                "runs": [{key: value for key, value in run.items() if key != "W"} for run in runs],
+                "runs": [{key: value for key, value in run.items() if key not in ("W", "H")} for run in runs],
                 "comparisons": comparisons[objective],
             }
+            if objective == "kl":
+                plot_activations(runs[0]["W"], runs[0]["H"], roll,
+                                 f"KL bez nadzora: {track.track_id}, r = {args.rank}, sjeme {runs[0]['seed']}",
+                                 run_dir / "activations.png")
             for run in runs:
                 print(f"{objective:>9} seed={run['seed']}  {run['n_iter']} it  final {run['final']:.6g}  "
                       f"stationarity {run['stationarity_start']} -> {run['stationarity_end']}", flush=True)
