@@ -52,7 +52,7 @@ src/gitara/
   spectrogram.py       A  STFT, frekvencije i vremena okvira, tonovi, klavirska rola
   evaluate.py          A  P, R i F1 na razini nota
   peaks.py             A  salijencija tonova iz spektralnih vrhova
-  nmf.py               B  funkcije cilja i multiplikativna pravila (KL, Frobenius)
+  nmf.py               B  funkcije cilja, multiplikativna pravila, gradijenti i stacionarnost
   provenance.py        B  zapis podrijetla pokretanja
   transcribe.py        C  aktivacije uz fiksni W i note iz aktivacija
   templates.py         C  učenje predložaka (maskirani NMF, prosjek spektara)
