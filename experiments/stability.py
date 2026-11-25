@@ -12,7 +12,7 @@ values, together with different final objective values, show that the starts rea
 factorizations of the same data.
 
 The distance to stationarity (``gitara.nmf.stationarity``) is measured at the start and at the
-end of every run, both at the normalization of ``fit`` (columns of ``W`` with unit l1 norm).
+end of every run, in the balanced representative, so it does not depend on the scaling.
 Non-increase of the objective is a theorem; a small final distance is only an observation.
 The template stability across seeds and folds with the mask needs ``gitara.templates`` (C3)
 and is not part of this script.
@@ -63,13 +63,6 @@ def match_components(reference: NDArray, other: NDArray) -> tuple[NDArray[np.int
     return order[np.argsort(rows)], similarity[rows, order][np.argsort(rows)]
 
 
-def normalized(W: NDArray, Hs: Sequence[NDArray]) -> tuple[NDArray[np.float64], list[NDArray[np.float64]]]:
-    """Rescale to unit l1 columns of W, as ``fit`` does, keeping every W H_b."""
-    scales = np.asarray(W, dtype=np.float64).sum(axis=0)
-    scales[scales == 0] = 1
-    return W / scales, [H * scales[:, None] for H in Hs]
-
-
 def run_starts(
     A: NDArray, rank: int, seeds: Sequence[int], objective: str, max_iter: int, tol: float,
 ) -> list[dict[str, Any]]:
@@ -80,7 +73,7 @@ def run_starts(
         rng = np.random.default_rng(seed)
         W0, H0 = rng.uniform(0.5, 1.5, (m, rank)), rng.uniform(0.5, 1.5, (rank, n))
         result = fit([A], W0, [H0], objective=objective, max_iter=max_iter, tol=tol)
-        start = stationarity([A], *normalized(W0, [H0]), objective=objective)
+        start = stationarity([A], W0, [H0], objective=objective)
         end = stationarity([A], result.W, result.Hs, objective=objective)
         runs.append({
             "seed": seed, "W": result.W, "H": result.Hs[0],

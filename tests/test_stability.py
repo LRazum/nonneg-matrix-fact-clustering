@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
-from experiments.stability import compare_to_first, cosine_matrix, match_components, normalized, run_starts
+from experiments.stability import compare_to_first, cosine_matrix, match_components, run_starts
 
 
 class MatchingTests(unittest.TestCase):
@@ -36,12 +36,6 @@ class MatchingTests(unittest.TestCase):
 
 
 class FactorTests(unittest.TestCase):
-    def test_normalization_keeps_the_product(self) -> None:
-        W, H = np.array([[1.0, 0.0], [3.0, 0.0]]), np.array([[1.0, 2.0], [5.0, 6.0]])
-        Wn, (Hn,) = normalized(W, [H])
-        assert_allclose(Wn @ Hn, W @ H)
-        assert_allclose(Wn.sum(axis=0), [1, 0])
-
     def test_run_starts_records_each_seed(self) -> None:
         rng = np.random.default_rng(5)
         A = rng.uniform(0.5, 1.5, (6, 2)) @ rng.uniform(0.5, 1.5, (2, 7))
