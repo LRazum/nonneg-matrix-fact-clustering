@@ -7,8 +7,9 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from experiments.convergence import (
-    FIGURES, SHIFTED_TRACKS, masked_start, max_relative_increase, publish, run_setting,
-    stopping_iteration, training_sample, transcription_start,
+    EPS_VALUES, FIGURES, SHIFTED_TRACKS, eps_histories_identical, masked_start,
+    max_relative_increase, publish, run_setting, stopping_iteration, time_objective,
+    training_sample, transcription_start,
 )
 from gitara.data import Track
 from gitara.nmf import fit
@@ -100,6 +101,30 @@ class RunSettingTests(unittest.TestCase):
             self.assertEqual(t, stopping_iteration(summary["history"], float(tol)))
             if t is not None:
                 self.assertGreaterEqual(summary["gap_at_stop"][tol], 0)
+        self.assertGreater(summary["objective_seconds"], 0)
+        self.assertAlmostEqual(summary["objective_share"],
+                               summary["objective_seconds"] / summary["seconds_per_iter"])
+
+    def test_time_objective_is_positive_for_both_objectives_and_blocks(self) -> None:
+        rng = np.random.default_rng(4)
+        blocks = [rng.random((5, 4)), rng.random((5, 3))]
+        W, Hs = rng.uniform(0.5, 1.5, (5, 2)), [rng.uniform(0.5, 1.5, (2, 4)), rng.uniform(0.5, 1.5, (2, 3))]
+        for objective in ("kl", "frobenius"):
+            seconds = time_objective(blocks, W, Hs, objective, repeats=3)
+            self.assertTrue(np.isfinite(seconds) and seconds > 0)
+
+    def test_eps_histories_identical(self) -> None:
+        def run(objective, seed, eps, history, status="ok"):
+            return {"objective": objective, "seed": seed, "eps": eps, "status": status, "history": history}
+
+        same = [run("kl", 0, eps, [3.0, 2.0, 1.5]) for eps in EPS_VALUES]
+        # The largest eps changes the last value by one unit in the last place.
+        last = {eps: 1.5 for eps in EPS_VALUES} | {max(EPS_VALUES): float(np.nextafter(1.5, 2.0))}
+        differ = [run("kl", 1, eps, [3.0, 2.0, last[eps]]) for eps in EPS_VALUES]
+        failed = [run("frobenius", 0, eps, [2.0, 1.0]) for eps in EPS_VALUES[:-1]]
+        failed.append(run("frobenius", 0, EPS_VALUES[-1], None, status="failed"))
+        self.assertEqual(eps_histories_identical(same + differ + failed),
+                         {"kl seed=0": True, "kl seed=1": False, "frobenius seed=0": False})
 
 
 class PublishTests(unittest.TestCase):
