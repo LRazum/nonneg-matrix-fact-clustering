@@ -258,7 +258,9 @@ class GradientTests(unittest.TestCase):
         W, Hs = rng.uniform(0.5, 1.5, (4, 2)), [rng.uniform(0.5, 1.5, (2, 3)), rng.uniform(0.5, 1.5, (2, 1))]
         blocks = [W @ H for H in Hs]
         for objective in ("kl", "frobenius"):
-            self.assertEqual(stationarity(blocks, W, Hs, objective=objective), (0.0, 0.0))
+            self.assertEqual(stationarity(blocks, W, Hs, objective=objective, balance=False), (0.0, 0.0))
+            # Balancing rescales the factors, so W H is equal only up to rounding.
+            self.assertLess(max(stationarity(blocks, W, Hs, objective=objective)), 1e-12)
 
     def test_frobenius_origin_is_stationary_but_not_a_minimum(self) -> None:
         A = np.array([[1.0, 2.0], [3.0, 1.0]])
@@ -280,9 +282,23 @@ class GradientTests(unittest.TestCase):
         _, (grad_h,) = gradients([A], W, [np.array([[0.0, 1.0]])], objective="frobenius")
         self.assertLess(grad_h[0, 0], 0)
         self.assertAlmostEqual(
-            stationarity([A], W, [np.array([[0.0, 1.0]])], objective="frobenius")[1],
+            stationarity([A], W, [np.array([[0.0, 1.0]])], objective="frobenius", balance=False)[1],
             np.linalg.norm(np.minimum([[0.0, 1.0]], grad_h)),
         )
+
+    def test_balanced_measure_does_not_depend_on_scaling(self) -> None:
+        rng = np.random.default_rng(14)
+        blocks = [rng.random((5, 4)), rng.random((5, 3))]
+        W, Hs = rng.uniform(0.5, 1.5, (5, 2)), [rng.uniform(0.5, 1.5, (2, 4)), rng.uniform(0.5, 1.5, (2, 3))]
+        D = np.array([1e-3, 50.0])
+        scaled_W, scaled_Hs = W * D, [H / D[:, None] for H in Hs]
+        for objective in ("kl", "frobenius"):
+            with self.subTest(objective=objective):
+                assert_allclose(stationarity(blocks, scaled_W, scaled_Hs, objective=objective),
+                                stationarity(blocks, W, Hs, objective=objective), rtol=1e-10)
+                raw = stationarity(blocks, W, Hs, objective=objective, balance=False)
+                raw_scaled = stationarity(blocks, scaled_W, scaled_Hs, objective=objective, balance=False)
+                self.assertFalse(np.allclose(raw, raw_scaled))
 
     def test_invalid_inputs_are_rejected(self) -> None:
         A, W, H = np.ones((2, 2)), np.ones((2, 1)), np.ones((1, 2))

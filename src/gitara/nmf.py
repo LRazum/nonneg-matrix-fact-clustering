@@ -303,18 +303,32 @@ def stationarity(
     Hs: Sequence[ArrayLike],
     *,
     objective: Objective = "kl",
+    balance: bool = True,
 ) -> tuple[float, float]:
     """Return the Frobenius norms of min(W, grad_W) and of min(H_b, grad_H_b) over all blocks.
 
     For x >= 0, min(x, g) = 0 exactly when g >= 0 and x g = 0, so both values are zero
-    exactly at a first-order (KKT) point over the nonnegative orthant. They change under
-    the rescaling W D, D^{-1} H that keeps WH, so compare them at a fixed normalization,
-    e.g. after fit, whose W columns have unit l1 norm.
+    exactly at a first-order (KKT) point over the nonnegative orthant. The values change
+    under the rescaling W D, D^{-1} H that keeps WH. With ``balance`` they are taken at the
+    balanced representative, in which column k of W and row k of H (over all blocks) have
+    equal l2 norms; it is the same for every positive diagonal D, so the result does not
+    depend on the scaling. Components with a zero column or row are left as they are.
     """
-    grad_w, grad_hs = gradients(blocks, W, Hs, objective=objective)
-    w_residual = np.linalg.norm(np.minimum(np.asarray(W, dtype=np.float64), grad_w))
+    _check_objective(objective)
+    data_blocks, w, h_blocks = _factor_inputs(blocks, W, Hs, "W", "Hs")
+    W = np.asarray(w, dtype=np.float64)
+    Hs = [np.asarray(H, dtype=np.float64) for H in h_blocks]
+    if balance:
+        w_norms = np.linalg.norm(W, axis=0)
+        h_norms = np.sqrt(sum(np.linalg.norm(H, axis=1) ** 2 for H in Hs))
+        scales = np.ones_like(w_norms)
+        both = (w_norms > 0) & (h_norms > 0)
+        scales[both] = np.sqrt(h_norms[both] / w_norms[both])
+        W = W * scales
+        Hs = [H / scales[:, None] for H in Hs]
+    grad_w, grad_hs = gradients(data_blocks, W, Hs, objective=objective)
+    w_residual = np.linalg.norm(np.minimum(W, grad_w))
     h_residual = np.sqrt(sum(
-        np.linalg.norm(np.minimum(np.asarray(H, dtype=np.float64), grad)) ** 2
-        for H, grad in zip(Hs, grad_hs, strict=True)
+        np.linalg.norm(np.minimum(H, grad)) ** 2 for H, grad in zip(Hs, grad_hs, strict=True)
     ))
     return float(w_residual), float(h_residual)

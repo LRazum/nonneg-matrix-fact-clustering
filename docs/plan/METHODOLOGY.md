@@ -105,9 +105,12 @@ $\|\min(W,\nabla_W f)\|_F$ i $\bigl(\sum_b\|\min(H_b,\nabla_{H_b} f)\|_F^2\bigr)
 Za $x\ge0$ vrijedi $\min(x,g)=0$ točno kada su $g\ge0$ i $xg=0$. Obje su vrijednosti
 zato nula točno u točki koja zadovoljava uvjete prvog reda (KKT) na nenegativnom ortantu.
 To je nužan uvjet, a ne dokaz lokalnog minimuma: za Frobeniusov cilj točka $W=0$, $H=0$
-zadovoljava uvjete, a nije lokalni minimum. Mjera se mijenja pri preskaliranju
-$WD$, $D^{-1}H$, pa se uspoređuje uz istu normalizaciju, npr. nakon `fit`, gdje stupci od
-$W$ imaju $\ell_1$-normu 1. Test provjerava gradijente središnjim razlikama, a
+zadovoljava uvjete, a nije lokalni minimum. Sama mjera mijenja se pri preskaliranju $WD$,
+$D^{-1}H$, koje čuva $WH$. Zato je `stationarity` zadano računa u uravnoteženom prikazu, u
+kojem stupac $k$ od $W$ i redak $k$ od $H$ (preko svih blokova) imaju jednaku $\ell_2$-normu.
+Taj je prikaz isti za svaku pozitivnu dijagonalnu $D$, pa rezultat ne ovisi o skaliranju.
+Uz $\ell_1$-normalizaciju iz `fit` elementi od $W$ su reda $1/m$, pa je
+$\min(W,\nabla_W f)\le W$ umjetno malen, a ostatci za $W$ i $H$ nisu usporedivi. Test provjerava gradijente središnjim razlikama, a
 multiplikativna pravila kao skalirane gradijentne korake s koracima
 $\eta = H\oslash(W^T\mathbf 1)$ i $W\oslash(\mathbf 1H^T)$ za KL te
 $H\oslash(W^TWH)$ i $W\oslash(WHH^T)$ za Frobenius.
