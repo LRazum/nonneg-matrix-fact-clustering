@@ -181,7 +181,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--track", default="00_BN1-129-Eb_comp")
     parser.add_argument("--rank", type=int, default=len(PITCHES))
     parser.add_argument("--seeds", type=int, nargs="+", default=list(range(10)))
-    parser.add_argument("--max-iter", type=int, default=1000)
+    parser.add_argument("--max-iter", type=int, default=2000)
     parser.add_argument("--tol", type=float, default=1e-4)
     return parser
 

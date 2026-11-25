@@ -120,7 +120,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
     parser.add_argument("--tracks-per-group", type=int, default=1, help="tracks per (player, mode)")
     parser.add_argument("--selection-seed", type=int, default=0)
-    parser.add_argument("--max-iter", type=int, default=500)
+    parser.add_argument("--max-iter", type=int, default=200)
     parser.add_argument("--tol", type=float, default=1e-4)
     return parser
 
