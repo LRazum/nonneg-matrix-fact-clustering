@@ -203,7 +203,6 @@ class FitTests(unittest.TestCase):
             fit([[[1]]], [[1e300]], [[[1e300]]], objective="frobenius")
 
 
-
 def total_objective(objective: str, blocks, W, Hs) -> float:
     loss = kl_divergence if objective == "kl" else frobenius
     return sum(loss(A, W @ H) for A, H in zip(blocks, Hs, strict=True))
@@ -258,9 +257,41 @@ class GradientTests(unittest.TestCase):
         W, Hs = rng.uniform(0.5, 1.5, (4, 2)), [rng.uniform(0.5, 1.5, (2, 3)), rng.uniform(0.5, 1.5, (2, 1))]
         blocks = [W @ H for H in Hs]
         for objective in ("kl", "frobenius"):
-            self.assertEqual(stationarity(blocks, W, Hs, objective=objective, balance=False), (0.0, 0.0))
-            # Balancing rescales the factors, so W H is equal only up to rounding.
+            # W H equals the data only up to rounding, so the residuals are compared with a bound.
+            self.assertLess(max(stationarity(blocks, W, Hs, objective=objective, balance=False)), 1e-12)
             self.assertLess(max(stationarity(blocks, W, Hs, objective=objective)), 1e-12)
+
+    def test_kl_boundary_kkt_point_that_is_not_an_exact_factorization(self) -> None:
+        # Fixed W, one column a = (1, 3, 0). With h = (2, 0): W h = (2, 2, 0), so
+        # dD/dh_1 = 2 - 1/2 - 3/2 = 0 and dD/dh_2 = w_32 (1 - 0) = 1 > 0 at h_2 = 0.
+        # The KKT conditions in H hold on the boundary, and D > 0 (no exact factorization).
+        W = np.array([[1.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+        a = np.array([[1.0], [3.0], [0.0]])
+        h = np.array([[2.0], [0.0]])
+        _, (grad_h,) = gradients([a], W, [h], objective="kl")
+        assert_allclose(grad_h, [[0.0], [1.0]], atol=1e-15)
+        self.assertGreater(kl_divergence(a, W @ h), 0)
+        _, h_residual = stationarity([a], W, [h], objective="kl", balance=False)
+        self.assertLess(h_residual, 1e-15)
+        # Moving h_2 away from the boundary increases D, as the positive gradient says.
+        self.assertGreater(kl_divergence(a, W @ (h + [[0.0], [1e-3]])), kl_divergence(a, W @ h))
+
+    def test_balancing_leaves_an_inactive_component_unscaled(self) -> None:
+        rng = np.random.default_rng(15)
+        A = rng.random((4, 3))
+        W, H = rng.uniform(0.5, 1.5, (4, 2)), rng.uniform(0.5, 1.5, (2, 3))
+        W[:, 1] = 0  # inactive template: its row of H does not affect W H
+        scale = np.array([np.sqrt(np.linalg.norm(H[0]) / np.linalg.norm(W[:, 0])), 1.0])
+        for objective in ("kl", "frobenius"):
+            with self.subTest(objective=objective):
+                balanced = stationarity([A], W, [H], objective=objective)
+                self.assertTrue(np.isfinite(balanced).all())
+                manual = stationarity([A], W * scale, [H / scale[:, None]], objective=objective, balance=False)
+                assert_allclose(balanced, manual, rtol=1e-12)
+                # Rescaling only the active component leaves the balanced measure unchanged.
+                D = np.array([7.0, 1.0])
+                assert_allclose(stationarity([A], W * D, [H / D[:, None]], objective=objective),
+                                balanced, rtol=1e-10)
 
     def test_frobenius_origin_is_stationary_but_not_a_minimum(self) -> None:
         A = np.array([[1.0, 2.0], [3.0, 1.0]])

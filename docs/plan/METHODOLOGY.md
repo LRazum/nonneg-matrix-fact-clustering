@@ -110,8 +110,9 @@ $D^{-1}H$, koje čuva $WH$. Zato je `stationarity` zadano računa u uravnotežen
 kojem stupac $k$ od $W$ i redak $k$ od $H$ (preko svih blokova) imaju jednaku $\ell_2$-normu.
 Taj je prikaz isti za svaku pozitivnu dijagonalnu $D$, pa rezultat ne ovisi o skaliranju.
 Uz $\ell_1$-normalizaciju iz `fit` elementi od $W$ su reda $1/m$, pa je
-$\min(W,\nabla_W f)\le W$ umjetno malen, a ostatci za $W$ i $H$ nisu usporedivi. Test provjerava gradijente središnjim razlikama, a
-multiplikativna pravila kao skalirane gradijentne korake s koracima
+$\min(W,\nabla_W f)\le W$ umjetno malen, a ostaci za $W$ i $H$ nisu usporedivi. Komponenta s
+nul-stupcem u $W$ ili nul-retkom u $H$ ne preskalira se. Test provjerava gradijente središnjim
+razlikama, a multiplikativna pravila kao skalirane gradijentne korake s koracima
 $\eta = H\oslash(W^T\mathbf 1)$ i $W\oslash(\mathbf 1H^T)$ za KL te
 $H\oslash(W^TWH)$ i $W\oslash(WHH^T)$ za Frobenius.
 
