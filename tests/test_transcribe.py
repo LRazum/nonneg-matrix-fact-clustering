@@ -68,10 +68,20 @@ class ExtractNotesTests(unittest.TestCase):
         H = block({0: [0.1, 0.4, 0.8, 1.0, 1.0, 0.0]}, 6)
         intervals, _ = notes(H, retrigger=0.1)
         np.testing.assert_allclose(intervals, [[0.2, 0.5]])
-        # Even when the whole ramp is inside the run, it splits only once, at the steepest frame.
+        # Even when the whole ramp is inside the run (first frame already above a small
+        # threshold) it is one attack, because the activation never fell before the steep frame.
         intervals, _ = notes(H, retrigger=0.1, threshold=0.05)
-        self.assertEqual(len(intervals), 2)
-        np.testing.assert_allclose(intervals, [[0.0, 0.2], [0.2, 0.5]])
+        np.testing.assert_allclose(intervals, [[0.0, 0.5]])
+        H = block({0: [0.1, 0.4, 0.8, 1.0, 1.0, 0.0]}, 6)
+        intervals, _ = notes(H, retrigger=0.2, threshold=0.05)
+        np.testing.assert_allclose(intervals, [[0.0, 0.5]])
+
+    def test_attack_after_a_fall_inside_the_run_splits_once_and_needs_a_new_fall(self) -> None:
+        # Fall at frame 1, steepest rise at frame 3 -> split there. The following ramp
+        # (frames 5-6) has no fall since that cut, so it does not split again.
+        H = block({0: [1.0, 0.6, 0.6, 0.9, 0.95, 1.0, 1.0, 0.0]}, 8)
+        intervals, _ = notes(H, retrigger=0.25, threshold=0.05)
+        np.testing.assert_allclose(intervals, [[0.0, 0.3], [0.3, 0.7]])
 
     def test_second_attack_with_a_ramp_splits_once_at_its_steepest_frame(self) -> None:
         H = block({0: [1.0, 0.5, 0.5, 0.7, 1.0, 1.0, 0.0]}, 7)

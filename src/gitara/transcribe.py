@@ -66,9 +66,12 @@ def extract_notes(
     2. A frame is active if the normalized activation is >= ``threshold`` (0 < threshold <= 1).
     3. Each maximal run of active frames in a row becomes a note.
     4. If ``retrigger`` is given, a run is split before frame ``t`` when the rise
-       ``d_t = h_t - h_{t-1}`` (of the normalized activation) exceeds ``retrigger`` AND is a local
-       maximum of the rise (``d_t >= d_{t-1}`` and ``d_t > d_{t+1}``). An attack smeared over
-       several frames by the analysis window therefore splits at most once, at its steepest frame.
+       ``d_t = h_t - h_{t-1}`` (of the normalized activation) exceeds ``retrigger``, is a local
+       maximum of the rise (``d_t >= d_{t-1}`` and ``d_t > d_{t+1}``), AND the activation has
+       stopped rising at least once since the last cut (``d_s <= 0`` for some ``s`` strictly
+       between the last cut, or the start of the run, and ``t``). A single attack smeared over
+       several frames by the analysis window is therefore never split, even if it lies entirely
+       inside an active run; a new attack needs a pause or a fall in the activation before it.
     5. Notes shorter than ``min_duration`` seconds are dropped.
     Notes are sorted by onset, then by pitch.
     """
@@ -109,16 +112,19 @@ def extract_notes(
     offsets: list[float] = []
     notes_pitch: list[float] = []
     for k in range(K):
+        rise = np.diff(norm[k], prepend=0.0)  # d_t; the frame before 0 counts as silent
         edges = np.diff(np.concatenate(([0], active[k].astype(np.int8), [0])))
         for start, stop in zip(np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)):
             cuts = [start]
             if retrigger is not None and stop - start > 1:
-                rise = np.diff(norm[k], prepend=0.0)  # d_t; the frame before 0 counts as silent
+                fell = False  # has d_s <= 0 occurred since the last cut?
                 for t in range(start + 1, stop):
-                    previous = rise[t - 1]
                     following = rise[t + 1] if t + 1 < n else -np.inf
-                    if rise[t] > retrigger and rise[t] >= previous and rise[t] > following:
+                    if fell and rise[t] > retrigger and rise[t] >= rise[t - 1] and rise[t] > following:
                         cuts.append(t)
+                        fell = False
+                    elif rise[t] <= 0:
+                        fell = True
             cuts.append(stop)
             for first, end in zip(cuts[:-1], cuts[1:]):
                 t0 = times[first]
