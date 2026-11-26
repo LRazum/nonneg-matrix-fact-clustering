@@ -237,7 +237,7 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
 4. Utjecaj ε: vrijednosti $10^{-12}$ i $10^{-9}$ te bez ε gdje je to sigurno.
 5. `python -m experiments.convergence` sa zapisom podrijetla; slike i JSON u `results/`.
 
-**Stanje (2026-11-25):** provedeno pokretanje `20261125T092016Z-convergence-6f2ff9`. Rezultati i
+**Stanje (2026-11-26):** provedeno pokretanje `20261126T081632Z-convergence-f0a504`. Rezultati i
 prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a slike u mapi
 [results/convergence/](../../../results/convergence/README.md). Odstupanja od plana:
 
@@ -249,6 +249,12 @@ prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a s
    nema `EXCLUDED_TRACKS` (prijedlog u #7).
 4. Dva ranija pokretanja istog dana prekinuta su i zapisana kao neuspjela, s razlogom: prvo zbog
    nepotrebno dugog učenja s maskom i opterećenog računala, drugo zbog dodavanja transkripcije.
+5. Nakon pregleda (#53) udio izračuna cilja mjeri se prema iteraciji na istim završnim
+   faktorima, a zapis broji subnormalne elemente. Pokretanje `20261125T092016Z-convergence-6f2ff9`
+   dalo je iste povijesti, ali pogrešan udio. Pokretanje `20261125T203400Z-convergence-98e123`
+   prekinuto je prije kraja i ostalo je lokalno, u stanju `running`; ništa iz njega nije
+   korišteno. Ni `20261126T071737Z-convergence-864fbd` (commit `d703163`) nije korišten, jer je
+   još imao pogrešan udio.
 
 ## B6: konvergencija i stabilnost (#28)
 
