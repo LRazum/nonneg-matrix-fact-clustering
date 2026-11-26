@@ -23,7 +23,15 @@ on ``tol``, so one objective history shows where ``fit`` would stop for every to
 ``TOLS``. A failed combination, e.g. a zero
 denominator with ``eps=0``, is recorded and reported, not skipped. The peak memory that
 ``fit`` allocates on top of the data is measured in a separate short run with
-``tracemalloc``, so that tracing does not distort the timing.
+``tracemalloc``, so that tracing does not distort the timing. The time of one objective
+evaluation and of one whole iteration are each the median of ``OBJECTIVE_REPEATS`` timings,
+after one discarded warm-up, at the final factors and with the routines of the ``fit`` loop;
+their ratio is the share of the objective in an iteration. The mean time per iteration over
+the run is not used for that share, because the cost of an iteration changes during a run:
+entries of ``W`` and ``H`` that the updates drive towards zero become subnormal, and
+arithmetic with subnormal numbers is slow. Their number at the end is recorded. For every
+setting the record states whether the objective histories of all eps values are equal bit
+for bit.
 
 Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json`` with the
 summary, ``curves.json`` with every objective history and one figure per setting.
@@ -45,13 +53,18 @@ import numpy as np
 from numpy.typing import NDArray
 
 from gitara.data import DEFAULT_MANIFEST, DEFAULT_ROOT, MODES, Track, list_tracks, load_audio, load_notes
-from gitara.nmf import fit, frobenius, kl_divergence
+# The routines of one fit iteration, without input checks, to time an iteration and its objective.
+from gitara.nmf import _normalize, _total_objective, _update_h, _update_w, fit
 from gitara.provenance import finish_run, start_run
 from gitara.spectrogram import F_MAX, HOP, N_WIN, PITCHES, SAMPLE_RATE, piano_roll, stft_magnitude
 
 OBJECTIVES = ("kl", "frobenius")
 EPS_VALUES = (1e-12, 1e-9, 0.0)
 TOLS = (1e-3, 1e-4, 1e-5)
+# Options passed to every fit call and written to the record from the same constants.
+FIT_TOL = 0.0
+FIT_NORMALIZE = True
+OBJECTIVE_REPEATS = 5
 # Annotations with a constant offset (marl/GuitarSet#5); exclusion proposed in issue #7.
 SHIFTED_TRACKS = ("04_BN3-154-E_comp", "04_Jazz1-200-B_comp")
 MEMORY_ITERATIONS = 2
@@ -101,6 +114,71 @@ def masked_start(
     return W0, [mask_from_roll(roll) for roll in rolls]
 
 
+def time_objective(
+    blocks: Sequence[NDArray], W: NDArray, Hs: Sequence[NDArray], objective: str,
+    repeats: int = OBJECTIVE_REPEATS,
+) -> float:
+    """Median seconds of one objective evaluation as ``fit`` computes it in each iteration.
+
+    One warm-up evaluation is discarded, because the first call after ``fit`` also pays for
+    allocating and paging in fresh memory.
+    """
+    _total_objective(blocks, W, Hs, objective)
+    timings = []
+    for _ in range(repeats):
+        start = time.perf_counter()
+        _total_objective(blocks, W, Hs, objective)
+        timings.append(time.perf_counter() - start)
+    return float(np.median(timings))
+
+
+def time_iteration(
+    blocks: Sequence[NDArray], W: NDArray, Hs: Sequence[NDArray], *, objective: str, eps: float,
+    update_W: bool = True, repeats: int = OBJECTIVE_REPEATS,
+) -> float:
+    """Median seconds of one ``fit`` iteration (updates, normalization, objective) from ``W, Hs``.
+
+    Every timing starts from copies of the same factors, after one discarded warm-up, with the
+    floating-point settings of ``fit``.
+    """
+    def one() -> float:
+        W1, Hs1 = np.array(W, dtype=np.float64), tuple(np.array(H, dtype=np.float64) for H in Hs)
+        with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
+            start = time.perf_counter()
+            _update_h(tuple(blocks), W1, Hs1, objective, eps)
+            if update_W:
+                _update_w(tuple(blocks), W1, Hs1, objective, eps)
+                if FIT_NORMALIZE:
+                    _normalize(W1, Hs1)
+            _total_objective(tuple(blocks), W1, Hs1, objective)
+            return time.perf_counter() - start
+
+    one()
+    return float(np.median([one() for _ in range(repeats)]))
+
+
+def subnormal_entries(X: NDArray) -> int:
+    """Number of nonzero entries smaller in magnitude than the smallest normal float64."""
+    return int(np.count_nonzero((X != 0) & (np.abs(X) < np.finfo(np.float64).tiny)))
+
+
+def eps_histories_identical(runs: Sequence[dict[str, Any]]) -> dict[str, bool]:
+    """For each (objective, seed): are the histories of every eps value equal bit for bit?
+
+    A combination with a failed or missing eps value counts as not identical.
+    """
+    groups: dict[str, list[list[float]]] = {}
+    for run in runs:
+        key = f"{run['objective']} seed={run['seed']}"
+        groups.setdefault(key, [])
+        if run["status"] == "ok":
+            groups[key].append(list(run["history"]))
+    return {
+        key: len(histories) == len(EPS_VALUES) and all(h == histories[0] for h in histories)
+        for key, histories in groups.items()
+    }
+
+
 def run_setting(
     blocks: Sequence[NDArray], W0: NDArray, H0s: Sequence[NDArray], *,
     objective: str, eps: float, max_iter: int, update_W: bool = True,
@@ -112,17 +190,16 @@ def run_setting(
     """
     start = time.perf_counter()
     try:
-        result = fit(blocks, W0, H0s, objective=objective, eps=eps, max_iter=max_iter, tol=0,
-                     update_W=update_W)
+        result = fit(blocks, W0, H0s, objective=objective, eps=eps, max_iter=max_iter, tol=FIT_TOL,
+                     normalize=FIT_NORMALIZE, update_W=update_W)
     except FloatingPointError as error:
         return {"status": "failed", "error": repr(error), "seconds": time.perf_counter() - start}
     seconds = time.perf_counter() - start
-    # fit evaluates the objective once per iteration; time one evaluation to separate it.
-    loss = kl_divergence if objective == "kl" else frobenius
-    start = time.perf_counter()
-    for block, H in zip(blocks, result.Hs, strict=True):
-        loss(block, result.W @ H)
-    objective_seconds = time.perf_counter() - start
+    seconds_per_iter = seconds / result.n_iter if result.n_iter else None
+    # fit evaluates the objective once per iteration; its share is measured at the final factors.
+    objective_seconds = time_objective(blocks, result.W, result.Hs, objective)
+    iteration_seconds = time_iteration(blocks, result.W, result.Hs, objective=objective, eps=eps,
+                                       update_W=update_W)
     history = result.objective
     stops = {tol: stopping_iteration(history, tol) for tol in TOLS}
     final = history[-1]
@@ -131,8 +208,14 @@ def run_setting(
         "n_iter": result.n_iter,
         "stop_reason": result.stop_reason,
         "seconds": seconds,
-        "seconds_per_iter": seconds / result.n_iter if result.n_iter else None,
+        # Mean over the run; includes the initial objective evaluation and the input checks.
+        "seconds_per_iter": seconds_per_iter,
+        "iteration_seconds": iteration_seconds,
         "objective_seconds": objective_seconds,
+        "objective_share": objective_seconds / iteration_seconds,
+        "subnormal_entries": {
+            "W": subnormal_entries(result.W), "H": sum(subnormal_entries(H) for H in result.Hs),
+        },
         "initial": history[0],
         "final": final,
         "max_relative_increase": max_relative_increase(history),
@@ -154,7 +237,8 @@ def peak_memory(
     """Peak bytes allocated by a short ``fit`` run, excluding the data already in memory."""
     tracemalloc.start()
     try:
-        fit(blocks, W0, H0s, objective=objective, max_iter=MEMORY_ITERATIONS, tol=0, update_W=update_W)
+        fit(blocks, W0, H0s, objective=objective, max_iter=MEMORY_ITERATIONS, tol=FIT_TOL,
+            normalize=FIT_NORMALIZE, update_W=update_W)
         return tracemalloc.get_traced_memory()[1]
     finally:
         tracemalloc.stop()
@@ -333,9 +417,13 @@ def main(argv: Sequence[str] | None = None) -> None:
         "held_out_player": args.held_out_player,
         "objectives": list(OBJECTIVES),
         "eps": list(EPS_VALUES),
-        "tol": 0,
+        "tol": FIT_TOL,
         "tols_evaluated": list(TOLS),
-        "normalize": True,
+        "normalize": FIT_NORMALIZE,
+        "objective_timing": (
+            f"objective and one iteration at the final factors, each the median of {OBJECTIVE_REPEATS} "
+            "timings after one warm-up"
+        ),
         "unsupervised": {
             "track": unsupervised.track_id, "rank": args.rank, "max_iter": args.max_iter,
             "init": "W0, H0 uniform(0.5, 1.5)",
@@ -432,6 +520,7 @@ def _experiment(
         results[name]["runs"] = [
             {k: v for k, v in run.items() if k not in ("history", "W")} for run in setting_runs
         ]
+        results[name]["eps_histories_identical"] = eps_histories_identical(setting_runs)
         plot_setting(setting_runs, titles[name], run_dir / f"{name}.png")
     return results, curves
 
