@@ -67,7 +67,7 @@ Provjerite integraciju s aplikacijom prije tvrdnje da je Codex završni hook akt
 `.github/workflows/ci.yml` pokreće se na PR-ovima, pri pushu na `main` i ručnim pokretanjem.
 Jedan posao provjerava dokumentaciju i alate iz `tools/`. Posao „Numeričke provjere” postavlja
 projektno okruženje i pokreće `tools/check_project.py`. Projektni testovi provjeravaju uvoz
-paketa, svojstva NMF-a na sintetičkim podacima i zapis podrijetla u privremenom git
+paketa, svojstva NMF-a i njegovih gradijenata na sintetičkim podacima i zapis podrijetla u privremenom git
 repozitoriju.
 
 Pokrenite lokalno iz korijena repozitorija:

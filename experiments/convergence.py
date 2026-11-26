@@ -251,9 +251,12 @@ def spectrogram_and_roll(track: Track) -> tuple[NDArray[np.float64], NDArray[np.
 
 
 def training_sample(
-    tracks: Sequence[Track], held_out: int, per_group: int, rng: np.random.Generator,
+    tracks: Sequence[Track], held_out: int | None, per_group: int, rng: np.random.Generator,
 ) -> list[Track]:
-    """Draw ``per_group`` tracks per (training player, mode), skipping shifted annotations."""
+    """Draw ``per_group`` tracks per (training player, mode), skipping shifted annotations.
+
+    ``held_out=None`` draws from every player.
+    """
     chosen = []
     for player in sorted({track.player for track in tracks} - {held_out}):
         for mode in MODES:

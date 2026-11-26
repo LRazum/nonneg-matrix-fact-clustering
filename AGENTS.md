@@ -153,6 +153,8 @@ python3 tools/check_before_stop.py
 python3 tools/daily_check.py --dry-run  # treba pristup čitanju GitHuba; ništa ne objavljuje
 uv run python -m gitara.data download  # preuzima GuitarSet (~0,7 GB) i provjerava manifest
 uv run python -m experiments.convergence  # B5: konvergencija na stvarnim spektrogramima
+uv run python -m experiments.stability  # B6: nejedinstvenost i stacionarnost bez nadzora
+uv run python -m experiments.template_stability  # B6: stabilnost predložaka s maskom
 gh issue list --label finding --state open
 ```
 

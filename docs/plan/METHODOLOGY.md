@@ -97,6 +97,24 @@ u povijesti. Nerast iz izvornog dokaza odnosi se na točna multiplikativna pravi
 pretpostavkama. U kodu su porasti mogući zbog zaštite ε ili aritmetike s pomičnim zarezom.
 Ograničenja stacionarnosti opisuje [Gillis, odjeljak 3.1.2](https://arxiv.org/abs/1401.5226v2).
 
+Za mjerenje udaljenosti od stacionarnosti `gradients` vraća $\nabla_W f$ i svaki
+$\nabla_{H_b} f$. Uz $R_b = \mathbf 1 - A_b\oslash WH_b$ za KL, s nulom na mjestima gdje
+je $A_b=0$, i $R_b = WH_b - A_b$ za $\tfrac12\|A_b-WH_b\|_F^2$, vrijedi
+$\nabla_{H_b} f = W^TR_b$ i $\nabla_W f = \sum_b R_bH_b^T$. `stationarity` vraća
+$\|\min(W,\nabla_W f)\|_F$ i $\bigl(\sum_b\|\min(H_b,\nabla_{H_b} f)\|_F^2\bigr)^{1/2}$.
+Za $x\ge0$ vrijedi $\min(x,g)=0$ točno kada su $g\ge0$ i $xg=0$. Obje su vrijednosti
+zato nula točno u točki koja zadovoljava uvjete prvog reda (KKT) na nenegativnom ortantu.
+To je nužan uvjet, a ne dokaz lokalnog minimuma: za Frobeniusov cilj točka $W=0$, $H=0$
+zadovoljava uvjete, a nije lokalni minimum. Sama mjera mijenja se pri preskaliranju $WD$,
+$D^{-1}H$, koje čuva $WH$. Zato je `stationarity` zadano računa u uravnoteženom prikazu, u
+kojem stupac $k$ od $W$ i redak $k$ od $H$ (preko svih blokova) imaju jednaku $\ell_2$-normu.
+Taj je prikaz isti za svaku pozitivnu dijagonalnu $D$, pa rezultat ne ovisi o skaliranju.
+Uz $\ell_1$-normalizaciju iz `fit` elementi od $W$ su reda $1/m$, pa je
+$\min(W,\nabla_W f)\le W$ umjetno malen, a ostatci za $W$ i $H$ nisu usporedivi. Test provjerava gradijente središnjim razlikama, a
+multiplikativna pravila kao skalirane gradijentne korake s koracima
+$\eta = H\oslash(W^T\mathbf 1)$ i $W\oslash(\mathbf 1H^T)$ za KL te
+$H\oslash(W^TWH)$ i $W\oslash(WHH^T)$ za Frobenius.
+
 ### 2.3 Ponašanje na stvarnim spektrogramima (B5)
 
 Brojevi u ovom odjeljku potječu iz pokretanja `20261126T081632Z-convergence-f0a504`
