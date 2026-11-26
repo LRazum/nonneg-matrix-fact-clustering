@@ -24,9 +24,14 @@ on ``tol``, so one objective history shows where ``fit`` would stop for every to
 denominator with ``eps=0``, is recorded and reported, not skipped. The peak memory that
 ``fit`` allocates on top of the data is measured in a separate short run with
 ``tracemalloc``, so that tracing does not distort the timing. The time of one objective
-evaluation is the median of ``OBJECTIVE_REPEATS`` timings, after one discarded warm-up, of the
-routine that ``fit`` calls once per iteration. For every setting the record states whether the
-objective histories of all eps values are equal bit for bit.
+evaluation and of one whole iteration are each the median of ``OBJECTIVE_REPEATS`` timings,
+after one discarded warm-up, at the final factors and with the routines of the ``fit`` loop;
+their ratio is the share of the objective in an iteration. The mean time per iteration over
+the run is not used for that share, because the cost of an iteration changes during a run:
+entries of ``W`` and ``H`` that the updates drive towards zero become subnormal, and
+arithmetic with subnormal numbers is slow. Their number at the end is recorded. For every
+setting the record states whether the objective histories of all eps values are equal bit
+for bit.
 
 Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json`` with the
 summary, ``curves.json`` with every objective history and one figure per setting.
@@ -48,8 +53,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from gitara.data import DEFAULT_MANIFEST, DEFAULT_ROOT, MODES, Track, list_tracks, load_audio, load_notes
-# _total_objective is the routine fit evaluates once per iteration, without input checks.
-from gitara.nmf import _total_objective, fit
+# The routines of one fit iteration, without input checks, to time an iteration and its objective.
+from gitara.nmf import _normalize, _total_objective, _update_h, _update_w, fit
 from gitara.provenance import finish_run, start_run
 from gitara.spectrogram import F_MAX, HOP, N_WIN, PITCHES, SAMPLE_RATE, piano_roll, stft_magnitude
 
@@ -127,6 +132,36 @@ def time_objective(
     return float(np.median(timings))
 
 
+def time_iteration(
+    blocks: Sequence[NDArray], W: NDArray, Hs: Sequence[NDArray], *, objective: str, eps: float,
+    update_W: bool = True, repeats: int = OBJECTIVE_REPEATS,
+) -> float:
+    """Median seconds of one ``fit`` iteration (updates, normalization, objective) from ``W, Hs``.
+
+    Every timing starts from copies of the same factors, after one discarded warm-up, with the
+    floating-point settings of ``fit``.
+    """
+    def one() -> float:
+        W1, Hs1 = np.array(W, dtype=np.float64), tuple(np.array(H, dtype=np.float64) for H in Hs)
+        with np.errstate(over="raise", divide="raise", invalid="raise", under="ignore"):
+            start = time.perf_counter()
+            _update_h(tuple(blocks), W1, Hs1, objective, eps)
+            if update_W:
+                _update_w(tuple(blocks), W1, Hs1, objective, eps)
+                if FIT_NORMALIZE:
+                    _normalize(W1, Hs1)
+            _total_objective(tuple(blocks), W1, Hs1, objective)
+            return time.perf_counter() - start
+
+    one()
+    return float(np.median([one() for _ in range(repeats)]))
+
+
+def subnormal_entries(X: NDArray) -> int:
+    """Number of nonzero entries smaller in magnitude than the smallest normal float64."""
+    return int(np.count_nonzero((X != 0) & (np.abs(X) < np.finfo(np.float64).tiny)))
+
+
 def eps_histories_identical(runs: Sequence[dict[str, Any]]) -> dict[str, bool]:
     """For each (objective, seed): are the histories of every eps value equal bit for bit?
 
@@ -161,8 +196,10 @@ def run_setting(
         return {"status": "failed", "error": repr(error), "seconds": time.perf_counter() - start}
     seconds = time.perf_counter() - start
     seconds_per_iter = seconds / result.n_iter if result.n_iter else None
-    # fit evaluates the objective once per iteration; time it separately to see its share.
+    # fit evaluates the objective once per iteration; its share is measured at the final factors.
     objective_seconds = time_objective(blocks, result.W, result.Hs, objective)
+    iteration_seconds = time_iteration(blocks, result.W, result.Hs, objective=objective, eps=eps,
+                                       update_W=update_W)
     history = result.objective
     stops = {tol: stopping_iteration(history, tol) for tol in TOLS}
     final = history[-1]
@@ -173,8 +210,12 @@ def run_setting(
         "seconds": seconds,
         # Mean over the run; includes the initial objective evaluation and the input checks.
         "seconds_per_iter": seconds_per_iter,
+        "iteration_seconds": iteration_seconds,
         "objective_seconds": objective_seconds,
-        "objective_share": objective_seconds / seconds_per_iter if seconds_per_iter else None,
+        "objective_share": objective_seconds / iteration_seconds,
+        "subnormal_entries": {
+            "W": subnormal_entries(result.W), "H": sum(subnormal_entries(H) for H in result.Hs),
+        },
         "initial": history[0],
         "final": final,
         "max_relative_increase": max_relative_increase(history),
@@ -376,7 +417,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         "tol": FIT_TOL,
         "tols_evaluated": list(TOLS),
         "normalize": FIT_NORMALIZE,
-        "objective_timing": f"median of {OBJECTIVE_REPEATS} evaluations after one warm-up",
+        "objective_timing": (
+            f"objective and one iteration at the final factors, each the median of {OBJECTIVE_REPEATS} "
+            "timings after one warm-up"
+        ),
         "unsupervised": {
             "track": unsupervised.track_id, "rank": args.rank, "max_iter": args.max_iter,
             "init": "W0, H0 uniform(0.5, 1.5)",
