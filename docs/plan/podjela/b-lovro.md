@@ -262,8 +262,9 @@ prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a s
    - kod NMF-a bez nadzora na jednoj snimki pokaži nejedinstvenost: komponente se uparuju
      tek nakon permutacije (Hungarian) i skaliranja. To je eksperimentalna ilustracija
      Mislavove matematike. Taj dio i udaljenost od stacionarnosti (korak 3) ne čekaju C3:
-     `python -m experiments.stability` sparuje stupce od $W$ iz više sjemena s prvim
-     sjemenom i mjeri `stationarity` na početku i na kraju.
+     `python -m experiments.stability` sparuje stupce od $W$ svih parova sjemena, za sliku
+     s prvim sjemenom kao proizvoljnom referencom, i mjeri `stationarity` na početku i na
+     kraju. Kontrola ranog zaustavljanja je isto pokretanje uz `--tol 0`.
    - `python -m experiments.template_stability` uspoređuje predloške naučene s maskom kroz
      sjemena i foldove. Dok C3 nije spojen, uči ih zamjenska funkcija `learn_masked`
      (početak iz plana C3 i `fit`); kad C3 stigne, mijenja se samo ona.
@@ -272,29 +273,47 @@ prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a s
    `gitara.nmf.stationarity`, uz gradijente iz `gitara.nmf.gradients` (opis u
    [metodologiji](../METHODOLOGY.md), odjeljak 2.2).
 
-**Stanje (2026-11-25):** proveden je dio koji ne čeka cijele foldove. Zaključci su opažanja,
-a ne teoremi.
+**Stanje (2026-11-26):** proveden je dio koji ne čeka cijele foldove. Zaključci su opažanja,
+a ne teoremi. Sva pokretanja su iz commita `e075606`, na čistom stablu i s jednom BLAS dretvom.
 
-- **Bez nadzora:** `20261125T101917Z-stability-638725` (commit `601ebec`), 10 sjemena, `tol`
-  $10^{-4}$.
-  - KL staje nakon 373–593 iteracija, Frobenius nakon 1380–2000.
-  - Završne vrijednosti: KL 3181,3–3286,4, Frobenius 1027,5–1238,7.
+- **Bez nadzora:** `20261126T075517Z-stability-6215d1`, 10 sjemena, `tol` $10^{-4}$, najviše
+  2000 iteracija.
+  - KL staje nakon 373–593 iteracija, a Frobenius nakon 1380–2000.
+  - Završne vrijednosti su KL 3181,3–3286,4 i Frobenius 1027,5–1238,7.
   - Nakon Hungarian sparivanja srednja kosinusna sličnost s prvim sjemenom je 0,83–0,90, a bez
     sparivanja 0,05–0,15. Sličnost iznad 0,99 ima samo 12–20 (KL) i 9–17 (Frobenius) od 49
-    komponenti, pa sjemena dolaze do različitih faktorizacija, a ne samo do permutacija.
-  - Uravnotežena udaljenost od stacionarnosti na kraju iznosi za KL 39–89 % ($W$) i 38–63 %
-    ($H$) početne vrijednosti, a za Frobenius 8–12 % i 12–18 %. Relativni pad ispod $10^{-4}$
-    dakle ne znači blizinu stacionarne točke. Početna vrijednost je zasićena
-    ($\min(x,g)\le x$), pa omjer nije mjera napretka u strogom smislu.
-- **S maskom:** `20261125T101427Z-template_stability-ef8b7e` (commit `c9816a3`).
+    komponenti. Podaci nisu točno ranga 49, pa različita sjemena dolaze do različitih
+    približnih faktorizacija iste matrice.
+  - Prvo sjeme nije neobično. Po svih 45 parova sjemena srednja sparena sličnost je 0,80–0,90
+    (KL) i 0,81–0,88 (Frobenius), a prosjek svakog sjemena prema ostalima 0,83–0,86 (KL) i
+    0,85–0,86 (Frobenius).
+  - Uravnotežena udaljenost od stacionarnosti na kraju podijeljena s $\|A\|_F$ iznosi za KL
+    0,09–0,21 ($W$) i 0,09–0,15 ($H$), a za Frobenius 0,020–0,028 i 0,028–0,043. KL i
+    Frobenius nisu u istim jedinicama, pa se te vrijednosti ne uspoređuju izravno. Relativni
+    pad ispod $10^{-4}$ dakle ne znači blizinu stacionarne točke.
+- **Kontrola ranog zaustavljanja:** `20261126T075959Z-stability-1f50aa`, isti početci, `tol=0` i
+  točno 2000 iteracija.
+  - Raspon završnih vrijednosti smanjuje se s 3,3 % na 2,9 % (KL, 3089,4–3177,4) i s 20,6 % na
+    15,0 % (Frobenius, 1027,5–1182,0).
+  - Srednja sparena sličnost po svim parovima je 0,82–0,92 (KL) i 0,81–0,88 (Frobenius).
+    Sličnost iznad 0,99 ima 14–26 (KL) i 10–16 (Frobenius) od 49 komponenti.
+  - Udaljenost od stacionarnosti kod KL-a pada na 0,04–0,12 ($W$) i 0,04–0,09 ($H$) od
+    $\|A\|_F$, a kod Frobeniusa ostaje 0,018–0,029 i 0,029–0,043.
+  - Rano zaustavljanje dakle objašnjava samo manji dio razlika. Sjemena i nakon 2000 iteracija
+    završavaju u različitim točkama.
+- **S maskom:** `20261126T081231Z-template_stability-a2b6a4`.
   - Postavke: 12 snimki (po jedna za svaki par gitarista i načina), 6 foldova, 3 sjemena,
-    `tol` $10^{-4}$. Zamjena za C3 daje isti $W$ kao `learn_templates` iz #52.
-  - Kroz sjemena medijan kosinusne sličnosti je 1,0, a najmanja vrijednost 0,9995 (KL) i 0,989
-    (Frobenius).
-  - Kroz foldove medijan je 0,97 (KL) i 0,96 (Frobenius). Najniži su rijetko označeni tonovi,
-    npr. MIDI 71 (0,70).
+    `tol` $10^{-4}$. Uzorak uključuje sve gitariste, jer svaki fold izostavlja drugog, pa su
+    snimke testnog gitarista jednog folda u skupu za učenje ostalih. Ništa iz ovog pokretanja
+    ne služi za odabir parametara. Zamjena za C3 daje isti $W$ kao `learn_templates` iz #52.
+  - Kroz sjemena je medijan kosinusne sličnosti po tonu 1,0. Najmanji medijan po tonu je 0,9995
+    (KL) i 0,989 (Frobenius).
+  - Kroz foldove je medijan 0,97 (KL) i 0,97 (Frobenius). Najniži su rijetko označeni tonovi,
+    npr. MIDI 71 kod KL-a (0,70) i MIDI 40 kod Frobeniusa (0,60).
 - Pokretanje `20261125T100918Z-stability-28d39b` mjerilo je stacionarnost uz
-  $\ell_1$-normalizaciju iz `fit` i ne koristi se (vidi #50).
+  $\ell_1$-normalizaciju iz `fit` i ne koristi se (vidi #50). Pokretanja od 2026-11-25
+  (`638725`, `ef8b7e`) imaju iste faktore, ali bez sparivanja svih parova i relativne
+  stacionarnosti.
 - Ostaju cijeli foldovi s `learn_templates`, usporedba vremena transkripcije (korak 1) i slike u
   `results/` za B7.
 
