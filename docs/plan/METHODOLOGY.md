@@ -97,6 +97,104 @@ u povijesti. Nerast iz izvornog dokaza odnosi se na točna multiplikativna pravi
 pretpostavkama. U kodu su porasti mogući zbog zaštite ε ili aritmetike s pomičnim zarezom.
 Ograničenja stacionarnosti opisuje [Gillis, odjeljak 3.1.2](https://arxiv.org/abs/1401.5226v2).
 
+### 2.3 Ponašanje na stvarnim spektrogramima (B5)
+
+Brojevi u ovom odjeljku potječu iz pokretanja `20261126T081632Z-convergence-f0a504`
+(`python -m experiments.convergence`, commit `df7d34b`, čisto radno stablo, jedna BLAS
+dretva). Ranije pokretanje `20261125T092016Z-convergence-6f2ff9` (commit `eb94a59`) dalo je
+iste povijesti funkcije cilja; razlikuje se samo mjerenje vremena. Slike i sažetak zapisa nalaze se u mapi
+[results/convergence/](../../results/convergence/README.md). Učitani su samo gitaristi 0–4;
+gitarist 5 (testni u ovom foldu) nije učitan. Svaka postavka pokrenuta je za KL i Frobenius,
+za ε jednak $10^{-12}$, $10^{-9}$ i 0 te za sjemena 0, 1 i 2. Svako pokretanje ima `tol=0`, pa
+jedna povijest pokazuje gdje bi `fit` stao za svaku toleranciju.
+
+- **Bez nadzora:** snimka `00_BN1-129-Eb_comp` ($511\times962$), $r=49$, $W_0$ i $H_0$ iz
+  $U(0{,}5;\,1{,}5)$, 2000 iteracija.
+- **Učenje s maskom:** 20 snimki, po dvije za svaki par gitarista 0–4 i načina (sjeme odabira 0),
+  ukupno 26 438 okvira. $H_0$ je maska iz klavirske role s pozadinskim retkom. $W_0$ je iz
+  $U(0{,}5;\,1{,}5)$ za 38 označenih tonova i pozadinu; ostalih 11 tonova ima nul-stupac.
+  Ovo je zamjena za C3 prema njegovom planu, a ne konačna metoda. 200 iteracija.
+- **Transkripcija:** ista snimka kao bez nadzora, koja nije u uzorku za učenje. $W$ je fiksan i
+  jednak predlošcima iz učenja s maskom s istim ciljem i sjemenom. $H_0$ ima jedinice za
+  nenulte predloške, prema planu C2. Ažurira se samo $H$, 1000 iteracija.
+
+Opažanja su empirijska i vrijede za ove podatke i početke:
+
+1. Ni u jednom od 54 pokretanja funkcija cilja nije porasla. To je u skladu s nerastom točnih
+   pravila (L3, teoremi 1 i 2), ali to opažanje nije dokaz.
+2. Povijesti za tri vrijednosti ε jednake su bit po bit. Pokretač to provjerava za svaku
+   postavku, cilj i sjeme, a rezultat je u sažetku (`eps_histories_identical`). Donja granica
+   ε, dakle, ni u jednom pokretanju nije promijenila izračun, a uz ε = 0 nijedno pokretanje nije
+   palo. Izvedeno pravilo ovdje je jednako izvornom. Uz ε = 0 nulti nazivnik uz nenulti faktor
+   i brojnik prekinuo bi izvođenje, pa se to nije dogodilo; element s nultim faktorom ili s
+   nultim brojnikom i nazivnikom (npr. neaktivni tonovi s maskom) pravilo ne mijenja. Ovaj
+   rezultat zato ne govori što ε radi kad nazivnik nije pozitivan; to pokrivaju sintetički
+   testovi u `tests/test_nmf.py`.
+3. Iteracija u kojoj relativni pad prvi put padne ispod tolerancije, uz raspon po sjemenima. U
+   zagradi je koliko je vrijednost cilja u toj iteraciji veća od vrijednosti u posljednjoj
+   iteraciji:
+
+   | Postavka | Cilj | $10^{-3}$ | $10^{-4}$ | $10^{-5}$ |
+   |---|---|---|---|---|
+   | Bez nadzora | KL | 117–132 | 481–588 (2,8–5,0 %) | 1545, 1879, iza 2000 |
+   | Bez nadzora | Frobenius | 259–297 | 1499–1953 (0,4–5,3 %) | iza 2000 |
+   | S maskom | KL | 15 | 27–29 (0,12–0,22 %) | 58–95 |
+   | S maskom | Frobenius | 30–34 | 68–73 (0,34 %) | 165–171 |
+   | Transkripcija | KL | 23 | 46 (0,17 %) | 88 |
+   | Transkripcija | Frobenius | 35 | 84–86 (0,52–0,55 %) | 210–217 |
+
+   Relativni padovi KL-a i Frobeniusa nisu u istim jedinicama, pa se brojevi iteracija dvaju
+   ciljeva ne uspoređuju izravno. Razlika do posljednje iteracije nije udaljenost od optimuma.
+   Bez nadzora relativni pad po iteraciji nije monoton, pa pravilo zaustavljanja može stati na
+   privremenom usporavanju. Kod transkripcije, gdje je problem po $H$ konveksan, pad glatko
+   opada.
+4. Bez nadzora različita sjemena završavaju na različitim vrijednostima: KL od 3109,7 do 3177,4,
+   a Frobenius od 1114,0 do 1125,4 nakon 2000 iteracija. To je u skladu s nekonveksnošću
+   punog problema. S maskom se završne vrijednosti razlikuju najviše 0,03 % (KL) i 0,12 %
+   (Frobenius).
+5. Vrijeme je okvirno, jer računalo nije bilo izolirano za mjerenje. Prosjek po iteraciji
+   cijelog pokretanja (medijan po sjemenima i ε, jedna dretva, uključuje izračun cilja u
+   svakoj iteraciji):
+
+   | Postavka | KL | Frobenius |
+   |---|---|---|
+   | Bez nadzora | 23,1 ms | 14,3 ms |
+   | S maskom | 613 ms | 120 ms |
+   | Transkripcija | 18,3 ms | 4,6 ms |
+
+   Udio izračuna cilja mjeri se na završnim faktorima: medijan od pet izračuna cilja
+   podijeljen je medijanom od pet cijelih iteracija iz istih faktora, istim funkcijama kao u
+   `fit`. Udio je 0,69 za KL s maskom, 0,58–0,60 za KL bez nadzora i 0,64–0,80 za KL u
+   transkripciji. Za Frobenius je 0,39–0,48, a u transkripciji 0,61–0,68. Izračun KL cilja
+   dakle nosi većinu vremena KL iteracije. Uz linearni rast s brojem okvira KL iteracija s
+   maskom na cijelom skupu za učenje jednog folda (oko 390 000 okvira) trajala bi oko 9 s.
+6. Bez nadzora iteracija na kraju traje dulje od prosjeka: 28 ms prema 23 ms za KL i 46 ms
+   prema 14 ms za Frobenius. Pravila elemente približavaju nuli, ali ih ne postavljaju na nulu
+   (svojstvo „nule ostaju nule” vrijedi samo za početne nule). Takvi elementi postaju
+   subnormalni brojevi, a račun s njima je spor. Na kraju Frobeniusovog pokretanja bez
+   nadzora 886–1049 od 25 039 elemenata od $W$ i 412–465 elemenata od $H$ subnormalni su; kod
+   KL-a ih je 27–44 u $W$ i 207–268 u $H$. S maskom subnormalnih elemenata nema, a u
+   transkripciji ih ima 164–257 u $H$. Prvo pokretanje mjerilo je zato pogrešan udio: vrijeme
+   cilja na završnim faktorima dijelilo je prosjekom iteracija cijelog pokretanja, pa je za
+   Frobenius bez nadzora udio bio veći od 1.
+7. Uz podatke `fit` je dodatno zauzeo najviše 73 MiB pri učenju s maskom (KL, 103 MiB
+   podataka) i 32 MiB bez nadzora. Za cijeli fold to treba ponovno izmjeriti.
+
+**Prijedlog za Z2** (#24); ovo je prijedlog, a ne odluka:
+
+- učenje predložaka: `tol` $=10^{-4}$, uz `max_iter` $=200$ kao gornju granicu. S maskom je
+  vrijednost cilja pri tom zaustavljanju 0,12–0,34 % iznad vrijednosti nakon 200 iteracija;
+- transkripcija: `tol` $=10^{-5}$, uz `max_iter` $=500$, jer je jedna snimka jeftina. Pri tom
+  zaustavljanju vrijednost cilja je 0,03–0,12 % iznad vrijednosti nakon 1000 iteracija;
+- ε ostaje $10^{-12}$: ovdje nije utjecao, a štiti od dijeljenja nulom;
+- razmotriti rjeđi izračun funkcije cilja u `fit`, jer on nosi 58–80 % vremena KL iteracije.
+  To mijenja pravilo zaustavljanja, pa traži odluku tima, izmjenu B2 i testove;
+- subnormalne elemente za sada ne dirati. Uz predložene tolerancije učenje s maskom ih nema,
+  a u transkripciji je usporenje malo. Postavljanje malih elemenata na nulu promijenilo bi
+  pravilo i jamstvo nerasta, pa bi tražilo izvod i odluku tima;
+- brojeve iteracija provjeriti na cijelom foldu kada postoje C3 i C4, jer je ovdje uzorak od 20
+  snimki.
+
 ## 3. Izvod odabranog algoritma
 
 Nakon odabira algoritma izvesti njegova stvarna ažuriranja iz funkcije cilja, umjesto pukog

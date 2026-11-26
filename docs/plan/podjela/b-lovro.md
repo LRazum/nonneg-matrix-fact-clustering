@@ -145,18 +145,23 @@ koristiti `fit` u C2 i C3.
 
 **Cilj:** `gitara.provenance`, tako da svaki broj u seminaru ima izvor (AGENTS.md, pravilo 6).
 
-1. `start_run(name, config)` vraća zapis s ovim podacima:
-   - identifikator (vrijeme i kratki hash);
-   - naredba i konfiguracija;
-   - git commit i podatak ima li necommitiranih promjena. Ako ih ima, sprema se i diff;
-   - verzija Pythona i paketa, platforma i varijable dretvi;
-   - MD5 manifesta podataka i sjemena.
-2. `finish_run(record, status, results, errors)` sprema zapis u novu mapu unutar
-   results/runs/ (izvan Gita). Nikad ne prepisuje postojeću mapu. Neuspjelo pokretanje također
-   se sprema, sa statusom i porukom pogreške.
+1. `start_run(name, config, *, seeds, manifest=None)` stvara novu mapu unutar results/runs/
+   (izvan Gita) i u nju zapisuje run.json sa statusom `running`. Zapis sadrži:
+   - identifikator (vrijeme, naziv i nasumični sufiks);
+   - naredbu i konfiguraciju;
+   - git commit i podatak ima li necommitiranih promjena. Ako ih ima, sprema se diff koji
+     obuhvaća i neverzionirane datoteke, a `git apply` na tom commitu vraća pokrenuti kod;
+   - verziju Pythona i paketa, platformu i varijable dretvi;
+   - MD5 manifesta podataka (ili izričito `null`) i sjemena.
+
+   Mapa nastaje već na početku: artefakti pokretanja idu u nju, a prekinuto pokretanje ostavlja
+   zapis sa statusom `running`. Postojeća mapa nikad se ne prepisuje.
+2. `finish_run(record, status, results, errors)` zapisuje ishod `ok` ili `failed`. Neuspjelo
+   pokretanje mora imati poruku pogreške. Završeni zapis više se ne mijenja.
 3. Testovi:
-   - u privremenom git repozitoriju zapis prepoznaje necommitirane promjene;
-   - postojeća mapa se ne prepisuje;
+   - u privremenom git repozitoriju zapis prepoznaje necommitirane promjene, a diff primijenjen
+     na čistom klonu vraća iste datoteke;
+   - postojeća mapa se ne prepisuje, a završeni zapis se ne mijenja;
    - neuspjelo pokretanje je zapisano.
 
 **Gotovo kada:** Sara (A4) i Mislav (C4) mogu ga koristiti; Sara je pregledala PR.
@@ -231,6 +236,25 @@ Sve radi samo na gitaristima za učenje, nikad na testnom.
    Z2.
 4. Utjecaj ε: vrijednosti $10^{-12}$ i $10^{-9}$ te bez ε gdje je to sigurno.
 5. `python -m experiments.convergence` sa zapisom podrijetla; slike i JSON u `results/`.
+
+**Stanje (2026-11-26):** provedeno pokretanje `20261126T081632Z-convergence-f0a504`. Rezultati i
+prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a slike u mapi
+[results/convergence/](../../../results/convergence/README.md). Odstupanja od plana:
+
+1. Dodana je i transkripcija (fiksni $W$, ažurira se samo $H$), jer korak 3 traži prijedlog i za
+   nju.
+2. Učenje s maskom koristi zamjenu za C3 prema njegovom planu: uzorak od 20 snimki gitarista
+   0–4, a ne cijeli fold. Gitarist 5 nije učitan.
+3. Dvije snimke s pomaknutim anotacijama izostavljene su vlastitom konstantom dok `gitara.data`
+   nema `EXCLUDED_TRACKS` (prijedlog u #7).
+4. Dva ranija pokretanja istog dana prekinuta su i zapisana kao neuspjela, s razlogom: prvo zbog
+   nepotrebno dugog učenja s maskom i opterećenog računala, drugo zbog dodavanja transkripcije.
+5. Nakon pregleda (#53) udio izračuna cilja mjeri se prema iteraciji na istim završnim
+   faktorima, a zapis broji subnormalne elemente. Pokretanje `20261125T092016Z-convergence-6f2ff9`
+   dalo je iste povijesti, ali pogrešan udio. Pokretanje `20261125T203400Z-convergence-98e123`
+   prekinuto je prije kraja i ostalo je lokalno, u stanju `running`; ništa iz njega nije
+   korišteno. Ni `20261126T071737Z-convergence-864fbd` (commit `d703163`) nije korišten, jer je
+   još imao pogrešan udio.
 
 ## B6: konvergencija i stabilnost (#28)
 

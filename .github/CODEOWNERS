@@ -27,6 +27,7 @@
 /tests/test_nmf.py                  @saragrguric
 /tests/test_provenance.py           @saragrguric
 /experiments/convergence.py         @saragrguric
+/tests/test_convergence.py          @saragrguric
 /pyproject.toml                     @saragrguric
 /uv.lock                            @saragrguric
 /tools/check_project.py             @saragrguric

@@ -20,9 +20,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 BRANCH_PREFIXES = ("codex/", "mislav/", "sara/", "lovro/")
 
 # Remove an entry when its path is created; the checker reports stale entries.
-PLANNED = frozenset({
-    "experiments/", "results/",
-})
+PLANNED: frozenset[str] = frozenset()
 SKIP_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache"}
 FILE_EXTENSIONS = {
     "bib", "cfg", "csv", "example", "html", "ini", "ipynb", "json", "lock",

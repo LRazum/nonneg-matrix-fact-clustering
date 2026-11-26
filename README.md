@@ -51,7 +51,7 @@ python3 tools/check_before_stop.py
 ```
 
 Završna provjera obuhvaća dokumentaciju, testove alata i projektne provjere, uključujući
-sintaksu, uvoz paketa i numeričke testove NMF-a.
+sintaksu, uvoz paketa, numeričke testove NMF-a i testove zapisa podrijetla.
 
 Zasebne naredbe, CI i postavljanje lokalnih hookova opisani su u
 [tijeku rada i provjera](docs/plan/PIPELINE.md). Postupanje s nalazima i probno pokretanje
