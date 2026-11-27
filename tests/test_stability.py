@@ -1,9 +1,14 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 
-from experiments.stability import compare_to_first, cosine_matrix, match_components, pairwise, run_starts
+from experiments.stability import (
+    FIGURES, compare_to_first, cosine_matrix, main, match_components, pairwise, run_starts,
+)
 
 
 class MatchingTests(unittest.TestCase):
@@ -58,6 +63,23 @@ class FactorTests(unittest.TestCase):
             self.assertEqual(len(run["stationarity_start"]), 2)
             assert_allclose(run["stationarity_end_relative"],
                             np.array(run["stationarity_end"]) / np.linalg.norm(A))
+
+
+class PublishTests(unittest.TestCase):
+    def test_publish_copies_figures_and_record_to_out(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            run_dir, out_dir = Path(directory, "run"), Path(directory, "out")
+            run_dir.mkdir()
+            for name in FIGURES:
+                (run_dir / name).write_bytes(b"png")
+            record = {
+                "id": "x", "dir": str(run_dir), "status": "ok", "git": {"dirty": False},
+                "command": ["/home/someone/.venv/bin/python", "-m", "experiments.stability"],
+            }
+            (run_dir / "run.json").write_text(json.dumps(record), encoding="utf-8")
+            main(["--publish", str(run_dir), "--out", str(out_dir)])
+            self.assertEqual(sorted(p.name for p in out_dir.iterdir()), sorted([*FIGURES, "summary.json"]))
+            self.assertNotIn("someone", (out_dir / "summary.json").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

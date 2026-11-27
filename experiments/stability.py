@@ -25,6 +25,8 @@ Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json``,
 ``stability.png`` and ``activations.png``. The latter shows, for the first KL start, the
 activations ``H`` with components ordered by the frequency of their largest template bin,
 under the annotated piano roll of the same recording (for the first walkthrough, Z1).
+``--publish results/runs/<id>`` copies the figures and the record of a finished run of
+committed code, without local absolute paths, to ``--out`` (default ``results/stability/``).
 """
 from __future__ import annotations
 
@@ -37,13 +39,15 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.optimize import linear_sum_assignment
 
-from experiments.convergence import spectrogram_and_roll
+from experiments.convergence import publish, spectrogram_and_roll
 from gitara.data import DEFAULT_MANIFEST, DEFAULT_ROOT, list_tracks
 from gitara.nmf import fit, stationarity
 from gitara.provenance import finish_run, start_run
 from gitara.spectrogram import F_MAX, HOP, N_WIN, PITCHES, SAMPLE_RATE
 
 OBJECTIVES = ("kl", "frobenius")
+PUBLISHED = Path("results", "stability")
+FIGURES = ("stability.png", "activations.png")
 # Options passed to fit and written to the record from the same constants.
 EPS = 1e-12
 NORMALIZE = True
@@ -202,11 +206,17 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=list(range(10)))
     parser.add_argument("--max-iter", type=int, default=2000)
     parser.add_argument("--tol", type=float, default=1e-4)
+    parser.add_argument("--publish", type=Path, metavar="RUN_DIR",
+                        help="copy a finished run to --out instead of running")
+    parser.add_argument("--out", type=Path, default=PUBLISHED)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> None:
     args = _parser().parse_args(argv)
+    if args.publish:
+        publish(args.publish, args.out, FIGURES)
+        return
     if len(args.seeds) < 2:
         raise ValueError("at least two seeds are needed for a comparison")
     track = {track.track_id: track for track in list_tracks(args.root)}[args.track]

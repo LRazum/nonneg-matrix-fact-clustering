@@ -21,6 +21,9 @@ from this script is used to choose parameters.
 
 Outputs go to the provenance directory ``results/runs/<id>/``: ``run.json``,
 ``templates.npz`` with every learned ``W`` and ``template_stability.png``.
+``--publish results/runs/<id>`` copies the figure and the record of a finished run of
+committed code, without local absolute paths, to ``--out`` (default
+``results/template_stability/``); the templates stay local.
 """
 from __future__ import annotations
 
@@ -35,7 +38,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from experiments.convergence import SHIFTED_TRACKS, masked_start, spectrogram_and_roll, training_sample
+from experiments.convergence import SHIFTED_TRACKS, masked_start, publish, spectrogram_and_roll, training_sample
 from gitara.data import DEFAULT_MANIFEST, DEFAULT_ROOT, N_PLAYERS, Track, list_tracks
 from gitara.nmf import fit
 from gitara.provenance import finish_run, start_run
@@ -46,6 +49,8 @@ EPS = 1e-12
 NORMALIZE = True
 
 OBJECTIVES = ("kl", "frobenius")
+PUBLISHED = Path("results", "template_stability")
+FIGURES = ("template_stability.png",)
 
 
 def learn_masked(
@@ -130,11 +135,17 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--selection-seed", type=int, default=0)
     parser.add_argument("--max-iter", type=int, default=200)
     parser.add_argument("--tol", type=float, default=1e-4)
+    parser.add_argument("--publish", type=Path, metavar="RUN_DIR",
+                        help="copy a finished run to --out instead of running")
+    parser.add_argument("--out", type=Path, default=PUBLISHED)
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> None:
     args = _parser().parse_args(argv)
+    if args.publish:
+        publish(args.publish, args.out, FIGURES)
+        return
     if len(args.seeds) < 2 or len(args.folds) < 2:
         raise ValueError("at least two seeds and two folds are needed for a comparison")
     sample = training_sample(
