@@ -359,13 +359,13 @@ def plot_setting(runs: Sequence[dict[str, Any]], title: str, path: Path) -> None
     plt.close(fig)
 
 
-def publish(run_dir: Path, out_dir: Path = PUBLISHED) -> None:
+def publish(run_dir: Path, out_dir: Path = PUBLISHED, figures: Sequence[str] = FIGURES) -> None:
     """Copy the figures and the record of a finished run, without local paths, to ``out_dir``."""
     record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
     if record["status"] != "ok" or record["git"]["dirty"]:
         raise ValueError(f"run {record['id']} must have finished ok on a clean work tree")
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name in FIGURES:
+    for name in figures:
         shutil.copy2(run_dir / name, out_dir / name)
     del record["dir"]
     record["command"] = ["python", *record["command"][1:]]

@@ -280,9 +280,11 @@ prijedlog za Z2 nalaze se u [metodologiji](../METHODOLOGY.md), odjeljak 2.3, a s
    [metodologiji](../METHODOLOGY.md), odjeljak 2.2).
 
 **Stanje (2026-11-26):** proveden je dio koji ne čeka cijele foldove. Zaključci su opažanja,
-a ne teoremi. Sva pokretanja su iz commita `e075606`, na čistom stablu i s jednom BLAS dretvom.
+a ne teoremi. Sva pokretanja su iz commita `c32cd53`, na čistom stablu i s jednom BLAS dretvom.
+Slike i sažetci zapisa su u [results/stability/](../../../results/stability/README.md) i
+[results/template_stability/](../../../results/template_stability/README.md).
 
-- **Bez nadzora:** `20261126T075517Z-stability-6215d1`, 10 sjemena, `tol` $10^{-4}$, najviše
+- **Bez nadzora:** `20261127T142405Z-stability-0153e3`, 10 sjemena, `tol` $10^{-4}$, najviše
   2000 iteracija.
   - KL staje nakon 373–593 iteracija, a Frobenius nakon 1380–2000.
   - Završne vrijednosti su KL 3181,3–3286,4 i Frobenius 1027,5–1238,7.
@@ -297,7 +299,7 @@ a ne teoremi. Sva pokretanja su iz commita `e075606`, na čistom stablu i s jedn
     0,09–0,21 ($W$) i 0,09–0,15 ($H$), a za Frobenius 0,020–0,028 i 0,028–0,043. KL i
     Frobenius nisu u istim jedinicama, pa se te vrijednosti ne uspoređuju izravno. Relativni
     pad ispod $10^{-4}$ dakle ne znači blizinu stacionarne točke.
-- **Kontrola ranog zaustavljanja:** `20261126T075959Z-stability-1f50aa`, isti početci, `tol=0` i
+- **Kontrola ranog zaustavljanja:** `20261127T143014Z-stability-bc26ec`, isti početci, `tol=0` i
   točno 2000 iteracija.
   - Raspon završnih vrijednosti smanjuje se s 3,3 % na 2,9 % (KL, 3089,4–3177,4) i s 20,6 % na
     15,0 % (Frobenius, 1027,5–1182,0).
@@ -307,7 +309,7 @@ a ne teoremi. Sva pokretanja su iz commita `e075606`, na čistom stablu i s jedn
     $\|A\|_F$, a kod Frobeniusa ostaje 0,018–0,029 i 0,029–0,043.
   - Rano zaustavljanje dakle objašnjava samo manji dio razlika. Sjemena i nakon 2000 iteracija
     završavaju u različitim točkama.
-- **S maskom:** `20261126T081231Z-template_stability-a2b6a4`.
+- **S maskom:** `20261127T144648Z-template_stability-7a9d17`.
   - Postavke: 12 snimki (po jedna za svaki par gitarista i načina), 6 foldova, 3 sjemena,
     `tol` $10^{-4}$. Uzorak uključuje sve gitariste, jer svaki fold izostavlja drugog, pa su
     snimke testnog gitarista jednog folda u skupu za učenje ostalih. Ništa iz ovog pokretanja
@@ -319,9 +321,9 @@ a ne teoremi. Sva pokretanja su iz commita `e075606`, na čistom stablu i s jedn
 - Pokretanje `20261125T100918Z-stability-28d39b` mjerilo je stacionarnost uz
   $\ell_1$-normalizaciju iz `fit` i ne koristi se (vidi #50). Pokretanja od 2026-11-25
   (`638725`, `ef8b7e`) imaju iste faktore, ali bez sparivanja svih parova i relativne
-  stacionarnosti.
-- Ostaju cijeli foldovi s `learn_templates`, usporedba vremena transkripcije (korak 1) i slike u
-  `results/` za B7.
+  stacionarnosti. Pokretanja od 2026-11-26 (`6215d1`, `1f50aa`, `a2b6a4`, commit `e075606`)
+  dala su iste brojke, ali su njihovi lokalni zapisi izgubljeni, pa su ponovljena.
+- Ostaju cijeli foldovi s `learn_templates` i usporedba vremena transkripcije (korak 1).
 
 **Gotovo kada:** slike konvergencije i stabilnosti imaju identifikatore pokretanja; zaključci su
 u nacrtu poglavlja; sva sjemena su prikazana, ne samo povoljna.
